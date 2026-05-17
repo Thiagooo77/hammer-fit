@@ -10,51 +10,71 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, CheckSquare, TrendingUp, LogOut, ShieldCheck } from "lucide-react";
+import {
+  LayoutDashboard,
+  Building2,
+  Users,
+  CheckSquare,
+  Target,
+  TrendingUp,
+  Trophy,
+  Bell,
+  Settings,
+  LogOut,
+  ShieldCheck,
+  ListChecks,
+} from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { supabase } from "@/lib/supabase";
-
-const items = [
-  {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Checklists",
-    url: "/checklists",
-    icon: CheckSquare,
-  },
-  {
-    title: "Vendas & Metas",
-    url: "/vendas",
-    icon: TrendingUp,
-  },
-  {
-    title: "Aprovações",
-    url: "/admin/approvals",
-    icon: ShieldCheck,
-  },
-];
+import { useAuthStore } from "@/store/authStore";
 
 export function AppSidebar() {
   const navigate = useNavigate();
+  const { role, signOut } = useAuthStore();
+  const isAdmin = role === "admin";
+
+  const adminItems = [
+    { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+    { title: "Setores", url: "/dashboard/setores", icon: Building2 },
+    { title: "Funcionários", url: "/dashboard/funcionarios", icon: Users },
+    { title: "Checklists", url: "/dashboard/checklists", icon: CheckSquare },
+    { title: "Aprovações", url: "/dashboard/aprovacoes", icon: ShieldCheck },
+    { title: "Metas", url: "/dashboard/metas", icon: Target },
+    { title: "Vendas", url: "/dashboard/vendas", icon: TrendingUp },
+    { title: "Ranking", url: "/dashboard/ranking", icon: Trophy },
+    { title: "Notificações", url: "/dashboard/notificacoes", icon: Bell },
+    { title: "Configurações", url: "/dashboard/configuracoes", icon: Settings },
+  ];
+
+  const employeeItems = [
+    { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+    { title: "Minhas Atividades", url: "/dashboard/minhas-atividades", icon: ListChecks },
+    { title: "Ranking", url: "/dashboard/ranking", icon: Trophy },
+    { title: "Notificações", url: "/dashboard/notificacoes", icon: Bell },
+  ];
+
+  const items = isAdmin ? adminItems : employeeItems;
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await signOut();
     navigate({ to: "/login" });
   };
 
   return (
     <Sidebar variant="inset" collapsible="icon">
       <SidebarHeader className="p-4">
-        <div className="flex items-center gap-2 font-black text-primary italic">
-          <span className="text-xl tracking-tighter">HAMMER FIT</span>
+        <div className="flex items-center gap-2">
+          <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center font-black italic text-black">
+            H
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-black italic tracking-tighter text-primary leading-none">HAMMER</span>
+            <span className="text-xs text-muted-foreground leading-none mt-1">FIT</span>
+          </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Menu Operacional</SidebarGroupLabel>
+          <SidebarGroupLabel>{isAdmin ? "Painel ADM" : "Menu Operacional"}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
