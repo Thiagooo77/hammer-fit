@@ -50,7 +50,7 @@ function SectorsPage() {
               <Card className="border-white/10 bg-white/5 backdrop-blur-xl hover:bg-white/10 hover:border-primary/30 transition-all duration-200 cursor-pointer group h-full">
                 <CardContent className="p-6 space-y-4">
                   <div className="flex items-center justify-between">
-                    <div className="h-10 w-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${sector.color}20`, color: sector.color }}>
+                    <div className="h-10 w-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${sector.color}20`, color: sector.color || "#f7931e" }}>
                       <Building2 className="h-5 w-5" />
                     </div>
                     <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -69,7 +69,7 @@ function SectorsPage() {
                     <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                       <div
                         className="h-full transition-all duration-500"
-                        style={{ width: `${sector.productivity}%`, backgroundColor: sector.color }}
+                        style={{ width: `${sector.productivity}%`, backgroundColor: sector.color || "#f7931e" }}
                       />
                     </div>
                     <p className="text-xs text-muted-foreground">{sector.completed}/{sector.total} tarefas</p>

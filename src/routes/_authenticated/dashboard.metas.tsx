@@ -45,7 +45,7 @@ function GoalsPage() {
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-white">{g.title}</CardTitle>
                     {sector && (
-                      <span className="text-xs px-2 py-1 rounded font-bold" style={{ backgroundColor: `${sector.color}20`, color: sector.color }}>
+                      <span className="text-xs px-2 py-1 rounded font-bold" style={{ backgroundColor: `${sector.color}20`, color: sector.color || "#f7931e" }}>
                         {sector.name}
                       </span>
                     )}

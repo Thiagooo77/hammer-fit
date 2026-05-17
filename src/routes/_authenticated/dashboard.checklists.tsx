@@ -160,7 +160,7 @@ function ChecklistsPage() {
                     </div>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{task.description}</p>
                     <div className="flex gap-3 mt-2 text-xs text-muted-foreground">
-                      {sector && <span style={{ color: sector.color }}>● {sector.name}</span>}
+                      {sector && <span style={{ color: sector.color || "#f7931e" }}>● {sector.name}</span>}
                       <span>{assignee?.full_name || "—"}</span>
                       {task.due_date && (
                         <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(task.due_date).toLocaleDateString("pt-BR")}</span>

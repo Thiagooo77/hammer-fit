@@ -54,7 +54,7 @@ function EmployeesPage() {
                     <p className="font-bold text-white truncate">{p.full_name || "Sem nome"}</p>
                     <p className="text-xs text-muted-foreground">{p.position || (role === "admin" ? "Administrador" : "Funcionário")}</p>
                     {sector && (
-                      <span className="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase" style={{ backgroundColor: `${sector.color}20`, color: sector.color }}>
+                      <span className="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase" style={{ backgroundColor: `${sector.color}20`, color: sector.color || "#f7931e" }}>
                         {sector.name}
                       </span>
                     )}
