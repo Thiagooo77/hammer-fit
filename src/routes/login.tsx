@@ -11,11 +11,19 @@ import { z } from "zod";
 
 function getAuthErrorMessage(message: string) {
   const normalized = message.toLowerCase();
+  console.error("[AuthError]", message);
+
   if (normalized.includes("email logins are disabled") || normalized.includes("email_provider_disabled")) {
-    return "Login por e-mail está desativado no Supabase. Ative Authentication > Providers > Email para criar conta e entrar com senha.";
+    return "O login por e-mail está desativado no Supabase. Ative em 'Authentication > Providers > Email'.";
   }
   if (normalized.includes("invalid login credentials")) {
-    return "E-mail ou senha incorretos. Se acabou de cadastrar, confirme que o provedor Email está ativo no Supabase e que a confirmação de e-mail está desativada.";
+    return "E-mail ou senha incorretos. Verifique seus dados. Se acabou de criar a conta, verifique se a confirmação por e-mail está ativa ou se o cadastro realmente foi concluído.";
+  }
+  if (normalized.includes("user already registered") || normalized.includes("already registered")) {
+    return "Este e-mail já está cadastrado. Tente fazer login.";
+  }
+  if (normalized.includes("too many requests")) {
+    return "Muitas tentativas. Aguarde um momento e tente novamente.";
   }
   return message;
 }

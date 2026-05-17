@@ -99,9 +99,17 @@ function MyTasksPage() {
                   </div>
                   <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{t.description}</p>
                   {t.is_recurring ? (
-                    <p className="text-xs text-primary font-bold mt-2 flex items-center gap-1"><CheckCircle className="h-3 w-3" /> Atividade Definitiva (Recorrente)</p>
+                    <div className="flex flex-col gap-1 mt-2">
+                      <p className="text-xs text-primary font-bold flex items-center gap-1">
+                        <CheckCircle className="h-3 w-3" /> Atividade Definitiva (Recorrente)
+                      </p>
+                      <p className="text-[10px] text-muted-foreground italic">Esta tarefa não expira e deve ser realizada periodicamente.</p>
+                    </div>
                   ) : t.due_date && (
-                    <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(t.due_date).toLocaleDateString("pt-BR")}</p>
+                    <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      Prazo: {new Date(t.due_date).toLocaleDateString("pt-BR")}
+                    </p>
                   )}
                   {t.rejection_note && <p className="text-xs text-red-400 mt-2">Observação: {t.rejection_note}</p>}
                   {t.photo_url && (
