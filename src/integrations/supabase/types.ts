@@ -379,6 +379,264 @@ export type Database = {
         }
         Relationships: []
       }
+      hammer_goals: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          current_value: number
+          end_date: string | null
+          id: string
+          sector_id: string | null
+          start_date: string
+          target_value: number
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          current_value?: number
+          end_date?: string | null
+          id?: string
+          sector_id?: string | null
+          start_date?: string
+          target_value?: number
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          current_value?: number
+          end_date?: string | null
+          id?: string
+          sector_id?: string | null
+          start_date?: string
+          target_value?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hammer_goals_sector_id_fkey"
+            columns: ["sector_id"]
+            isOneToOne: false
+            referencedRelation: "hammer_sectors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hammer_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          read: boolean | null
+          title: string
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          read?: boolean | null
+          title: string
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          read?: boolean | null
+          title?: string
+          type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      hammer_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          position: string | null
+          sector_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          position?: string | null
+          sector_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          position?: string | null
+          sector_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hammer_profiles_sector_id_fkey"
+            columns: ["sector_id"]
+            isOneToOne: false
+            referencedRelation: "hammer_sectors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hammer_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["hammer_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["hammer_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["hammer_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      hammer_sales: {
+        Row: {
+          client_name: string
+          commission: number | null
+          created_at: string
+          created_by: string | null
+          employee_id: string | null
+          id: string
+          plan: string | null
+          sale_date: string
+          value: number
+        }
+        Insert: {
+          client_name: string
+          commission?: number | null
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string | null
+          id?: string
+          plan?: string | null
+          sale_date?: string
+          value?: number
+        }
+        Update: {
+          client_name?: string
+          commission?: number | null
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string | null
+          id?: string
+          plan?: string | null
+          sale_date?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      hammer_sectors: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      hammer_tasks: {
+        Row: {
+          approved: boolean | null
+          approved_by: string | null
+          assigned_to: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          due_date: string | null
+          feedback: string | null
+          id: string
+          photo_url: string | null
+          priority: string
+          rejection_note: string | null
+          sector_id: string | null
+          status: string
+          title: string
+        }
+        Insert: {
+          approved?: boolean | null
+          approved_by?: string | null
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          feedback?: string | null
+          id?: string
+          photo_url?: string | null
+          priority?: string
+          rejection_note?: string | null
+          sector_id?: string | null
+          status?: string
+          title: string
+        }
+        Update: {
+          approved?: boolean | null
+          approved_by?: string | null
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          feedback?: string | null
+          id?: string
+          photo_url?: string | null
+          priority?: string
+          rejection_note?: string | null
+          sector_id?: string | null
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hammer_tasks_sector_id_fkey"
+            columns: ["sector_id"]
+            isOneToOne: false
+            referencedRelation: "hammer_sectors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hydration_logs: {
         Row: {
           id: string
@@ -1104,9 +1362,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      hammer_has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["hammer_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      hammer_role: "admin" | "employee"
       user_role: "admin" | "professor" | "aluno"
     }
     CompositeTypes: {
@@ -1235,6 +1500,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      hammer_role: ["admin", "employee"],
       user_role: ["admin", "professor", "aluno"],
     },
   },
