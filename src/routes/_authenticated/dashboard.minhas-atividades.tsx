@@ -27,15 +27,22 @@ function MyTasksPage() {
   const { data: tasks, isLoading } = useQuery({
     queryKey: ["my-tasks", user?.id],
     queryFn: async () => {
+      // Fetch only pending, rejected or recently completed tasks (last 7 days)
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
       const { data, error } = await supabase
         .from("hammer_tasks")
         .select("*")
         .eq("assigned_to", user!.id)
+        .or(`status.in.(pending,rejected,completed,in_progress),created_at.gte.${sevenDaysAgo.toISOString()}`)
         .order("created_at", { ascending: false });
+        
       if (error) throw error;
       return data;
     },
     enabled: !!user,
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 
   const handleComplete = async () => {
