@@ -3,10 +3,14 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 function createSupabaseClient() {
+  const fallbackSupabaseUrl = 'https://phbrnbrdnxxwnhifsxvc.supabase.co';
+  const fallbackPublishableKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoYnJuYnJkbnh4d25oaWZzeHZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3NjI3ODYsImV4cCI6MjA5MzMzODc4Nn0.FznVHCVLfh5ssnKBpCZxuGAi52SOha_cbGjoZ-hCxRc';
+  const serverEnv = typeof process !== 'undefined' ? process.env : undefined;
+
   // Use import.meta.env for client-side (Vite build-time replacement)
   // Fall back to process.env for SSR (server-side rendering)
-  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || serverEnv?.SUPABASE_URL || fallbackSupabaseUrl;
+  const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || serverEnv?.SUPABASE_PUBLISHABLE_KEY || fallbackPublishableKey;
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     const missing = [

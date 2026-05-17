@@ -8,7 +8,16 @@ import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
+    const cachedUser = useAuthStore.getState().user;
+    if (cachedUser) return;
+
     const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      useAuthStore.getState().setUser(session.user);
+      await useAuthStore.getState().refreshRole();
+      return;
+    }
+
     if (!session) {
       throw redirect({
         to: "/login",

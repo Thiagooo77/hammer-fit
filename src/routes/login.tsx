@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,6 +40,8 @@ function LoginPage() {
   const [authError, setAuthError] = useState("");
   const navigate = useNavigate();
   const search = Route.useSearch();
+  const setUser = useAuthStore((s) => s.setUser);
+  const refreshRole = useAuthStore((s) => s.refreshRole);
   const redirectTo = search.redirect || "/dashboard";
 
   const handleSubmit = async (mode: "login" | "signup", e: React.FormEvent) => {
@@ -52,17 +55,19 @@ function LoginPage() {
     setLoading(true);
 
     if (mode === "login") {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         const message = getAuthErrorMessage(error.message);
         setAuthError(message);
         toast.error(message);
       } else {
+        setUser(data.user);
+        await refreshRole();
         toast.success("Bem-vindo de volta!");
         navigate({ to: redirectTo });
       }
     } else {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -75,8 +80,10 @@ function LoginPage() {
         setAuthError(message);
         toast.error(message);
       } else {
-        const session = error === null ? (await supabase.auth.getSession()).data.session : null;
+        const session = data.session ?? (await supabase.auth.getSession()).data.session;
         if (session) {
+          setUser(session.user);
+          await refreshRole();
           toast.success("Conta criada e logada com sucesso!");
           navigate({ to: redirectTo });
         } else {
