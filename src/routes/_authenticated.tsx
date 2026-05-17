@@ -8,7 +8,18 @@ import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
-    const { data: { session } } = await supabase.auth.getSession();
+    // Only fetch session if we don't already have one in the store or if we're not initialized
+    const store = useAuthStore.getState();
+    let session = null;
+
+    if (!store.user) {
+      const { data } = await supabase.auth.getSession();
+      session = data.session;
+    } else {
+      // We have a user, just verify session hasn't expired (fast check)
+      const { data } = await supabase.auth.getSession();
+      session = data.session;
+    }
     
     if (!session) {
       throw redirect({
@@ -17,12 +28,12 @@ export const Route = createFileRoute("/_authenticated")({
       });
     }
 
-    // Ensure store is synced with latest session on every load/navigation
-    const store = useAuthStore.getState();
+    // Ensure store is synced, but don't block heavily if not needed
     if (!store.user || store.user.id !== session.user.id) {
       store.setUser(session.user);
       await store.refreshRole();
     } else if (!store.role) {
+      // Fetch role only if missing
       await store.refreshRole();
     }
   },
