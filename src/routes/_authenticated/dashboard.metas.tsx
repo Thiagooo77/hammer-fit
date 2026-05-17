@@ -1,16 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from "@/store/authStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Target } from "lucide-react";
+import { Target, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/metas")({
   component: GoalsPage,
 });
 
 function GoalsPage() {
+  const role = useAuthStore((s) => s.role);
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({ title: "", sector_id: "", target_value: "", start_date: new Date().toISOString().split("T")[0], end_date: "" });
+
   const { data: goals, isLoading } = useQuery({
     queryKey: ["goals-list"],
     queryFn: async () => {
@@ -22,11 +36,68 @@ function GoalsPage() {
     },
   });
 
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (submitting) return;
+    if (!form.title || !form.target_value || !form.sector_id) return toast.error("Preencha todos os campos");
+
+    setSubmitting(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from("hammer_goals").insert({
+      title: form.title,
+      sector_id: form.sector_id,
+      target_value: parseFloat(form.target_value),
+      start_date: form.start_date,
+      end_date: form.end_date || null,
+      created_by: user!.id,
+    });
+
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Meta cadastrada!");
+      setOpen(false);
+      setForm({ title: "", sector_id: "", target_value: "", start_date: new Date().toISOString().split("T")[0], end_date: "" });
+      queryClient.invalidateQueries({ queryKey: ["goals-list"] });
+    }
+    setSubmitting(false);
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-black text-white">Metas</h2>
-        <p className="text-sm text-muted-foreground">Acompanhamento de objetivos por setor</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-black text-white">Metas</h2>
+          <p className="text-sm text-muted-foreground">Acompanhamento de objetivos por setor</p>
+        </div>
+        {role === "admin" && (
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="mr-2 h-4 w-4" /> Nova Meta</Button>
+            </DialogTrigger>
+            <DialogContent className="bg-[#0a0a0a] border-white/10">
+              <DialogHeader><DialogTitle>Criar Nova Meta</DialogTitle></DialogHeader>
+              <form onSubmit={handleCreate} className="space-y-3">
+                <div><Label>Título da Meta</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Ex: Vendas Mensais" required /></div>
+                <div>
+                  <Label>Setor</Label>
+                  <Select value={form.sector_id} onValueChange={(v) => setForm({ ...form, sector_id: v })}>
+                    <SelectTrigger><SelectValue placeholder="Selecione o setor" /></SelectTrigger>
+                    <SelectContent>
+                      {goals?.sectors.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div><Label>Valor Alvo (R$)</Label><Input type="number" step="0.01" value={form.target_value} onChange={(e) => setForm({ ...form, target_value: e.target.value })} required /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Início</Label><Input type="date" value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} /></div>
+                  <div><Label>Fim (Opcional)</Label><Input type="date" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} /></div>
+                </div>
+                <Button type="submit" className="w-full" disabled={submitting}>{submitting ? "Salvando..." : "Criar Meta"}</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {isLoading ? <Skeleton className="h-64 bg-white/5" /> : goals?.goals.length === 0 ? (
