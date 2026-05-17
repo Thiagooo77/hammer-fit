@@ -8,21 +8,22 @@ import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
-    const cachedUser = useAuthStore.getState().user;
-    if (cachedUser) return;
-
     const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      useAuthStore.getState().setUser(session.user);
-      await useAuthStore.getState().refreshRole();
-      return;
-    }
-
+    
     if (!session) {
       throw redirect({
         to: "/login",
         search: { redirect: location.href },
       });
+    }
+
+    // Ensure store is synced with latest session on every load/navigation
+    const store = useAuthStore.getState();
+    if (!store.user || store.user.id !== session.user.id) {
+      store.setUser(session.user);
+      await store.refreshRole();
+    } else if (!store.role) {
+      await store.refreshRole();
     }
   },
   component: AuthenticatedLayout,

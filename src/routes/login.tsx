@@ -62,8 +62,17 @@ function LoginPage() {
         setAuthError(message);
         toast.error(message);
       } else {
+        // Force state update and wait for role
         setUser(data.user);
-        await refreshRole();
+        const { data: roleData } = await supabase
+          .from("hammer_roles")
+          .select("role")
+          .eq("user_id", data.user.id)
+          .maybeSingle();
+        
+        const finalRole = roleData?.role || "employee";
+        useAuthStore.setState({ role: finalRole as any });
+        
         toast.success("Bem-vindo de volta!");
         navigate({ to: redirectTo });
       }
@@ -96,7 +105,7 @@ function LoginPage() {
         const session = data.session ?? (await supabase.auth.getSession()).data.session;
         if (session) {
           setUser(session.user);
-          await refreshRole();
+          useAuthStore.setState({ role: cargo as any });
           toast.success("Conta criada e logada com sucesso!");
           navigate({ to: redirectTo });
         } else {
