@@ -102,6 +102,11 @@ function LoginPage() {
           <CardDescription>Gestão Operacional Premium de Academia</CardDescription>
         </CardHeader>
         <CardContent>
+          {authError && (
+            <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive" role="alert">
+              {authError}
+            </div>
+          )}
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-white/5">
               <TabsTrigger value="login">Entrar</TabsTrigger>
