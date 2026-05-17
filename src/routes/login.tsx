@@ -11,11 +11,19 @@ import { z } from "zod";
 
 function getAuthErrorMessage(message: string) {
   const normalized = message.toLowerCase();
+  console.error("[AuthError]", message);
+
   if (normalized.includes("email logins are disabled") || normalized.includes("email_provider_disabled")) {
-    return "Login por e-mail está desativado no Supabase. Ative Authentication > Providers > Email para criar conta e entrar com senha.";
+    return "O login por e-mail está desativado no Supabase. Ative em 'Authentication > Providers > Email'.";
   }
   if (normalized.includes("invalid login credentials")) {
-    return "E-mail ou senha incorretos. Se acabou de cadastrar, confirme que o provedor Email está ativo no Supabase e que a confirmação de e-mail está desativada.";
+    return "E-mail ou senha incorretos. Verifique seus dados. Se acabou de criar a conta, verifique se a confirmação por e-mail está ativa ou se o cadastro realmente foi concluído.";
+  }
+  if (normalized.includes("user already registered") || normalized.includes("already registered")) {
+    return "Este e-mail já está cadastrado. Tente fazer login.";
+  }
+  if (normalized.includes("too many requests")) {
+    return "Muitas tentativas. Aguarde um momento e tente novamente.";
   }
   return message;
 }
@@ -23,6 +31,7 @@ function getAuthErrorMessage(message: string) {
 export const Route = createFileRoute("/login")({
   validateSearch: z.object({
     redirect: z.string().optional().catch("/dashboard"),
+    tab: z.enum(["login", "signup"]).optional().catch("login"),
   }),
   component: LoginPage,
 });
@@ -109,7 +118,8 @@ function LoginPage() {
           toast.success("Conta criada e logada com sucesso!");
           navigate({ to: redirectTo });
         } else {
-          toast.success("Conta criada! Se o login automático falhou, tente entrar com seus dados.");
+          toast.info("Conta criada! Por favor, verifique seu e-mail para confirmar o cadastro antes de entrar.");
+          setAuthError("Confirmação necessária. Verifique seu e-mail.");
         }
       }
     }
@@ -136,7 +146,7 @@ function LoginPage() {
               {authError}
             </div>
           )}
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs defaultValue={search.tab || "login"} className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-white/5">
               <TabsTrigger value="login">Entrar</TabsTrigger>
               <TabsTrigger value="signup">Cadastrar</TabsTrigger>

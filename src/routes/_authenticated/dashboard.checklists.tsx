@@ -132,7 +132,11 @@ function ChecklistsPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div><Label>Prazo</Label><Input type="date" value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })} disabled={form.is_recurring} /></div>
+                <div className={form.is_recurring ? "opacity-50 pointer-events-none" : ""}>
+                  <Label>Prazo</Label>
+                  <Input type="date" value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })} disabled={form.is_recurring} />
+                  {form.is_recurring && <p className="text-[10px] text-primary mt-1">Atividades definitivas não exigem prazo.</p>}
+                </div>
               </div>
               <div className="flex items-center space-x-2 py-2">
                 <input 
