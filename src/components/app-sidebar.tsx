@@ -82,7 +82,11 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
-                    <Link to={item.url} className="flex items-center gap-2">
+                    <Link 
+                      to={item.url} 
+                      className="flex items-center gap-2"
+                      activeProps={{ className: "text-primary font-bold bg-white/5" }}
+                    >
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </Link>

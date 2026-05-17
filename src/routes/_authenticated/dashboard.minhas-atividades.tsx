@@ -104,6 +104,17 @@ function MyTasksPage() {
                     <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(t.due_date).toLocaleDateString("pt-BR")}</p>
                   )}
                   {t.rejection_note && <p className="text-xs text-red-400 mt-2">Observação: {t.rejection_note}</p>}
+                  {t.photo_url && (
+                    <div className="mt-3">
+                      <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Sua Evidência:</p>
+                      <img 
+                        src={t.photo_url} 
+                        alt="Evidência" 
+                        className="w-20 h-20 object-cover rounded border border-white/10 cursor-pointer hover:scale-105 transition-transform" 
+                        onClick={() => t.photo_url && window.open(t.photo_url, '_blank')}
+                      />
+                    </div>
+                  )}
                 </div>
                 {(t.status === "pending" || t.status === "rejected") && (
                   <Button onClick={() => { setSelected(t); setFeedback(""); setPhotoUrl(""); }} size="sm">

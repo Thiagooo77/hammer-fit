@@ -85,7 +85,12 @@ function ApprovalsPage() {
             <Card key={task.id} className="border-white/10 bg-white/5 backdrop-blur-xl">
               <CardContent className="p-4 flex flex-col md:flex-row gap-4">
                 {task.photo_url && (
-                  <img src={task.photo_url} alt="Evidência" className="w-32 h-32 object-cover rounded-lg border border-white/10" />
+                  <img 
+                    src={task.photo_url} 
+                    alt="Evidência" 
+                    className="w-32 h-32 object-cover rounded-lg border border-white/10 cursor-pointer hover:opacity-80 transition-opacity" 
+                    onClick={() => task.photo_url && window.open(task.photo_url, '_blank')}
+                  />
                 )}
                 <div className="flex-1 space-y-2">
                   <p className="font-bold text-white text-lg">{task.title}</p>
