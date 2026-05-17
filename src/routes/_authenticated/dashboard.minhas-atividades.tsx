@@ -111,7 +111,7 @@ function MyTasksPage() {
                         src={t.photo_url} 
                         alt="Evidência" 
                         className="w-20 h-20 object-cover rounded border border-white/10 cursor-pointer hover:scale-105 transition-transform" 
-                        onClick={() => window.open(t.photo_url, '_blank')}
+                        onClick={() => t.photo_url && window.open(t.photo_url, '_blank')}
                       />
                     </div>
                   )}

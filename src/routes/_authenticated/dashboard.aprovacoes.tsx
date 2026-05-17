@@ -89,7 +89,7 @@ function ApprovalsPage() {
                     src={task.photo_url} 
                     alt="Evidência" 
                     className="w-32 h-32 object-cover rounded-lg border border-white/10 cursor-pointer hover:opacity-80 transition-opacity" 
-                    onClick={() => window.open(task.photo_url, '_blank')}
+                    onClick={() => task.photo_url && window.open(task.photo_url, '_blank')}
                   />
                 )}
                 <div className="flex-1 space-y-2">
