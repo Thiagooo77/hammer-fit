@@ -584,6 +584,7 @@ export type Database = {
           due_date: string | null
           feedback: string | null
           id: string
+          is_recurring: boolean | null
           photo_url: string | null
           priority: string
           rejection_note: string | null
@@ -602,6 +603,7 @@ export type Database = {
           due_date?: string | null
           feedback?: string | null
           id?: string
+          is_recurring?: boolean | null
           photo_url?: string | null
           priority?: string
           rejection_note?: string | null
@@ -620,6 +622,7 @@ export type Database = {
           due_date?: string | null
           feedback?: string | null
           id?: string
+          is_recurring?: boolean | null
           photo_url?: string | null
           priority?: string
           rejection_note?: string | null

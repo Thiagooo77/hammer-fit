@@ -23,7 +23,7 @@ function ChecklistsPage() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({ title: "", description: "", sector_id: "", assigned_to: "", priority: "medium", due_date: "" });
+  const [form, setForm] = useState({ title: "", description: "", sector_id: "", assigned_to: "", priority: "medium", due_date: "", is_recurring: false });
 
   const { data, isLoading } = useQuery({
     queryKey: ["all-tasks"],
@@ -52,6 +52,7 @@ function ChecklistsPage() {
       assigned_to: form.assigned_to,
       priority: form.priority,
       due_date: form.due_date || null,
+      is_recurring: form.is_recurring,
       created_by: user!.id,
     };
     console.log("[ChecklistCreate]", payload);
@@ -68,7 +69,7 @@ function ChecklistsPage() {
       });
       toast.success("Tarefa criada e atribuída!");
       setOpen(false);
-      setForm({ title: "", description: "", sector_id: "", assigned_to: "", priority: "medium", due_date: "" });
+      setForm({ title: "", description: "", sector_id: "", assigned_to: "", priority: "medium", due_date: "", is_recurring: false });
       queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
     }
     setSubmitting(false);
@@ -131,7 +132,19 @@ function ChecklistsPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div><Label>Prazo</Label><Input type="date" value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })} /></div>
+                <div><Label>Prazo</Label><Input type="date" value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })} disabled={form.is_recurring} /></div>
+              </div>
+              <div className="flex items-center space-x-2 py-2">
+                <input 
+                  type="checkbox" 
+                  id="is_recurring" 
+                  checked={form.is_recurring} 
+                  onChange={(e) => setForm({ ...form, is_recurring: e.target.checked })}
+                  className="h-4 w-4 rounded border-white/10 bg-white/5 text-primary focus:ring-primary"
+                />
+                <Label htmlFor="is_recurring" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Tarefa Recorrente (Atividade Definitiva)
+                </Label>
               </div>
               <Button type="submit" className="w-full" disabled={submitting}>{submitting ? "Criando..." : "Criar Tarefa"}</Button>
             </form>
@@ -162,7 +175,9 @@ function ChecklistsPage() {
                     <div className="flex gap-3 mt-2 text-xs text-muted-foreground">
                       {sector && <span style={{ color: (sector.color ?? "#f7931e") }}>● {sector.name}</span>}
                       <span>{assignee?.full_name || "—"}</span>
-                      {task.due_date && (
+                      {task.is_recurring ? (
+                        <span className="flex items-center gap-1 text-primary font-bold"><CheckCircle className="h-3 w-3" /> Recorrente</span>
+                      ) : task.due_date && (
                         <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(task.due_date).toLocaleDateString("pt-BR")}</span>
                       )}
                     </div>
