@@ -31,6 +31,7 @@ function getAuthErrorMessage(message: string) {
 export const Route = createFileRoute("/login")({
   validateSearch: z.object({
     redirect: z.string().optional().catch("/dashboard"),
+    tab: z.enum(["login", "signup"]).optional().catch("login"),
   }),
   component: LoginPage,
 });
@@ -117,7 +118,8 @@ function LoginPage() {
           toast.success("Conta criada e logada com sucesso!");
           navigate({ to: redirectTo });
         } else {
-          toast.success("Conta criada! Se o login automático falhou, tente entrar com seus dados.");
+          toast.info("Conta criada! Por favor, verifique seu e-mail para confirmar o cadastro antes de entrar.");
+          setAuthError("Confirmação necessária. Verifique seu e-mail.");
         }
       }
     }
@@ -144,7 +146,7 @@ function LoginPage() {
               {authError}
             </div>
           )}
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs defaultValue={search.tab || "login"} className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-white/5">
               <TabsTrigger value="login">Entrar</TabsTrigger>
               <TabsTrigger value="signup">Cadastrar</TabsTrigger>
