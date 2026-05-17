@@ -64,6 +64,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
 
     authSubscription = subscription;
+
+    // Optional: Refresh session when window gains focus to prevent "disconnecting"
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          const current = get().user;
+          if (!current || current.id !== session.user.id) {
+            set({ user: session.user });
+            await get().refreshRole();
+          }
+        }
+      });
+    }
   },
   setUser: (user) => {
     const current = get().user;
