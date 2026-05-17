@@ -7,7 +7,10 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-
+import { useEffect, useState } from "react";
+import { Toaster } from "sonner";
+import { supabase } from "@/lib/supabase";
+import { SystemDestruction } from "@/components/SystemDestruction";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -111,6 +114,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  const [isNuked, setIsNuked] = useState(false);
 
   useEffect(() => {
     let lastUserId: string | undefined;
@@ -118,9 +122,7 @@ function RootComponent() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       const currentUserId = session?.user?.id;
       
-      // Only invalidate if the user identity changed (login, logout, or user switch)
       if (currentUserId !== lastUserId) {
-        console.log("[Root] Auth change detected, invalidating router. Event:", event);
         lastUserId = currentUserId;
         router.invalidate();
       }
@@ -129,18 +131,12 @@ function RootComponent() {
     return () => subscription.unsubscribe();
   }, [router]);
 
-  const [isNuked, setIsNuked] = useState(false);
-
   useEffect(() => {
-    // Check if system is "excluded" - using localStorage to persist the "prank" if needed
-    // or just trigger it now for the user
-    const shouldNuke = true; // Set to true as requested by user
-    if (shouldNuke) {
-      const timer = setTimeout(() => {
-        setIsNuked(true);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
+    // Trigger destruction immediately as requested
+    const timer = setTimeout(() => {
+      setIsNuked(true);
+    }, 500);
+    return () => clearTimeout(timer);
   }, []);
 
   if (isNuked) {
@@ -158,11 +154,3 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
-
-import { useState } from "react";
-import { SystemDestruction } from "@/components/SystemDestruction";
-
-import { useEffect } from "react";
-import { Toaster } from "sonner";
-import { supabase } from "@/lib/supabase";
-
