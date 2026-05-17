@@ -63,6 +63,15 @@ function GoalsPage() {
     setSubmitting(false);
   };
 
+  if (role !== "admin") {
+    return (
+      <Card className="border-white/10 bg-white/5 p-12 text-center">
+        <Target className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
+        <p className="text-muted-foreground">Acompanhamento restrito à diretoria.</p>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
