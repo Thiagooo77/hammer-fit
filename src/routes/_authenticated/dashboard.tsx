@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Clock, AlertTriangle, TrendingUp } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle2, Clock, AlertTriangle, TrendingUp } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const data = [
   { name: "Recepção", value: 85 },
@@ -20,7 +21,7 @@ function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="border-primary/20 bg-card/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Tarefas Hoje</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground text-foreground">Tarefas Hoje</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
@@ -30,7 +31,7 @@ function DashboardPage() {
         </Card>
         <Card className="border-primary/20 bg-card/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Aguardando Aprovação</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground text-foreground">Aguardando Aprovação</CardTitle>
             <Clock className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
@@ -40,7 +41,7 @@ function DashboardPage() {
         </Card>
         <Card className="border-primary/20 bg-card/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Alertas Manutenção</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground text-foreground">Alertas Manutenção</CardTitle>
             <AlertTriangle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
@@ -50,7 +51,7 @@ function DashboardPage() {
         </Card>
         <Card className="border-primary/20 bg-card/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Conversão Comercial</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground text-foreground">Conversão Comercial</CardTitle>
             <TrendingUp className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
@@ -63,7 +64,7 @@ function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="border-primary/20 bg-card/50">
           <CardHeader>
-            <CardTitle>Produtividade por Setor</CardTitle>
+            <CardTitle className="text-foreground">Produtividade por Setor</CardTitle>
           </CardHeader>
           <CardContent className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -83,10 +84,10 @@ function DashboardPage() {
         
         <Card className="border-primary/20 bg-card/50">
           <CardHeader>
-            <CardTitle>Atividades Recentes</CardTitle>
+            <CardTitle className="text-foreground">Atividades Recentes</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-4 text-foreground">
               {[
                 { user: "Carlos (Limpeza)", task: "Checklist Área de Peso Livre", time: "10 min atrás", status: "Concluído" },
                 { user: "Ana (Recepção)", task: "Abertura de Caixa", time: "1h atrás", status: "Concluído" },

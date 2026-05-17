@@ -28,7 +28,7 @@ function AuthenticatedLayout() {
         <main className="flex-1 overflow-auto p-6">
           <div className="mb-6 flex items-center gap-4">
             <SidebarTrigger />
-            <h1 className="text-2xl font-bold tracking-tight text-primary">HAMMER FIT</h1>
+            <h1 className="text-2xl font-black italic tracking-tighter text-primary">HAMMER FIT</h1>
           </div>
           <Outlet />
         </main>

@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { z } from "zod";
 
 export const Route = createFileRoute("/login")({
-  validateSearch: (search: any) => ({
-    redirect: search.redirect || "/dashboard",
+  validateSearch: z.object({
+    redirect: z.string().optional().catch("/dashboard"),
   }),
   component: LoginPage,
 });
@@ -18,7 +19,7 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { redirect } = Route.useSearch();
+  const search = Route.useSearch();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,12 +31,12 @@ function LoginPage() {
       setLoading(false);
     } else {
       toast.success("Bem-vindo de volta!");
-      navigate({ to: redirect });
+      navigate({ to: search.redirect });
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] p-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] p-4 font-sans antialiased">
       <Card className="w-full max-w-md border-primary/20 bg-[#1a1a1a]">
         <CardHeader className="space-y-1 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
