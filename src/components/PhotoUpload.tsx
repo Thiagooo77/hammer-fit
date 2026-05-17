@@ -38,9 +38,12 @@ export function PhotoUpload({ onUploaded, currentUrl }: PhotoUploadProps) {
       const { error } = await supabase.storage.from("hammer-evidence").upload(path, file);
       if (error) throw error;
 
-      const { data: pub } = supabase.storage.from("hammer-evidence").getPublicUrl(path);
-      setPreview(pub.publicUrl);
-      onUploaded(pub.publicUrl);
+      const { data: signed, error: signErr } = await supabase.storage
+        .from("hammer-evidence")
+        .createSignedUrl(path, 60 * 60 * 24 * 365);
+      if (signErr) throw signErr;
+      setPreview(signed.signedUrl);
+      onUploaded(signed.signedUrl);
       toast.success("Foto enviada com sucesso!");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erro no upload";
