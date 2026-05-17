@@ -62,23 +62,52 @@ function RankingPage() {
         </Card>
       ) : (
         <>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-3 pb-8">
             {top3.map((person, i) => {
               const Icon = medalIcons[i];
+              // Order them as 2nd, 1st, 3rd visually
+              const visualOrder = [1, 0, 2];
+              const displayIdx = visualOrder.indexOf(i);
+              
+              // Scale the center one
+              const isFirst = i === 0;
+
               return (
-                <Card key={i} className={`border bg-gradient-to-br backdrop-blur-xl shadow-[0_0_40px_rgba(247,147,30,0.1)] ${medalGrads[i]}`}>
-                  <CardContent className="p-6 text-center space-y-3">
-                    <Icon className={`h-10 w-10 mx-auto ${medalColors[i]}`} />
-                    <Avatar className="h-20 w-20 mx-auto border-2 border-primary/30">
-                      <AvatarFallback className="bg-primary/20 text-primary text-2xl font-black">{person.name[0]?.toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-bold text-white text-lg">{person.name}</p>
-                      <p className="text-xs uppercase text-muted-foreground tracking-wider">{i + 1}º Lugar</p>
+                <Card 
+                  key={i} 
+                  className={`relative border bg-gradient-to-br backdrop-blur-xl transition-all duration-500 hover:scale-105 shadow-[0_0_50px_rgba(0,0,0,0.5)] 
+                    ${isFirst ? "md:-mt-6 border-primary/50 shadow-primary/20" : "border-white/10 shadow-black/40"}
+                    ${medalGrads[i]}
+                  `}
+                  style={{ order: displayIdx }}
+                >
+                  <CardContent className="p-8 text-center space-y-4">
+                    <div className={`absolute -top-4 left-1/2 -translate-x-1/2 p-2 rounded-full bg-[#0a0a0a] border ${isFirst ? "border-primary" : "border-white/10"}`}>
+                      <Icon className={`h-8 w-8 ${medalColors[i]}`} />
                     </div>
-                    <div>
-                      <p className="text-3xl font-black text-primary">R$ {person.total.toLocaleString("pt-BR")}</p>
-                      <p className="text-xs text-muted-foreground">{person.count} vendas • R$ {person.commission.toLocaleString("pt-BR")} comissão</p>
+                    
+                    <div className="pt-4">
+                      <Avatar className={`mx-auto border-4 ${isFirst ? "h-32 w-32 border-primary ring-4 ring-primary/20" : "h-24 w-24 border-white/10 shadow-xl"}`}>
+                        <AvatarFallback className={`${isFirst ? "bg-primary/20 text-primary text-4xl" : "bg-white/5 text-2xl"} font-black`}>
+                          {person.name[0]?.toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className={`font-black text-white ${isFirst ? "text-2xl" : "text-lg"}`}>{person.name}</p>
+                      <p className="text-xs uppercase text-muted-foreground font-bold tracking-[0.2em]">{i + 1}º Lugar</p>
+                    </div>
+
+                    <div className="pt-2 border-t border-white/5">
+                      <p className={`font-black ${isFirst ? "text-4xl text-primary" : "text-2xl text-white"}`}>
+                        R$ {person.total.toLocaleString("pt-BR")}
+                      </p>
+                      <div className="flex items-center justify-center gap-2 mt-1">
+                         <span className="text-xs text-muted-foreground font-medium">{person.count} vendas</span>
+                         <span className="h-1 w-1 rounded-full bg-white/20" />
+                         <span className="text-xs text-primary/80 font-bold">R$ {person.commission.toLocaleString("pt-BR")} comissão</span>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
