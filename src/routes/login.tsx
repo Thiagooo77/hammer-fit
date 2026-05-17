@@ -58,8 +58,13 @@ function LoginPage() {
       if (error) {
         toast.error(error.message);
       } else {
-        toast.success("Conta criada! Verifique seu email se necessário.");
-        navigate({ to: redirectTo });
+        const session = error === null ? (await supabase.auth.getSession()).data.session : null;
+        if (session) {
+          toast.success("Conta criada e logada com sucesso!");
+          navigate({ to: redirectTo });
+        } else {
+          toast.success("Conta criada! Verifique seu email para confirmar o acesso.");
+        }
       }
     }
     setLoading(false);
