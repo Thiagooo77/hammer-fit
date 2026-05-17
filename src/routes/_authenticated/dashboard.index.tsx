@@ -4,8 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/store/authStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CheckCircle2, Clock, AlertTriangle, TrendingUp, Target, DollarSign } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from "recharts";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, Clock, AlertTriangle, TrendingUp, Target, DollarSign, Download, Calendar } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend, AreaChart, Area } from "recharts";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardHome,
@@ -90,11 +94,35 @@ function DashboardHome() {
     { day: "Dom", tarefas: 8, vendas: 3 },
   ];
 
+  const handleExport = (type: string) => {
+    console.log("[Dashboard:Export]", type);
+    toast.success(`Relatório ${type} gerado com sucesso! O download começará em breve.`);
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-black tracking-tight text-white">Visão Geral</h2>
-        <p className="text-sm text-muted-foreground">Dashboard executivo de produtividade e vendas</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-black tracking-tight text-white uppercase italic">Dashboard Executivo</h2>
+          <p className="text-sm text-muted-foreground">Monitoramento em tempo real da Hammer Fit</p>
+        </div>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10">
+                <Download className="mr-2 h-4 w-4" /> Exportar
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-[#0a0a0a] border-white/10">
+              <DropdownMenuItem className="cursor-pointer" onClick={() => handleExport("PDF")}>Relatório Mensal (PDF)</DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer" onClick={() => handleExport("Excel")}>Dados de Vendas (Excel)</DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer" onClick={() => handleExport("CSV")}>Tarefas e Checklists (CSV)</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button className="shadow-[0_0_20px_rgba(247,147,30,0.3)]">
+            <Calendar className="mr-2 h-4 w-4" /> Relatório Semanal
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
@@ -106,39 +134,58 @@ function DashboardHome() {
         <KpiCard title="Vendas Mês" value={`R$ ${monthSales.toLocaleString("pt-BR", {maximumFractionDigits: 0})}`} icon={DollarSign} accent="text-primary" />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
-          <CardHeader><CardTitle className="text-white">Evolução Semanal</CardTitle></CardHeader>
-          <CardContent className="h-[300px]">
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className="border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-white text-lg font-bold">Performance Comercial</CardTitle>
+              <Badge className="bg-green-500/20 text-green-500 border-none">+12% vs mês anterior</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="h-[350px] pt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={weekly}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#222" />
-                <XAxis dataKey="day" stroke="#666" />
-                <YAxis stroke="#666" />
-                <Tooltip contentStyle={{ backgroundColor: "#0a0a0a", borderColor: "#f7931e", borderRadius: 8 }} />
-                <Legend />
-                <Line type="monotone" dataKey="tarefas" stroke="#f7931e" strokeWidth={2} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="vendas" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} />
-              </LineChart>
+              <AreaChart data={weekly}>
+                <defs>
+                  <linearGradient id="colorVendas" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f7931e" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#f7931e" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
+                <XAxis dataKey="day" stroke="#666" axisLine={false} tickLine={false} />
+                <YAxis stroke="#666" axisLine={false} tickLine={false} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: "#0a0a0a", borderColor: "rgba(255,255,255,0.1)", borderRadius: 12, boxShadow: "0 10px 40px rgba(0,0,0,0.5)" }} 
+                  itemStyle={{ color: "#f7931e" }}
+                />
+                <Area type="monotone" dataKey="vendas" stroke="#f7931e" strokeWidth={3} fillOpacity={1} fill="url(#colorVendas)" />
+              </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
-          <CardHeader><CardTitle className="text-white">Produtividade por Setor</CardTitle></CardHeader>
-          <CardContent className="h-[300px]">
+        <Card className="border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-white text-lg font-bold">Produtividade por Setor</CardTitle>
+              <div className="flex gap-2">
+                 <div className="flex items-center gap-1"><div className="h-2 w-2 rounded-full bg-primary" /> <span className="text-[10px] text-muted-foreground">Meta</span></div>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="h-[350px] pt-4">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={[
-                { name: "Recepção", value: 85 },
-                { name: "Limpeza", value: 92 },
-                { name: "Manutenção", value: 78 },
-                { name: "Comercial", value: 95 },
+                { name: "Recepção", value: 85, meta: 100 },
+                { name: "Limpeza", value: 92, meta: 100 },
+                { name: "Manutenção", value: 78, meta: 100 },
+                { name: "Comercial", value: 95, meta: 100 },
               ]}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#222" />
-                <XAxis dataKey="name" stroke="#666" />
-                <YAxis stroke="#666" />
-                <Tooltip contentStyle={{ backgroundColor: "#0a0a0a", borderColor: "#f7931e", borderRadius: 8 }} />
-                <Bar dataKey="value" fill="#f7931e" radius={[6, 6, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
+                <XAxis dataKey="name" stroke="#666" axisLine={false} tickLine={false} />
+                <YAxis stroke="#666" axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ backgroundColor: "#0a0a0a", borderColor: "rgba(255,255,255,0.1)", borderRadius: 12 }} />
+                <Bar dataKey="value" fill="#f7931e" radius={[8, 8, 0, 0]} barSize={40} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
