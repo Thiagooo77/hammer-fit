@@ -1,15 +1,28 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from "@/store/authStore";
 import { Card, CardContent } from "@/components/ui/card";
-import { Building2, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Building2, ArrowRight, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/setores")({
   component: SectorsPage,
 });
 
 function SectorsPage() {
+  const role = useAuthStore((s) => s.role);
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({ name: "", description: "", color: "#f7931e" });
+
   const { data: sectors, isLoading } = useQuery({
     queryKey: ["sectors-list"],
     queryFn: async () => {
@@ -28,11 +41,53 @@ function SectorsPage() {
     },
   });
 
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (submitting) return;
+    if (!form.name) return toast.error("Nome é obrigatório");
+
+    setSubmitting(true);
+    const { error } = await supabase.from("hammer_sectors").insert(form);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Setor criado!");
+      setOpen(false);
+      setForm({ name: "", description: "", color: "#f7931e" });
+      queryClient.invalidateQueries({ queryKey: ["sectors-list"] });
+    }
+    setSubmitting(false);
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-black text-white">Setores</h2>
-        <p className="text-sm text-muted-foreground">Visão geral por área operacional</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-black text-white">Setores</h2>
+          <p className="text-sm text-muted-foreground">Visão geral por área operacional</p>
+        </div>
+        {role === "admin" && (
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="mr-2 h-4 w-4" /> Novo Setor</Button>
+            </DialogTrigger>
+            <DialogContent className="bg-[#0a0a0a] border-white/10">
+              <DialogHeader><DialogTitle>Criar Novo Setor</DialogTitle></DialogHeader>
+              <form onSubmit={handleCreate} className="space-y-3">
+                <div><Label>Nome do Setor</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex: Limpeza" required /></div>
+                <div><Label>Descrição</Label><Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+                <div>
+                  <Label>Cor de Destaque</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="h-10 w-20 p-1" />
+                    <span className="text-xs text-muted-foreground">{form.color}</span>
+                  </div>
+                </div>
+                <Button type="submit" className="w-full" disabled={submitting}>{submitting ? "Salvando..." : "Criar Setor"}</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {isLoading ? (
