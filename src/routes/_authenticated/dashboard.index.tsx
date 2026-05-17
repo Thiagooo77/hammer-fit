@@ -169,17 +169,28 @@ function DashboardHome() {
             <div className="flex items-center justify-between">
               <CardTitle className="text-white text-lg font-bold">Produtividade por Setor</CardTitle>
               <div className="flex gap-2">
-                 <div className="flex items-center gap-1"><div className="h-2 w-2 rounded-full bg-primary" /> <span className="text-[10px] text-muted-foreground">Meta</span></div>
+                 <div className="flex items-center gap-1"><div className="h-2 w-2 rounded-full bg-primary" /> <span className="text-[10px] text-muted-foreground">Produtividade %</span></div>
               </div>
             </div>
           </CardHeader>
           <CardContent className="h-[350px] pt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={[
-                { name: "Recepção", value: 85, meta: 100 },
-                { name: "Limpeza", value: 92, meta: 100 },
-                { name: "Manutenção", value: 78, meta: 100 },
-                { name: "Comercial", value: 95, meta: 100 },
+              <BarChart data={isAdmin ? (
+                (() => {
+                  const grouped: Record<string, { total: number; completed: number; name: string }> = {};
+                  tasks?.forEach(t => {
+                    const sid = t.sector_id || "default";
+                    if (!grouped[sid]) grouped[sid] = { total: 0, completed: 0, name: sid };
+                    grouped[sid].total++;
+                    if (t.status === "approved" || t.status === "completed") grouped[sid].completed++;
+                  });
+                  return Object.values(grouped).map(g => ({
+                    name: g.name.substring(0, 8),
+                    value: Math.round((g.completed / g.total) * 100)
+                  }));
+                })()
+              ) : [
+                { name: "Sua Taxa", value: productivity },
               ]}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
                 <XAxis dataKey="name" stroke="#666" axisLine={false} tickLine={false} />
