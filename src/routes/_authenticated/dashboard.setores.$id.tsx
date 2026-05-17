@@ -40,7 +40,7 @@ function SectorDetail() {
       </Button>
 
       <div className="flex items-center gap-3">
-        <div className="h-12 w-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${sector.color}20`, color: sector.color || "#f7931e" }}>
+        <div className="h-12 w-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${sector.color}20`, color: (sector.color ?? "#f7931e") }}>
           <Users className="h-6 w-6" />
         </div>
         <div>
