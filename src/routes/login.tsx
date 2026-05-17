@@ -36,6 +36,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [cargo, setCargo] = useState<"admin" | "employee">("employee");
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState("");
   const navigate = useNavigate();
@@ -79,7 +80,19 @@ function LoginPage() {
         const message = getAuthErrorMessage(error.message);
         setAuthError(message);
         toast.error(message);
-      } else {
+      } else if (data.user) {
+        // Explicitly create profile and role to ensure immediate access
+        await supabase.from("hammer_profiles").upsert({
+          id: data.user.id,
+          full_name: fullName,
+          position: cargo === "admin" ? "Administrador" : "Funcionário",
+        });
+        
+        await supabase.from("hammer_roles").upsert({
+          user_id: data.user.id,
+          role: cargo,
+        });
+
         const session = data.session ?? (await supabase.auth.getSession()).data.session;
         if (session) {
           setUser(session.user);
@@ -87,7 +100,7 @@ function LoginPage() {
           toast.success("Conta criada e logada com sucesso!");
           navigate({ to: redirectTo });
         } else {
-          toast.success("Conta criada! Verifique seu email para confirmar o acesso.");
+          toast.success("Conta criada! Se o login automático falhou, tente entrar com seus dados.");
         }
       }
     }
@@ -135,6 +148,19 @@ function LoginPage() {
                 <Input placeholder="Nome completo" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="border-white/10 bg-white/5" />
                 <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="border-white/10 bg-white/5" />
                 <Input type="password" placeholder="Senha (mín. 6)" value={password} onChange={(e) => setPassword(e.target.value)} required className="border-white/10 bg-white/5" />
+                
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase text-muted-foreground ml-1">Cargo / Função</label>
+                  <select 
+                    value={cargo} 
+                    onChange={(e) => setCargo(e.target.value as "admin" | "employee")}
+                    className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  >
+                    <option value="employee" className="bg-[#1a1a1a]">Funcionário</option>
+                    <option value="admin" className="bg-[#1a1a1a]">Administrador</option>
+                  </select>
+                </div>
+
                 <Button type="submit" className="w-full font-bold uppercase tracking-wider" disabled={loading}>
                   {loading ? "Criando..." : "Criar Conta"}
                 </Button>

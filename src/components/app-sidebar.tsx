@@ -14,6 +14,7 @@ import {
   LayoutDashboard,
   Building2,
   Users,
+  UserPlus,
   CheckSquare,
   Target,
   TrendingUp,
@@ -36,6 +37,7 @@ export function AppSidebar() {
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
     { title: "Setores", url: "/dashboard/setores", icon: Building2 },
     { title: "Funcionários", url: "/dashboard/funcionarios", icon: Users },
+    { title: "Criar Usuário", url: "/login", icon: UserPlus },
     { title: "Checklists", url: "/dashboard/checklists", icon: CheckSquare },
     { title: "Aprovações", url: "/dashboard/aprovacoes", icon: ShieldCheck },
     { title: "Metas", url: "/dashboard/metas", icon: Target },
@@ -80,7 +82,7 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
-                    <Link to={item.url as "/dashboard"} className="flex items-center gap-2">
+                    <Link to={item.url} className="flex items-center gap-2">
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </Link>

@@ -98,7 +98,11 @@ function MyTasksPage() {
                     <PriorityBadge priority={t.priority} />
                   </div>
                   <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{t.description}</p>
-                  {t.due_date && <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(t.due_date).toLocaleDateString("pt-BR")}</p>}
+                  {t.is_recurring ? (
+                    <p className="text-xs text-primary font-bold mt-2 flex items-center gap-1"><CheckCircle className="h-3 w-3" /> Atividade Definitiva (Recorrente)</p>
+                  ) : t.due_date && (
+                    <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(t.due_date).toLocaleDateString("pt-BR")}</p>
+                  )}
                   {t.rejection_note && <p className="text-xs text-red-400 mt-2">Observação: {t.rejection_note}</p>}
                 </div>
                 {(t.status === "pending" || t.status === "rejected") && (

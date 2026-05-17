@@ -70,6 +70,15 @@ function SalesPage() {
   });
   const chartData = Object.entries(monthly).map(([k, v]) => ({ month: k, valor: v })).reverse();
 
+  if (role !== "admin") {
+    return (
+      <Card className="border-white/10 bg-white/5 p-12 text-center">
+        <DollarSign className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
+        <p className="text-muted-foreground">Acesso restrito ao setor comercial/admin.</p>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
