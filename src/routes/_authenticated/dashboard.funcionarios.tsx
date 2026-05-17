@@ -4,7 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, UserPlus } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/dashboard/funcionarios")({
   component: EmployeesPage,
@@ -27,9 +29,16 @@ function EmployeesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-black text-white">Funcionários</h2>
-        <p className="text-sm text-muted-foreground">Equipe ativa da HAMMER FIT</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-black text-white">Funcionários</h2>
+          <p className="text-sm text-muted-foreground">Equipe ativa da HAMMER FIT</p>
+        </div>
+        <Link to="/login" search={{ redirect: "/dashboard/funcionarios" }}>
+          <Button size="sm">
+            <UserPlus className="mr-2 h-4 w-4" /> Novo Usuário
+          </Button>
+        </Link>
       </div>
 
       {data?.profiles.length === 0 ? (
