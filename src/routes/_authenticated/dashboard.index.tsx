@@ -35,16 +35,21 @@ function DashboardHome() {
   const user = useAuthStore((s) => s.user);
   const isAdmin = role === "admin";
 
-  const { data: tasks, isLoading } = useQuery({
-    queryKey: ["dashboard-tasks", user?.id, role],
+  const { data: dashboardData, isLoading } = useQuery({
+    queryKey: ["dashboard-data", user?.id, role],
     queryFn: async () => {
       const q = supabase.from("hammer_tasks").select("status, sector_id, created_at, assigned_to");
-      const { data, error } = isAdmin ? await q : await q.eq("assigned_to", user!.id);
-      if (error) throw error;
-      return data;
+      const [{ data: tasksData }, { data: sectorsData }] = await Promise.all([
+        isAdmin ? q : q.eq("assigned_to", user!.id),
+        supabase.from("hammer_sectors").select("id, name"),
+      ]);
+      return { tasks: tasksData || [], sectors: sectorsData || [] };
     },
     enabled: !!user,
   });
+
+  const tasks = dashboardData?.tasks;
+  const sectors = dashboardData?.sectors;
 
   const { data: sales } = useQuery({
     queryKey: ["dashboard-sales"],
@@ -179,13 +184,14 @@ function DashboardHome() {
                 (() => {
                   const grouped: Record<string, { total: number; completed: number; name: string }> = {};
                   tasks?.forEach(t => {
-                    const sid = t.sector_id || "default";
-                    if (!grouped[sid]) grouped[sid] = { total: 0, completed: 0, name: sid };
-                    grouped[sid].total++;
-                    if (t.status === "approved" || t.status === "completed") grouped[sid].completed++;
+                    const sector = sectors?.find(s => s.id === t.sector_id);
+                    const sName = sector?.name || "Geral";
+                    if (!grouped[sName]) grouped[sName] = { total: 0, completed: 0, name: sName };
+                    grouped[sName].total++;
+                    if (t.status === "approved" || t.status === "completed") grouped[sName].completed++;
                   });
                   return Object.values(grouped).map(g => ({
-                    name: g.name.substring(0, 8),
+                    name: g.name,
                     value: Math.round((g.completed / g.total) * 100)
                   }));
                 })()
