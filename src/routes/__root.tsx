@@ -110,10 +110,24 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      router.invalidate();
+    });
+    return () => subscription.unsubscribe();
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <Toaster position="top-right" theme="dark" />
     </QueryClientProvider>
   );
 }
+
+import { useEffect } from "react";
+import { Toaster } from "sonner";
+import { supabase } from "@/lib/supabase";
+
