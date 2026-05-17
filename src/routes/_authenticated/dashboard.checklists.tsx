@@ -29,12 +29,13 @@ function ChecklistsPage() {
     queryKey: ["all-tasks"],
     queryFn: async () => {
       const [{ data: tasks }, { data: sectors }, { data: profiles }] = await Promise.all([
-        supabase.from("hammer_tasks").select("*").order("created_at", { ascending: false }),
+        supabase.from("hammer_tasks").select("*").order("created_at", { ascending: false }).limit(100),
         supabase.from("hammer_sectors").select("*"),
         supabase.from("hammer_profiles").select("*"),
       ]);
       return { tasks: tasks || [], sectors: sectors || [], profiles: profiles || [] };
     },
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 
   const handleCreate = async (e: React.FormEvent) => {

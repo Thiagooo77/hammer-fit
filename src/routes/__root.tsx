@@ -113,9 +113,19 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      router.invalidate();
+    let lastUserId: string | undefined;
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      const currentUserId = session?.user?.id;
+      
+      // Only invalidate if the user identity changed (login, logout, or user switch)
+      if (currentUserId !== lastUserId) {
+        console.log("[Root] Auth change detected, invalidating router. Event:", event);
+        lastUserId = currentUserId;
+        router.invalidate();
+      }
     });
+
     return () => subscription.unsubscribe();
   }, [router]);
 

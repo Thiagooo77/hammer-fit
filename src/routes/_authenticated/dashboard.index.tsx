@@ -38,14 +38,28 @@ function DashboardHome() {
   const { data: dashboardData, isLoading } = useQuery({
     queryKey: ["dashboard-data", user?.id, role],
     queryFn: async () => {
-      const q = supabase.from("hammer_tasks").select("status, sector_id, created_at, assigned_to");
+      // Only fetch tasks from the last 30 days for the dashboard
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      let q = supabase
+        .from("hammer_tasks")
+        .select("status, sector_id, created_at, assigned_to")
+        .gte("created_at", thirtyDaysAgo.toISOString());
+      
+      if (!isAdmin) {
+        q = q.eq("assigned_to", user!.id);
+      }
+
       const [{ data: tasksData }, { data: sectorsData }] = await Promise.all([
-        isAdmin ? q : q.eq("assigned_to", user!.id),
+        q,
         supabase.from("hammer_sectors").select("id, name"),
       ]);
+      
       return { tasks: tasksData || [], sectors: sectorsData || [] };
     },
     enabled: !!user,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const tasks = dashboardData?.tasks;
@@ -61,6 +75,7 @@ function DashboardHome() {
       if (error) throw error;
       return data;
     },
+    staleTime: 1000 * 60 * 5,
   });
 
   const { data: goals } = useQuery({
@@ -70,6 +85,7 @@ function DashboardHome() {
       if (error) throw error;
       return data;
     },
+    staleTime: 1000 * 60 * 10,
   });
 
   if (isLoading) {

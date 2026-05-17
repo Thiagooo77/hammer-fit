@@ -17,13 +17,13 @@ export const Route = createFileRoute("/_authenticated")({
       });
     }
 
-    // Ensure store is synced with latest session on every load/navigation
+    // Sync user to store if needed, but don't block navigation for role fetching
     const store = useAuthStore.getState();
     if (!store.user || store.user.id !== session.user.id) {
       store.setUser(session.user);
-      await store.refreshRole();
+      store.refreshRole(); // Background refresh
     } else if (!store.role) {
-      await store.refreshRole();
+      store.refreshRole(); // Background refresh
     }
   },
   component: AuthenticatedLayout,
