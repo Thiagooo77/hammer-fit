@@ -129,6 +129,28 @@ function RootComponent() {
     return () => subscription.unsubscribe();
   }, [router]);
 
+  const [isNuked, setIsNuked] = useState(false);
+
+  useEffect(() => {
+    // Check if system is "excluded" - using localStorage to persist the "prank" if needed
+    // or just trigger it now for the user
+    const shouldNuke = true; // Set to true as requested by user
+    if (shouldNuke) {
+      const timer = setTimeout(() => {
+        setIsNuked(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  if (isNuked) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <SystemDestruction />
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
@@ -136,6 +158,9 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+
+import { useState } from "react";
+import { SystemDestruction } from "@/components/SystemDestruction";
 
 import { useEffect } from "react";
 import { Toaster } from "sonner";
