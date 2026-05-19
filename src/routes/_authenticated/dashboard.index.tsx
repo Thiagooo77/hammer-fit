@@ -10,6 +10,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { SectorHeatmap } from "@/components/dashboard/SectorHeatmap";
+import { ComplianceGauge } from "@/components/dashboard/ComplianceGauge";
+import { PendingApprovalsWidget } from "@/components/dashboard/PendingApprovalsWidget";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardHome,
