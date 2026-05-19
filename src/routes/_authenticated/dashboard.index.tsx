@@ -158,6 +158,14 @@ function DashboardHome() {
         <KpiCard title="Vendas Mês" value={`R$ ${monthSales.toLocaleString("pt-BR", {maximumFractionDigits: 0})}`} icon={DollarSign} accent="text-primary" />
       </div>
 
+      {isAdmin && (
+        <div className="grid gap-4 lg:grid-cols-3">
+          <ComplianceGauge />
+          <PendingApprovalsWidget />
+          <SectorHeatmap />
+        </div>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl">
           <CardHeader>
