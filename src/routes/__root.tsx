@@ -7,10 +7,9 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Toaster } from "sonner";
 import { supabase } from "@/lib/supabase";
-import { SystemDestruction } from "@/components/SystemDestruction";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
