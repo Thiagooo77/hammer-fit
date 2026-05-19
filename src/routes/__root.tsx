@@ -117,7 +117,7 @@ function RootComponent() {
   useEffect(() => {
     let lastUserId: string | undefined;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: { user?: { id?: string } } | null) => {
       const currentUserId = session?.user?.id;
 
       if (currentUserId !== lastUserId) {
