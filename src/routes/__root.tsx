@@ -7,10 +7,9 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Toaster } from "sonner";
 import { supabase } from "@/lib/supabase";
-import { SystemDestruction } from "@/components/SystemDestruction";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -114,14 +113,13 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
-  const [isNuked, setIsNuked] = useState(false);
 
   useEffect(() => {
     let lastUserId: string | undefined;
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       const currentUserId = session?.user?.id;
-      
+
       if (currentUserId !== lastUserId) {
         lastUserId = currentUserId;
         router.invalidate();
@@ -130,22 +128,6 @@ function RootComponent() {
 
     return () => subscription.unsubscribe();
   }, [router]);
-
-  useEffect(() => {
-    // Trigger destruction immediately as requested
-    const timer = setTimeout(() => {
-      setIsNuked(true);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isNuked) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <SystemDestruction />
-      </QueryClientProvider>
-    );
-  }
 
   return (
     <QueryClientProvider client={queryClient}>
