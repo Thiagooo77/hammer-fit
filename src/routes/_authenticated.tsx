@@ -1,6 +1,7 @@
 import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthInit } from "@/hooks/useAuthInit";
+import { useSLAWatcher } from "@/hooks/useSLAWatcher";
 import { useAuthStore } from "@/store/authStore";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AuthenticatedLayout() {
   useAuthInit();
+  useSLAWatcher();
   const role = useAuthStore((s) => s.role);
 
   return (

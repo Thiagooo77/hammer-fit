@@ -10,6 +10,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { SectorHeatmap } from "@/components/dashboard/SectorHeatmap";
+import { ComplianceGauge } from "@/components/dashboard/ComplianceGauge";
+import { PendingApprovalsWidget } from "@/components/dashboard/PendingApprovalsWidget";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardHome,
@@ -154,6 +157,14 @@ function DashboardHome() {
         <KpiCard title="Meta Mensal" value={`${goalPct}%`} icon={Target} hint={`R$ ${totalCurrent.toLocaleString("pt-BR")}`} />
         <KpiCard title="Vendas Mês" value={`R$ ${monthSales.toLocaleString("pt-BR", {maximumFractionDigits: 0})}`} icon={DollarSign} accent="text-primary" />
       </div>
+
+      {isAdmin && (
+        <div className="grid gap-4 lg:grid-cols-3">
+          <ComplianceGauge />
+          <PendingApprovalsWidget />
+          <SectorHeatmap />
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl">
