@@ -28,9 +28,16 @@ function getAuthErrorMessage(message: string) {
   return message;
 }
 
+// Only allow internal paths to prevent open-redirect attacks
+const safeRedirect = z
+  .string()
+  .regex(/^\/[^/].*/, "Apenas caminhos internos são permitidos")
+  .optional()
+  .catch("/dashboard");
+
 export const Route = createFileRoute("/login")({
   validateSearch: z.object({
-    redirect: z.string().optional().catch("/dashboard"),
+    redirect: safeRedirect,
     tab: z.enum(["login", "signup"]).optional().catch("login"),
   }),
   component: LoginPage,
@@ -45,14 +52,14 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [cargo, setCargo] = useState<"admin" | "employee">("employee");
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState("");
   const navigate = useNavigate();
   const search = Route.useSearch();
   const setUser = useAuthStore((s) => s.setUser);
-  const refreshRole = useAuthStore((s) => s.refreshRole);
-  const redirectTo = search.redirect || "/dashboard";
+  const rawRedirect = search.redirect || "/dashboard";
+  // Defense-in-depth: re-validate at navigation time
+  const redirectTo = /^\/[^/]/.test(rawRedirect) ? rawRedirect : "/dashboard";
 
   const handleSubmit = async (mode: "login" | "signup", e: React.FormEvent) => {
     e.preventDefault();
@@ -99,26 +106,23 @@ function LoginPage() {
         setAuthError(message);
         toast.error(message);
       } else if (data.user) {
-        // Explicitly create profile and role to ensure immediate access
+        // Profile and 'employee' role are created automatically by the
+        // handle_new_hammer_user trigger. Role cannot be self-assigned —
+        // an admin must promote the user later via the funcionários screen.
         await supabase.from("hammer_profiles").upsert({
           id: data.user.id,
           full_name: fullName,
-          position: cargo === "admin" ? "Administrador" : "Funcionário",
-        });
-        
-        await supabase.from("hammer_roles").upsert({
-          user_id: data.user.id,
-          role: cargo,
+          position: "Funcionário",
         });
 
         const session = data.session ?? (await supabase.auth.getSession()).data.session;
         if (session) {
           setUser(session.user);
-          useAuthStore.setState({ role: cargo as any });
-          toast.success("Conta criada e logada com sucesso!");
+          useAuthStore.setState({ role: "employee" as any });
+          toast.success("Conta criada! Aguarde a promoção pelo administrador para acesso completo.");
           navigate({ to: redirectTo });
         } else {
-          toast.info("Conta criada! Por favor, verifique seu e-mail para confirmar o cadastro antes de entrar.");
+          toast.info("Conta criada! Verifique seu e-mail para confirmar o cadastro antes de entrar.");
           setAuthError("Confirmação necessária. Verifique seu e-mail.");
         }
       }
@@ -167,18 +171,10 @@ function LoginPage() {
                 <Input placeholder="Nome completo" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="border-white/10 bg-white/5" />
                 <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="border-white/10 bg-white/5" />
                 <Input type="password" placeholder="Senha (mín. 6)" value={password} onChange={(e) => setPassword(e.target.value)} required className="border-white/10 bg-white/5" />
-                
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase text-muted-foreground ml-1">Cargo / Função</label>
-                  <select 
-                    value={cargo} 
-                    onChange={(e) => setCargo(e.target.value as "admin" | "employee")}
-                    className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                  >
-                    <option value="employee" className="bg-[#1a1a1a]">Funcionário</option>
-                    <option value="admin" className="bg-[#1a1a1a]">Administrador</option>
-                  </select>
-                </div>
+
+                <p className="text-xs text-muted-foreground ml-1">
+                  Novas contas começam como <strong>Funcionário</strong>. Um administrador pode promover você em <em>Funcionários</em>.
+                </p>
 
                 <Button type="submit" className="w-full font-bold uppercase tracking-wider" disabled={loading}>
                   {loading ? "Criando..." : "Criar Conta"}
