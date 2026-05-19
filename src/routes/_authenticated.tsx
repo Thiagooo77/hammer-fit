@@ -32,6 +32,7 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AuthenticatedLayout() {
   useAuthInit();
+  useSLAWatcher();
   const role = useAuthStore((s) => s.role);
 
   return (
