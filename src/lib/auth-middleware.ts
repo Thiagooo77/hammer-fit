@@ -1,5 +1,5 @@
 import { createMiddleware } from "@tanstack/react-start";
-import { supabase } from "./supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 export const requireSupabaseAuth = createMiddleware().server(async ({ next }) => {
   const authHeader = (next as any).headers?.get("Authorization") || "";

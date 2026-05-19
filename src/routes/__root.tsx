@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Toaster } from "sonner";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -117,7 +117,7 @@ function RootComponent() {
   useEffect(() => {
     let lastUserId: string | undefined;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: { user?: { id?: string } } | null) => {
       const currentUserId = session?.user?.id;
 
       if (currentUserId !== lastUserId) {
