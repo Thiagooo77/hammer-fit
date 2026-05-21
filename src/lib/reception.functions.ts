@@ -297,6 +297,7 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       charts: {
         salesByHour: filteredCharts,
         paymentMethods: paymentChart
-      }
+      },
+      todaysSessions: todaysSessions || []
     };
   });
