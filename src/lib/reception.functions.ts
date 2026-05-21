@@ -242,7 +242,7 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       name: item.receptionists?.name || "Desconhecido", 
       avatar: item.receptionists?.avatar_url || "",
       salesAmount: Number(item.sold_amount),
-      streak: index === 0 ? 3 : index === 1 ? 1 : 0, 
+      streak: 0, 
       goalPercentage: Math.round((Number(item.sold_amount) / Math.max(Number(item.goal_amount), 1)) * 100),
       position: index + 1
     }));
