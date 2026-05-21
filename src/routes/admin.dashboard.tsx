@@ -61,9 +61,11 @@ function AdminDashboard() {
               <CardTitle className="uppercase italic text-lg">Ações Rápidas</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 gap-2">
-              <Button variant="outline" className="justify-start gap-2">
-                <Users className="h-4 w-4" /> Gerenciar Usuários
-              </Button>
+              <Link to="/admin/receptionists">
+                <Button variant="outline" className="justify-start gap-2 w-full">
+                  <Users className="h-4 w-4" /> Gerenciar Recepcionistas
+                </Button>
+              </Link>
               <Button variant="outline" className="justify-start gap-2">
                 <BarChart3 className="h-4 w-4" /> Relatórios Financeiros
               </Button>
