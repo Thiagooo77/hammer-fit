@@ -31,6 +31,13 @@ function ReceptionGoalsDashboard() {
     enabled: !!user,
   });
 
+  const [currentDate] = React.useState(new Date().toLocaleDateString('pt-BR', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  }));
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -42,14 +49,6 @@ function ReceptionGoalsDashboard() {
   if (!user) {
     return <Navigate to="/login" />;
   }
-
-
-  const [currentDate] = React.useState(new Date().toLocaleDateString('pt-BR', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  }));
 
   if (isLoading) {
     return (
