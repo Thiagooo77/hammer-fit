@@ -212,6 +212,7 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       value: paymentMethods[key]
     }));
 
+    const currentHour = new Date().getHours();
     return {
       receptionist,
       currentSession,
@@ -227,7 +228,10 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
         mostLucrativeHour
       },
       charts: {
-        salesByHour: salesByHour.filter(h => h.count > 0 || new Date().getHours() >= Number(h.hour.split(':')[0])),
+        salesByHour: salesByHour.filter(h => {
+          const hNum = parseInt(h.hour.split(':')[0]);
+          return h.count > 0 || currentHour >= hNum;
+        }),
         paymentMethods: paymentChart
       }
     };
