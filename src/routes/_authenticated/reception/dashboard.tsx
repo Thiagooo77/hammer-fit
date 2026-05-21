@@ -221,6 +221,7 @@ function ReceptionGoalsDashboard() {
                 salesCount={smartStats.vendasCount}
                 receptionistId={receptionist.id}
                 sessionId={currentSession?.id}
+                canViewAudit={role === 'admin' || role === 'manager'}
                 payments={{
                   pix: charts?.paymentMethods.find((p: any) => p.name === 'Pix')?.value || 0,
                   dinheiro: charts?.paymentMethods.find((p: any) => p.name === 'Dinheiro')?.value || 0,
