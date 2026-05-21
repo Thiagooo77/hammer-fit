@@ -86,7 +86,7 @@ export function RankingBoard({ members }: RankingBoardProps) {
                   <p className="font-bold truncate text-sm">{member.name}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-[10px] bg-secondary px-1.5 py-0.5 rounded text-muted-foreground font-bold">
-                      {member.sales} VENDAS
+                      R$ {member.salesAmount?.toLocaleString('pt-BR') || '0,00'}
                     </span>
                     {member.streak > 0 && (
                       <span className="text-[10px] text-red-500 font-black flex items-center gap-0.5">
