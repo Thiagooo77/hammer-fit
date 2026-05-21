@@ -37,7 +37,13 @@ export function DashboardSidebar() {
     {
       title: "Vendas",
       icon: TrendingUp,
-      href: "/reception/dashboard", // Assuming sales are handled here for now
+      href: "/reception/dashboard",
+      roles: ["admin", "manager", "receptionist"],
+    },
+    {
+      title: "Checklists",
+      icon: CheckSquare,
+      href: "/reception/tasks",
       roles: ["admin", "manager", "receptionist"],
     },
     {
