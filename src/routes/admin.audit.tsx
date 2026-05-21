@@ -157,13 +157,13 @@ function AuditPage() {
                           {log.old_data ? (
                             <pre className="text-[10px] bg-red-500/5 border border-red-500/20 rounded p-2 overflow-auto max-h-60">
                               <div className="font-bold text-red-600 mb-1">ANTES</div>
-                              {JSON.stringify(log.old_data, null, 2)}
+                              {JSON.stringify(log.old_data, null, 2) as string}
                             </pre>
                           ) : null}
                           {log.new_data ? (
                             <pre className="text-[10px] bg-green-500/5 border border-green-500/20 rounded p-2 overflow-auto max-h-60">
                               <div className="font-bold text-green-600 mb-1">DEPOIS</div>
-                              {JSON.stringify(log.new_data, null, 2)}
+                              {JSON.stringify(log.new_data, null, 2) as string}
                             </pre>
                           ) : null}
                         </div>
