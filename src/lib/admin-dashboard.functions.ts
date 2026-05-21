@@ -48,8 +48,10 @@ export const getAdminDashboard = createServerFn({ method: "GET" })
     // Performance by hour (today)
     const performanceByHour = Array.from({ length: 24 }, (_, i) => ({ hour: `${i}:00`, amount: 0 }));
     (todaySales || []).forEach(s => {
-      const h = new Date(s.created_at).getHours();
-      performanceByHour[h].amount += Number(s.amount);
+      if (s.created_at) {
+        const h = new Date(s.created_at).getHours();
+        performanceByHour[h].amount += Number(s.amount);
+      }
     });
 
     // Weekly evolution
@@ -57,17 +59,19 @@ export const getAdminDashboard = createServerFn({ method: "GET" })
       const d = new Date();
       d.setDate(d.getDate() - (6 - i));
       const dateStr = d.toISOString().substring(0, 10);
-      const amount = (weekSales || []).filter(s => s.created_at.startsWith(dateStr)).reduce((acc, s) => acc + Number(s.amount), 0);
+      const amount = (weekSales || []).filter(s => s.created_at && s.created_at.startsWith(dateStr)).reduce((acc, s) => acc + Number(s.amount), 0);
       return { date: d.toLocaleDateString('pt-BR', { weekday: 'short' }), amount };
     });
 
     // Comparison by shift
     const shifts = { morning: 0, afternoon: 0, night: 0 };
     (todaySales || []).forEach(s => {
-      const h = new Date(s.created_at).getHours();
-      if (h < 12) shifts.morning += Number(s.amount);
-      else if (h < 18) shifts.afternoon += Number(s.amount);
-      else shifts.night += Number(s.amount);
+      if (s.created_at) {
+        const h = new Date(s.created_at).getHours();
+        if (h < 12) shifts.morning += Number(s.amount);
+        else if (h < 18) shifts.afternoon += Number(s.amount);
+        else shifts.night += Number(s.amount);
+      }
     });
 
     const formattedRanking = (ranking || []).map((item: any, index) => ({
