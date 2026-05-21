@@ -200,14 +200,23 @@ export const closeCashSession = createServerFn({ method: "POST" })
 export const getReceptionDashboard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const { supabase: userSupabase } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Fetch receptionist data for the current user
-    const { data: receptionist } = await supabaseAdmin
-      .from("receptionists")
-      .select("*")
-      .eq("user_id", context.userId)
-      .maybeSingle();
+    // Concurrent check for receptionist and open session
+    const [{ data: receptionist }, { data: currentSession }] = await Promise.all([
+      userSupabase
+        .from("receptionists")
+        .select("*")
+        .eq("user_id", context.userId)
+        .maybeSingle(),
+      userSupabase
+        .from("cash_sessions")
+        .select("*, receptionists (name, avatar_url)")
+        .eq("status", "open")
+        .maybeSingle()
+    ]);
+
 
     if (!receptionist) {
       return { receptionist: null, currentSession: null, dailyGoal: null, goalProgress: null, ranking: [], smartStats: { remaining: 0, percentage: 0, totalSoldToday: 0, vendasCount: 0, ticketMedio: 0, mostLucrativeHour: "N/A" }, charts: null, todaysSessions: [] };
