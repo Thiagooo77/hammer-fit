@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
 import { CashRegisterCard } from "@/components/reception/CashRegisterCard";
 import { GoalsProgress } from "@/components/reception/GoalsProgress";
@@ -6,7 +6,7 @@ import { RankingBoard } from "@/components/reception/RankingBoard";
 import { ShiftTimeline, type Shift } from "@/components/reception/ShiftTimeline";
 import { DailySummary } from "@/components/reception/DailySummary";
 import { AdvancedCharts } from "@/components/reception/AdvancedCharts";
-import { Target, Users, LayoutDashboard, Calendar, Bell, User as UserIcon, Loader2, Award, Zap, LogOut } from "lucide-react";
+import { Target, Users, LayoutDashboard, Calendar, Bell, User as UserIcon, Loader2, Award, Zap, LogOut, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
