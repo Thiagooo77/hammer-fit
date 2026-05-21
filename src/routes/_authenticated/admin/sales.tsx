@@ -73,14 +73,30 @@ function AdminSalesPage() {
   const fetchSales = useServerFn(listAllSales);
   const updateSaleFn = useServerFn(updateSaleAsAdmin);
   const deleteSaleFn = useServerFn(deleteSaleAsAdmin);
+  const createSaleFn = useServerFn(createSaleAsAdmin);
+  const fetchReceptionists = useServerFn(listReceptionistsForAdmin);
 
   const [searchTerm, setSearchTerm] = React.useState("");
   const [editingSale, setEditingSale] = React.useState<any>(null);
   const [deletingSaleId, setDeletingSaleId] = React.useState<string | null>(null);
+  const [createOpen, setCreateOpen] = React.useState(false);
+  const [newSale, setNewSale] = React.useState({
+    receptionist_id: "",
+    client_name: "",
+    service_name: "",
+    amount: "",
+    payment_method: "pix" as "pix" | "dinheiro" | "cartao" | "convenio" | "outros",
+  });
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin-sales"],
     queryFn: () => fetchSales(),
+    refetchInterval: 15000,
+  });
+
+  const { data: receptionistsData } = useQuery({
+    queryKey: ["admin-receptionists-list"],
+    queryFn: () => fetchReceptionists(),
   });
 
   const updateMutation = useMutation({
