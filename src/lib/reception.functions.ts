@@ -194,20 +194,19 @@ export const closeCashSession = createServerFn({ method: "POST" })
 
 // 4. Get Dashboard Data (Consolidated)
 export const getReceptionDashboard = createServerFn({ method: "GET" })
-  .handler(async () => {
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Fetch active receptionist data
+    // Fetch receptionist data for the current user
     const { data: receptionist } = await supabaseAdmin
       .from("receptionists")
       .select("*")
-      .eq("active", true)
-      .order("created_at", { ascending: true })
-      .limit(1)
+      .eq("user_id", context.userId)
       .maybeSingle();
 
     if (!receptionist) {
-      return { receptionist: null, currentSession: null, dailyGoal: null, goalProgress: null, ranking: [], smartStats: { remaining: 0, percentage: 0, totalSoldToday: 0, vendasCount: 0, ticketMedio: 0, mostLucrativeHour: "N/A" }, charts: null };
+      return { receptionist: null, currentSession: null, dailyGoal: null, goalProgress: null, ranking: [], smartStats: { remaining: 0, percentage: 0, totalSoldToday: 0, vendasCount: 0, ticketMedio: 0, mostLucrativeHour: "N/A" }, charts: null, todaysSessions: [] };
     }
 
     // Get today's start and end for filtering
