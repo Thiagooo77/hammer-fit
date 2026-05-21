@@ -111,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, [queryClient]);
 
-  const fetchUserData = async (userId: string) => {
+  const fetchUserData = async (userId: string, currentSession?: Session | null) => {
     try {
       const [userRole, userProfile] = await Promise.all([
         withTimeout(authService.getUserRole(userId), 10000, "Tempo de permissões excedido"),
@@ -119,9 +119,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ]);
       
       let finalRole = userRole;
+      const userEmail = currentSession?.user?.email || session?.user?.email;
       
       // Safety for master admin
-      if (!finalRole && session?.user?.email === 'admhammer@gmail.com') {
+      if (!finalRole && userEmail === 'admhammer@gmail.com') {
         finalRole = 'admin';
       }
       
@@ -129,8 +130,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setProfile(userProfile);
     } catch (error) {
       console.error('[AUTH_USER_DATA_ERROR]', error);
+      const userEmail = currentSession?.user?.email || session?.user?.email;
       // Hard fallback for master admin
-      if (session?.user?.email === 'admhammer@gmail.com') {
+      if (userEmail === 'admhammer@gmail.com') {
         setRole('admin');
       }
     } finally {
