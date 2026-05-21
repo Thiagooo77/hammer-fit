@@ -372,6 +372,76 @@ function AdminSalesPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Dialog de Criação */}
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="bg-slate-900 border-white/10 text-white sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black uppercase italic tracking-tight">
+              Nova <span className="text-primary">Venda</span>
+            </DialogTitle>
+            <DialogDescription className="text-slate-400">
+              Registre uma nova venda em nome de um recepcionista.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Recepcionista</Label>
+              <Select value={newSale.receptionist_id} onValueChange={(val) => setNewSale({ ...newSale, receptionist_id: val })}>
+                <SelectTrigger className="bg-white/5 border-white/10">
+                  <SelectValue placeholder="Selecione o recepcionista" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-white/10">
+                  {(receptionistsData?.receptionists || []).map((r: any) => (
+                    <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Cliente</Label>
+                <Input value={newSale.client_name} onChange={(e) => setNewSale({ ...newSale, client_name: e.target.value })} className="bg-white/5 border-white/10" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Serviço</Label>
+                <Input value={newSale.service_name} onChange={(e) => setNewSale({ ...newSale, service_name: e.target.value })} className="bg-white/5 border-white/10" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Valor (R$)</Label>
+                <Input type="number" step="0.01" value={newSale.amount} onChange={(e) => setNewSale({ ...newSale, amount: e.target.value })} className="bg-white/5 border-white/10" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Pagamento</Label>
+                <Select value={newSale.payment_method} onValueChange={(val: any) => setNewSale({ ...newSale, payment_method: val })}>
+                  <SelectTrigger className="bg-white/5 border-white/10">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-900 border-white/10">
+                    <SelectItem value="pix">PIX</SelectItem>
+                    <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                    <SelectItem value="cartao">Cartão</SelectItem>
+                    <SelectItem value="convenio">Convênio</SelectItem>
+                    <SelectItem value="outros">Outros</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateOpen(false)} className="border-white/10">Cancelar</Button>
+            <Button
+              className="bg-primary hover:bg-primary/90 font-black uppercase italic"
+              onClick={() => createMutation.mutate()}
+              disabled={createMutation.isPending || !newSale.receptionist_id || !newSale.service_name || !newSale.amount}
+            >
+              {createMutation.isPending ? <Loader2 className="animate-spin size-4" /> : "Registrar Venda"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Alerta de Exclusão */}
       <AlertDialog open={!!deletingSaleId} onOpenChange={(open) => !open && setDeletingSaleId(null)}>
         <AlertDialogContent className="bg-slate-900 border-white/10 text-white">
