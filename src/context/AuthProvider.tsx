@@ -27,23 +27,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const clearLocalAuthState = () => {
+    try {
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith('sb-') || k.includes('supabase'))
+        .forEach((k) => localStorage.removeItem(k));
+      sessionStorage.clear();
+    } catch (e) {
+      console.error('[AUTH_STORAGE_CLEAR_ERROR]', e);
+    }
+    setSession(null);
+    setRole(null);
+    setProfile(null);
+    setLoading(false);
+  };
+
   useEffect(() => {
     // Safety: if loading hangs >8s, clear stale auth storage and force logout
     const stuckTimer = setTimeout(() => {
       console.warn('[AUTH_STUCK] Loading exceeded 8s, clearing local session');
-      try {
-        Object.keys(localStorage)
-          .filter((k) => k.startsWith('sb-') || k.includes('supabase'))
-          .forEach((k) => localStorage.removeItem(k));
-        sessionStorage.clear();
-      } catch (e) {
-        console.error('[AUTH_STORAGE_CLEAR_ERROR]', e);
-      }
+      clearLocalAuthState();
       supabase.auth.signOut().catch(() => {});
-      setSession(null);
-      setRole(null);
-      setProfile(null);
-      setLoading(false);
     }, 8000);
 
     // Initial session
@@ -61,13 +65,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('[AUTH_STATE_CHANGE]', event);
       setSession(session);
       
       if (event === "SIGNED_IN" && session?.user) {
         console.log('[AUTH_LOGIN]', { email: session.user.email });
-        await fetchUserData(session.user.id);
+        setLoading(false);
+        setTimeout(() => {
+          fetchUserData(session.user.id).catch(err => console.error('[AUTH_USER_DATA_ERROR]', err));
+        }, 0);
         
         // Use setImmediate or setTimeout to avoid blocking the main UI thread during login
         setTimeout(() => {
