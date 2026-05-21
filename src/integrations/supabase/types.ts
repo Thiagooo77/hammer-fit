@@ -133,6 +133,50 @@ export type Database = {
           },
         ]
       }
+      checklists: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          shift: Database["public"]["Enums"]["checklist_shift"]
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          shift?: Database["public"]["Enums"]["checklist_shift"]
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          shift?: Database["public"]["Enums"]["checklist_shift"]
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklists_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "receptionists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       goal_progress: {
         Row: {
           goal_amount: number
@@ -485,6 +529,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "moderator" | "user" | "manager" | "receptionist"
       cash_session_status: "open" | "pending_review" | "closed"
+      checklist_shift: "morning" | "afternoon" | "night" | "general"
       hammer_role: "admin" | "employee"
       payment_method: "pix" | "dinheiro" | "cartao" | "convenio" | "outros"
       receptionist_status: "active" | "vacation" | "blocked"
@@ -618,6 +663,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "moderator", "user", "manager", "receptionist"],
       cash_session_status: ["open", "pending_review", "closed"],
+      checklist_shift: ["morning", "afternoon", "night", "general"],
       hammer_role: ["admin", "employee"],
       payment_method: ["pix", "dinheiro", "cartao", "convenio", "outros"],
       receptionist_status: ["active", "vacation", "blocked"],
