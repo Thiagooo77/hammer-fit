@@ -36,7 +36,7 @@ export const getAdminDashboard = createServerFn({ method: "GET" })
       supabaseAdmin.from("sales").select("*").gte("created_at", weekStart.toISOString()),
       supabaseAdmin.from("goal_progress").select("*, receptionists(name, avatar_url)").order("sold_amount", { ascending: false }),
       supabaseAdmin.from("receptionists").select("id").eq("active", true),
-      supabaseAdmin.from("daily_goals").select("*").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle(),
+      supabaseAdmin.from("goals").select("*").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle(),
       supabaseAdmin.from("cash_sessions").select("*").gte("opened_at", todayStart.toISOString())
     ]);
 

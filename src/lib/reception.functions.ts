@@ -227,7 +227,7 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       { data: todaysSessions }
     ] = await Promise.all([
       supabaseAdmin.from("cash_sessions").select("*, receptionists (name, avatar_url)").eq("status", "open").maybeSingle(),
-      supabaseAdmin.from("daily_goals").select("*").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle() as any,
+      supabaseAdmin.from("goals").select("*").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle() as any,
       supabaseAdmin.from("goal_progress").select("*").eq("receptionist_id", receptionist.id).maybeSingle(),
       supabaseAdmin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists(name, avatar_url)").order("sold_amount", { ascending: false }).limit(10),
       supabaseAdmin.from("sales").select("*").gte("created_at", todayStart.toISOString()).lt("created_at", tomorrowStart.toISOString()),
