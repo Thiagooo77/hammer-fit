@@ -256,7 +256,7 @@ function ReceptionGoalsDashboard() {
               />
             )}
             
-            <ShiftTimeline shifts={mockShifts} />
+            <ShiftTimeline shifts={formattedShifts} />
           </div>
 
           {/* Coluna Direita: Ranking e Outros */}
