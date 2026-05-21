@@ -115,13 +115,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fetchUserData = async (userId: string) => {
     try {
       const [userRole, userProfile] = await Promise.all([
-        withTimeout(authService.getUserRole(userId), 5000, "Tempo de permissões excedido"),
-        withTimeout(authService.getProfile(userId), 5000, "Tempo de perfil excedido")
+        withTimeout(authService.getUserRole(userId), 10000, "Tempo de permissões excedido"),
+        withTimeout(authService.getProfile(userId), 10000, "Tempo de perfil excedido")
       ]);
-      setRole(userRole);
+      
+      let finalRole = userRole;
+      
+      // Safety for master admin
+      if (!finalRole && session?.user?.email === 'admhammer@gmail.com') {
+        finalRole = 'admin';
+      }
+      
+      setRole(finalRole);
       setProfile(userProfile);
     } catch (error) {
       console.error('[AUTH_USER_DATA_ERROR]', error);
+      // Hard fallback for master admin
+      if (session?.user?.email === 'admhammer@gmail.com') {
+        setRole('admin');
+      }
     } finally {
       setLoading(false);
     }
