@@ -1,10 +1,21 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
-import { Navigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { getAdminDashboard } from "@/lib/admin-dashboard.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, Settings, LogOut, BarChart3, ShieldCheck } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { 
+  LayoutDashboard, Users, Settings, LogOut, BarChart3, 
+  ShieldCheck, TrendingUp, DollarSign, Target, Clock,
+  PieChart as PieChartIcon, Monitor
+} from "lucide-react";
+import { 
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
+  Tooltip, PieChart, Pie, Cell, LineChart, Line, CartesianGrid 
+} from "recharts";
+import { RankingBoard } from "@/components/reception/RankingBoard";
+import { motion } from "framer-motion";
 
 export const Route = createFileRoute("/admin/dashboard")({
   component: AdminDashboard,
