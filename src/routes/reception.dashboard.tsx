@@ -2,10 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import * as React from "react";
 import { CashRegisterCard } from "@/components/reception/CashRegisterCard";
 import { GoalsProgress } from "@/components/reception/GoalsProgress";
-import { RankingBoard, type RankingMember } from "@/components/reception/RankingBoard";
+import { RankingBoard } from "@/components/reception/RankingBoard";
 import { ShiftTimeline, type Shift } from "@/components/reception/ShiftTimeline";
 import { DailySummary } from "@/components/reception/DailySummary";
-import { Target, Users, LayoutDashboard, Calendar, Bell, User as UserIcon, Loader2 } from "lucide-react";
+import { AdvancedCharts } from "@/components/reception/AdvancedCharts";
+import { Target, Users, LayoutDashboard, Calendar, Bell, User as UserIcon, Loader2, Award, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
@@ -40,25 +41,23 @@ function ReceptionGoalsDashboard() {
     );
   }
 
-  if (error || !data) {
+  if (error || !data || !data.receptionist) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 text-center">
         <h1 className="text-2xl font-black text-red-500 mb-2">ERRO AO CARREGAR DASHBOARD</h1>
-        <p className="text-muted-foreground mb-4">{(error as any)?.message || "Ocorreu um erro inesperado."}</p>
+        <p className="text-muted-foreground mb-4">{(error as any)?.message || "Ocorreu um erro inesperado ou recepcionista não encontrado."}</p>
         <Button onClick={() => window.location.reload()}>Tentar Novamente</Button>
       </div>
     );
   }
 
+  const { receptionist, currentSession, goalProgress, dailyGoal, ranking, smartStats, charts } = data;
+
   const mockShifts: Shift[] = [
     { id: "s1", type: "Manhã", receptionist: "Ana Silva", time: "06:00 - 12:00", status: "encerrado" },
-    { id: "s2", type: "Tarde", receptionist: data.receptionist.name, time: "12:00 - 18:00", status: "ativo" },
+    { id: "s2", type: "Tarde", receptionist: receptionist.name, time: "12:00 - 18:00", status: "ativo" },
     { id: "s3", type: "Noite", receptionist: "Pendente", time: "18:00 - 22:00", status: "aguardando fechamento" },
   ];
-
-  const currentSession = data.currentSession;
-  const goalProgress = data.goalProgress;
-  const dailyGoal = data.dailyGoal;
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-12">
@@ -86,7 +85,7 @@ function ReceptionGoalsDashboard() {
             
             <div className="flex items-center gap-3 pl-6 border-l border-primary/10">
               <div className="text-right hidden sm:block">
-                <p className="text-xs font-black">{data.receptionist.name}</p>
+                <p className="text-xs font-black">{receptionist.name}</p>
                 <p className="text-[10px] text-muted-foreground uppercase font-bold">Recepcionista</p>
               </div>
               <Button variant="ghost" size="icon" className="relative">
@@ -94,8 +93,8 @@ function ReceptionGoalsDashboard() {
                 <span className="absolute top-2 right-2 size-2 bg-primary rounded-full" />
               </Button>
               <div className="size-10 rounded-full bg-secondary border border-primary/20 flex items-center justify-center overflow-hidden">
-                {data.receptionist.avatar_url ? (
-                  <img src={data.receptionist.avatar_url} alt={data.receptionist.name} className="size-full object-cover" />
+                {receptionist.avatar_url ? (
+                  <img src={receptionist.avatar_url} alt={receptionist.name} className="size-full object-cover" />
                 ) : (
                   <UserIcon className="size-5 text-primary" />
                 )}
@@ -106,90 +105,112 @@ function ReceptionGoalsDashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-8">
-        {/* Welcome Section */}
+        {/* Welcome & KPIs Header */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4"
+          className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6"
         >
           <div>
-            <h2 className="text-3xl font-black tracking-tighter uppercase">BOAS VINDAS, {data.receptionist.name.split(' ')[0]}!</h2>
-            <p className="text-muted-foreground">
-              O seu caixa está <span className={cn(
-                "font-bold uppercase",
-                currentSession ? "text-green-500" : "text-red-500"
-              )}>
-                {currentSession ? "Aberto" : "Fechado"}
-              </span>. Boas vendas!
+            <h2 className="text-4xl font-black tracking-tighter uppercase italic flex items-center gap-3">
+              <Zap className="size-8 text-primary animate-pulse" />
+              BOAS VINDAS, {receptionist.name.split(' ')[0]}!
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              O seu turno está <span className="font-bold text-primary uppercase">{currentSession ? "Em andamento" : "Aguardando início"}</span>.
             </p>
           </div>
-          <DailySummary />
+          
+          <div className="flex flex-wrap gap-4">
+            <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 flex flex-col items-center">
+              <span className="text-[10px] font-black uppercase text-muted-foreground">Vendido Hoje</span>
+              <span className="text-2xl font-black text-primary">R$ {smartStats.totalSoldToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            </div>
+            <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 flex flex-col items-center">
+              <span className="text-[10px] font-black uppercase text-muted-foreground">Progresso Meta</span>
+              <span className="text-2xl font-black">{smartStats.percentage}%</span>
+            </div>
+          </div>
         </motion.div>
 
-        {/* Cards Principais Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
-            <CashRegisterCard 
-              status={currentSession ? "Aberto" : "Fechado"}
-              startTime={currentSession ? new Date(currentSession.opened_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : "--:--"}
-              responsible={currentSession ? currentSession.receptionists.name : "Nenhum"}
-              totalSales={goalProgress ? Number(goalProgress.sold_amount) : 0}
-              salesCount={0} // No MVP real-time count yet
-              payments={{
-                pix: 0,
-                dinheiro: 0,
-                cartao: 0,
-                convenio: 0,
-                outros: 0
-              }}
-            />
-          </motion.div>
+        {/* Dash Grid Principal */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Coluna Esquerda: Caixas e Gráficos */}
+          <div className="lg:col-span-8 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <CashRegisterCard 
+                status={currentSession ? "Aberto" : "Fechado"}
+                startTime={currentSession ? new Date(currentSession.opened_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : "--:--"}
+                responsible={currentSession ? (currentSession.receptionists as any)?.name || "N/A" : "Nenhum"}
+                totalSales={smartStats.totalSoldToday}
+                salesCount={smartStats.vendasCount}
+                payments={{
+                  pix: 0,
+                  dinheiro: 0,
+                  cartao: 0,
+                  convenio: 0,
+                  outros: 0
+                }}
+              />
+              <GoalsProgress 
+                title="Sua Meta"
+                icon={<Target className="size-5" />}
+                target={goalProgress ? Number(goalProgress.goal_amount) : 0}
+                current={goalProgress ? Number(goalProgress.sold_amount) : 0}
+                type="individual"
+              />
+            </div>
 
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}>
-            <GoalsProgress 
-              title="Sua Meta"
-              icon={<Target className="size-5" />}
-              target={goalProgress ? Number(goalProgress.goal_amount) : 0}
-              current={goalProgress ? Number(goalProgress.sold_amount) : 0}
-              type="individual"
-            />
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 }}>
-            <GoalsProgress 
-              title="Meta da Clínica"
-              icon={<Users className="size-5" />}
-              target={dailyGoal ? Number(dailyGoal.goal_amount) : 0}
-              current={4250.00} // Mocked clinic total for now
-              type="general"
-              prediction={5800}
-            />
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.4 }}>
-            <RankingBoard members={data.ranking} />
-          </motion.div>
-        </div>
-
-        {/* Bottom Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
+            {charts && (
+              <AdvancedCharts 
+                salesByHour={charts.salesByHour} 
+                paymentMethods={charts.paymentMethods} 
+                smartStats={smartStats} 
+              />
+            )}
+            
             <ShiftTimeline shifts={mockShifts} />
           </div>
-          <div className="bg-primary/5 rounded-2xl border border-primary/10 p-6 flex flex-col items-center justify-center text-center">
-            <div className="size-16 bg-primary/20 rounded-full flex items-center justify-center mb-4">
-              <LayoutDashboard className="size-8 text-primary" />
-            </div>
-            <h3 className="text-xl font-black mb-2 uppercase italic">Visão Estratégica</h3>
-            <p className="text-sm text-muted-foreground mb-6">
-              Acompanhe o desempenho da equipe em tempo real e tome decisões baseadas em dados para atingir os objetivos da clínica.
-            </p>
-            <Button className="w-full gap-2 font-bold uppercase italic" variant="outline">
-              Ver Relatório Completo
-            </Button>
+
+          {/* Coluna Direita: Ranking e Outros */}
+          <div className="lg:col-span-4 space-y-6">
+            <RankingBoard members={ranking} />
+            
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="p-6 rounded-2xl bg-gradient-to-br from-primary to-primary-glow border border-primary/20 text-white relative overflow-hidden"
+            >
+              <Award className="absolute -bottom-4 -right-4 size-32 opacity-10 rotate-12" />
+              <div className="relative z-10">
+                <h3 className="text-xl font-black uppercase italic mb-2">Top Vendedor</h3>
+                <p className="text-sm opacity-80 mb-4">Mantenha o ritmo para garantir sua medalha de ouro no final do dia!</p>
+                <div className="bg-white/20 backdrop-blur-md rounded-xl p-3 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="size-10 rounded-full bg-yellow-500 flex items-center justify-center border-2 border-white/50">
+                      <Trophy className="size-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-black uppercase">Próximo Nível</p>
+                      <p className="text-sm font-bold italic">Gold Star II</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-black tracking-tighter">85%</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            <DailySummary />
           </div>
         </div>
       </main>
     </div>
   );
+}
+
+// Mock Trophy icon since it's used in the JSX
+function Trophy({ className }: { className?: string }) {
+  return <Award className={className} />;
 }
