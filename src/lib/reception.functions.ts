@@ -137,6 +137,14 @@ export const closeCashSession = createServerFn({ method: "POST" })
       .single();
 
     if (error) throw error;
+    await logAudit({
+      userId: context.userId,
+      actionType: difference === 0 ? "cash_close" : "cash_close_with_diff",
+      module: "cash",
+      description: `Fechamento de caixa. Esperado R$ ${expectedBalance.toFixed(2)}, informado R$ ${data.closing_balance}, diferença R$ ${difference.toFixed(2)}`,
+      oldData: { expectedBalance, totalSales },
+      newData: updatedSession,
+    });
     return { session: updatedSession, audit: { expectedBalance, totalSales, difference } };
   });
 
