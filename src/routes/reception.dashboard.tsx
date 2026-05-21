@@ -178,17 +178,19 @@ function ReceptionGoalsDashboard() {
           <div className="lg:col-span-8 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <CashRegisterCard 
-                status={currentSession ? "Aberto" : "Fechado"}
+                status={currentSession ? (currentSession.status === 'open' ? "Aberto" : "Em análise") : "Fechado"}
                 startTime={currentSession ? new Date(currentSession.opened_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : "--:--"}
                 responsible={currentSession ? (currentSession.receptionists as any)?.name || "N/A" : "Nenhum"}
                 totalSales={smartStats.totalSoldToday}
                 salesCount={smartStats.vendasCount}
+                receptionistId={receptionist.id}
+                sessionId={currentSession?.id}
                 payments={{
-                  pix: 0,
-                  dinheiro: 0,
-                  cartao: 0,
-                  convenio: 0,
-                  outros: 0
+                  pix: charts?.paymentMethods.find((p: any) => p.name === 'Pix')?.value || 0,
+                  dinheiro: charts?.paymentMethods.find((p: any) => p.name === 'Dinheiro')?.value || 0,
+                  cartao: charts?.paymentMethods.find((p: any) => p.name === 'Cartao')?.value || 0,
+                  convenio: charts?.paymentMethods.find((p: any) => p.name === 'Convenio')?.value || 0,
+                  outros: charts?.paymentMethods.find((p: any) => p.name === 'Outros')?.value || 0
                 }}
               />
               <GoalsProgress 
