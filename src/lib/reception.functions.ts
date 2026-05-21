@@ -209,9 +209,19 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
     const tomorrowStart = new Date(todayStart);
     tomorrowStart.setDate(todayStart.getDate() + 1);
 
-    // Fetch everything in a single parallel block
+    // 1. Get receptionist first to resolve IDs for subsequent queries
+    const { data: receptionist } = await userSupabase
+      .from("receptionists")
+      .select("*")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+
+    if (!receptionist) {
+      return { receptionist: null, currentSession: null, dailyGoal: null, goalProgress: null, ranking: [], smartStats: { remaining: 0, percentage: 0, totalSoldToday: 0, vendasCount: 0, ticketMedio: 0, mostLucrativeHour: "N/A" }, charts: null, todaysSessions: [] };
+    }
+
+    // 2. Fetch all other data in parallel
     const [
-      { data: receptionist },
       { data: currentSession },
       { data: dailyGoal },
       { data: goalProgress },
@@ -219,14 +229,14 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       { data: todaySales },
       { data: todaysSessions }
     ] = await Promise.all([
-      userSupabase.from("receptionists").select("*").eq("user_id", context.userId).maybeSingle(),
       userSupabase.from("cash_sessions").select("*, receptionists (name, avatar_url)").eq("status", "open").maybeSingle(),
       supabaseAdmin.from("goals" as any).select("*").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle() as any,
-      supabaseAdmin.from("goal_progress").select("*").eq("receptionist_id", receptionist?.id).maybeSingle(), // Use receptionist id after fetching
+      supabaseAdmin.from("goal_progress").select("*").eq("receptionist_id", receptionist.id).maybeSingle(),
       supabaseAdmin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists(name, avatar_url)").order("sold_amount", { ascending: false }).limit(10),
       supabaseAdmin.from("sales").select("*").gte("created_at", todayStart.toISOString()).lt("created_at", tomorrowStart.toISOString()),
       supabaseAdmin.from("cash_sessions").select("*, receptionists(name)").gte("opened_at", todayStart.toISOString()).order("opened_at", { ascending: true })
     ]);
+
 
 
     // Format ranking
