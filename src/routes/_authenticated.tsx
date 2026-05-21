@@ -2,6 +2,14 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 
+const withTimeout = async <T,>(promise: PromiseLike<T>, ms: number): Promise<T> => {
+  const timeout = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error("Timeout")), ms);
+  });
+  return Promise.race([promise, timeout]);
+};
+
+
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
     const { data: { session } } = await supabase.auth.getSession();
