@@ -135,7 +135,7 @@ export function LoginForm() {
               <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">Email Corporativo</FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="exemplo@hammerclinic.com.br" 
+                  placeholder="exemplo@hammerfit.com.br" 
                   {...field} 
                   className="bg-white/5 border-white/10 text-white placeholder:text-slate-600 focus:border-primary/50 transition-all rounded-xl h-12"
                 />
