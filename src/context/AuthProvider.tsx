@@ -28,16 +28,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Safety: if loading hangs >8s, clear stale auth storage and force logout
+    const stuckTimer = setTimeout(() => {
+      console.warn('[AUTH_STUCK] Loading exceeded 8s, clearing local session');
+      try {
+        Object.keys(localStorage)
+          .filter((k) => k.startsWith('sb-') || k.includes('supabase'))
+          .forEach((k) => localStorage.removeItem(k));
+        sessionStorage.clear();
+      } catch (e) {
+        console.error('[AUTH_STORAGE_CLEAR_ERROR]', e);
+      }
+      supabase.auth.signOut().catch(() => {});
+      setSession(null);
+      setRole(null);
+      setProfile(null);
+      setLoading(false);
+    }, 8000);
+
     // Initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
-        fetchUserData(session.user.id);
+        fetchUserData(session.user.id).finally(() => clearTimeout(stuckTimer));
       } else {
+        clearTimeout(stuckTimer);
         setLoading(false);
       }
     }).catch(error => {
       console.error('[AUTH_INITIAL_SESSION_ERROR]', error);
+      clearTimeout(stuckTimer);
       setLoading(false);
     });
 
