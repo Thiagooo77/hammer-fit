@@ -104,12 +104,14 @@ export const updateReceptionist = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
     const { id, ...patch } = data;
-    const updates: Record<string, unknown> = { ...patch };
-    if (patch.status !== undefined) updates.active = patch.status === "active";
+    const updates = {
+      ...patch,
+      ...(patch.status !== undefined ? { active: patch.status === "active" } : {}),
+    };
 
     const { data: rec, error } = await supabaseAdmin
       .from("receptionists")
-      .update(updates)
+      .update(updates as never)
       .eq("id", id)
       .select()
       .single();
