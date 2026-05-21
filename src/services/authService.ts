@@ -27,7 +27,7 @@ export const authService = {
 
   async getProfile(userId: string) {
     const { data, error } = await supabase
-      .from("profiles")
+      .from("users")
       .select("*")
       .eq("id", userId)
       .single();
