@@ -1,35 +1,28 @@
-import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabaseAdmin as supabase } from "@/integrations/supabase/client.server";
 
-export const recordProfessionalAudit = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({
-      action: z.string().min(1).max(60),
-      module: z.string().min(1).max(60),
-      description: z.string().max(1000).optional(),
-      oldData: z.any().optional(),
-      newData: z.any().optional(),
-    }).parse(input),
-  )
-  .handler(async ({ data, context }) => {
-    const { logAudit } = await import("@/lib/audit.server");
+export const getAuditLogs = async (userId: string, filters: any) => {
+  const { data: roles } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId);
     
-    console.log('[AUDIT_CREATED]', { 
-      user: context.userId, 
-      action: data.action, 
-      module: data.module 
-    });
+  const isAdmin = roles?.some(r => r.role === 'admin');
+  const isManager = roles?.some(r => r.role === 'manager');
+  
+  if (!isAdmin && !isManager) throw new Error("Acesso negado");
 
-    await logAudit({
-      userId: context.userId,
-      actionType: data.action,
-      module: data.module,
-      description: data.description,
-      oldData: data.oldData,
-      newData: data.newData,
-    });
-    
-    return { success: true };
-  });
+  let query = supabase
+    .from("audit_logs")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (filters.module) query = query.eq("module", filters.module);
+  if (!isAdmin) {
+    // Managers might see restricted audit
+    query = query.not("module", "eq", "system_config");
+  }
+
+  const { data, error } = await query.limit(filters.limit || 100);
+  if (error) throw error;
+  return data;
+};
