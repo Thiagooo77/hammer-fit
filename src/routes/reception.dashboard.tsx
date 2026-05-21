@@ -27,6 +27,7 @@ function ReceptionGoalsDashboard() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["reception-dashboard"],
     queryFn: () => fetchDashboard(),
+    refetchInterval: 30000, // Refresh every 30 seconds
     enabled: !!user,
   });
 
