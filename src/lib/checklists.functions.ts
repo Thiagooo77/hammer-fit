@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { supabase } from "./supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 
 const checklistSchema = z.object({
@@ -11,7 +11,7 @@ const checklistSchema = z.object({
   status: z.enum(["pending", "completed", "urgent"]).default("pending"),
 });
 
-export const listChecklists = createServerFn("GET", async () => {
+export const listChecklists = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await supabase
     .from("checklists")
     .select(`
@@ -24,47 +24,56 @@ export const listChecklists = createServerFn("GET", async () => {
   return { checklists: data };
 });
 
-export const createChecklist = createServerFn("POST", async (payload: { data: z.infer<typeof checklistSchema> }) => {
-  const { data, error } = await supabase
-    .from("checklists")
-    .insert([payload.data])
-    .select()
-    .single();
+export const createChecklist = createServerFn({ method: "POST" })
+  .validator((data: z.infer<typeof checklistSchema>) => data)
+  .handler(async ({ data }) => {
+    const { data: created, error } = await supabase
+      .from("checklists")
+      .insert([data])
+      .select()
+      .single();
 
-  if (error) throw new Error(error.message);
-  return { checklist: data };
-});
+    if (error) throw new Error(error.message);
+    return { checklist: created };
+  });
 
-export const updateChecklist = createServerFn("POST", async (payload: { data: z.infer<typeof checklistSchema> & { id: string } }) => {
-  const { data, error } = await supabase
-    .from("checklists")
-    .update(payload.data)
-    .eq("id", payload.data.id)
-    .select()
-    .single();
+export const updateChecklist = createServerFn({ method: "POST" })
+  .validator((data: z.infer<typeof checklistSchema> & { id: string }) => data)
+  .handler(async ({ data }) => {
+    const { id, ...updateData } = data;
+    const { data: updated, error } = await supabase
+      .from("checklists")
+      .update(updateData)
+      .eq("id", id)
+      .select()
+      .single();
 
-  if (error) throw new Error(error.message);
-  return { checklist: data };
-});
+    if (error) throw new Error(error.message);
+    return { checklist: updated };
+  });
 
-export const deleteChecklist = createServerFn("POST", async (payload: { id: string }) => {
-  const { error } = await supabase
-    .from("checklists")
-    .delete()
-    .eq("id", payload.id);
+export const deleteChecklist = createServerFn({ method: "POST" })
+  .validator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    const { error } = await supabase
+      .from("checklists")
+      .delete()
+      .eq("id", id);
 
-  if (error) throw new Error(error.message);
-  return { success: true };
-});
+    if (error) throw new Error(error.message);
+    return { success: true };
+  });
 
-export const toggleChecklistStatus = createServerFn("POST", async (payload: { id: string, status: "pending" | "completed" | "urgent" }) => {
-  const { data, error } = await supabase
-    .from("checklists")
-    .update({ status: payload.status })
-    .eq("id", payload.id)
-    .select()
-    .single();
+export const toggleChecklistStatus = createServerFn({ method: "POST" })
+  .validator((payload: { id: string, status: "pending" | "completed" | "urgent" }) => payload)
+  .handler(async ({ data }) => {
+    const { data: updated, error } = await supabase
+      .from("checklists")
+      .update({ status: data.status })
+      .eq("id", data.id)
+      .select()
+      .single();
 
-  if (error) throw new Error(error.message);
-  return { checklist: data };
-});
+    if (error) throw new Error(error.message);
+    return { checklist: updated };
+  });
