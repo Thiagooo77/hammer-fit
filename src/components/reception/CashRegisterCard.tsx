@@ -360,13 +360,3 @@ function PaymentItem({ icon, label, value }: { icon: React.ReactNode, label: str
     </div>
   );
 }
-
-function PaymentItem({ icon, label, value }: { icon: React.ReactNode, label: string, value: number }) {
-  return (
-    <div className="flex flex-col items-center p-2 rounded-lg bg-secondary/50 border border-primary/5">
-      <div className="text-primary mb-1">{icon}</div>
-      <p className="text-[10px] text-muted-foreground uppercase font-bold">{label}</p>
-      <p className="text-xs font-bold">R$ {value.toFixed(0)}</p>
-    </div>
-  );
-}
