@@ -59,6 +59,11 @@ function ReceptionGoalsDashboard() {
     { id: "s3", type: "Noite", receptionist: "Pendente", time: "18:00 - 22:00", status: "aguardando fechamento" },
   ];
 
+  const clinicTarget = dailyGoal ? Number(dailyGoal.goal_amount) : 10000;
+  const clinicCurrent = smartStats.totalSoldToday || 4250.00;
+  const clinicPercentage = Math.round((clinicCurrent / clinicTarget) * 100);
+  const clinicPrediction = clinicCurrent > 0 ? (clinicCurrent / (new Date().getHours() || 1)) * 18 : 0;
+
   return (
     <div className="min-h-screen bg-background text-foreground pb-12">
       {/* Header Superior */}
