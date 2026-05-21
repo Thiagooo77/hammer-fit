@@ -101,16 +101,16 @@ function ReceptionGoalsDashboard() {
   const clinicPrediction = clinicCurrent > 0 ? (clinicCurrent / (new Date().getHours() || 1)) * 18 : 0;
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-12">
-      {/* Header Superior */}
-      <header className="sticky top-0 z-40 w-full border-b border-primary/10 bg-background/80 backdrop-blur-md">
+    <div className="min-h-screen bg-slate-950 text-slate-50 pb-12 selection:bg-primary/30">
+      {/* Premium Glass Header */}
+      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/60 backdrop-blur-xl transition-all">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="size-10 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
-              <LayoutDashboard className="text-primary-foreground size-6" />
+            <div className="p-2 bg-primary/20 rounded-lg border border-primary/30 shadow-[0_0_10px_rgba(179,114,45,0.3)]">
+              <LayoutDashboard className="text-primary size-6" />
             </div>
             <div>
-              <h1 className="text-xl font-black tracking-tighter uppercase italic">Hammer Clinic</h1>
+              <h1 className="text-xl font-black tracking-tighter uppercase italic">Hammer <span className="text-primary">Clinic</span></h1>
               <div className="flex items-center gap-2 text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
                 <Calendar className="size-3" />
                 {currentDate}
@@ -120,26 +120,22 @@ function ReceptionGoalsDashboard() {
 
           <div className="flex items-center gap-6">
             <div className="hidden md:flex flex-col items-end">
-              <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Turno Ativo</span>
-              <span className="text-sm font-black text-primary">
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Turno Ativo</span>
+              <span className="text-sm font-black text-primary italic">
                 {currentSession ? (new Date(currentSession.opened_at).getHours() < 12 ? "MANHÃ" : new Date(currentSession.opened_at).getHours() < 18 ? "TARDE" : "NOITE") : "NENHUM"}
               </span>
             </div>
             
-            <div className="flex items-center gap-3 pl-6 border-l border-primary/10">
+            <div className="flex items-center gap-3 pl-6 border-l border-white/10">
               <div className="text-right hidden sm:block">
                 <p className="text-xs font-black">{receptionist.name}</p>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold">Recepcionista</p>
+                <p className="text-[10px] text-primary uppercase font-black italic tracking-widest">Recepcionista</p>
               </div>
-              <Button variant="ghost" size="icon" className="relative" onClick={() => signOut()}>
+              <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-colors" onClick={() => signOut()}>
                 <LogOut className="size-5" />
               </Button>
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="size-5" />
-                <span className="absolute top-2 right-2 size-2 bg-primary rounded-full" />
-              </Button>
-
-              <div className="size-10 rounded-full bg-secondary border border-primary/20 flex items-center justify-center overflow-hidden">
+              
+              <div className="size-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shadow-inner">
                 {receptionist.avatar_url ? (
                   <img src={receptionist.avatar_url} alt={receptionist.name} className="size-full object-cover" />
                 ) : (
