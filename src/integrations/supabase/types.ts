@@ -123,6 +123,27 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       receptionists: {
         Row: {
           active: boolean | null
@@ -240,7 +261,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "manager" | "receptionist"
       cash_session_status: "open" | "pending_review" | "closed"
       hammer_role: "admin" | "employee"
       payment_method: "pix" | "dinheiro" | "cartao" | "convenio" | "outros"
@@ -372,7 +393,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "manager", "receptionist"],
       cash_session_status: ["open", "pending_review", "closed"],
       hammer_role: ["admin", "employee"],
       payment_method: ["pix", "dinheiro", "cartao", "convenio", "outros"],
