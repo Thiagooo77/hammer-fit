@@ -4,7 +4,7 @@ import { supabaseAdmin as supabase } from "@/integrations/supabase/client.server
 export const seedAdminUser = createServerFn({ method: "POST" })
   .handler(async () => {
 
-    const email = "gerenciahammer@gmail.com";
+    const email = "admhammer@gmail.com";
     const password = "hammer123";
 
     // Check if user exists
