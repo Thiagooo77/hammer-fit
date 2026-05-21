@@ -90,6 +90,42 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 function AuthenticatedLayout() {
+  const router = useRouter();
+  const { role, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const isAdmin = role === "admin" || role === "manager";
+    const routesToPreload: Array<{ to: string }> = isAdmin
+      ? [
+          { to: "/admin/dashboard" },
+          { to: "/admin/receptionists" },
+          { to: "/admin/audit" },
+          { to: "/reception/dashboard" },
+          { to: "/reception/tasks" },
+        ]
+      : [
+          { to: "/reception/dashboard" },
+          { to: "/reception/tasks" },
+        ];
+
+    const idle = (cb: () => void) => {
+      if (typeof window === "undefined") return;
+      const ric = (window as any).requestIdleCallback as
+        | ((cb: () => void, opts?: { timeout: number }) => number)
+        | undefined;
+      if (ric) ric(cb, { timeout: 2000 });
+      else window.setTimeout(cb, 300);
+    };
+
+    idle(() => {
+      routesToPreload.forEach((r) => {
+        router.preloadRoute(r as any).catch(() => {});
+      });
+    });
+  }, [router, role, isAuthenticated]);
+
   return (
     <div className="flex min-h-screen bg-slate-950">
       <DashboardSidebar />
@@ -99,5 +135,6 @@ function AuthenticatedLayout() {
     </div>
   );
 }
+
 
 
