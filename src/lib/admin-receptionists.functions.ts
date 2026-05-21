@@ -22,7 +22,10 @@ export const listReceptionists = createServerFn({ method: "GET" })
     await assertAdmin(context.userId);
     const { data, error } = await supabaseAdmin
       .from("receptionists")
-      .select("*")
+      .select(`
+        *,
+        user_roles!inner(role)
+      `)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return { receptionists: data ?? [] };
