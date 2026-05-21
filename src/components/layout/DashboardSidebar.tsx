@@ -12,7 +12,8 @@ import {
   FileText,
   Menu,
   X,
-  CheckSquare
+  CheckSquare,
+  Building2
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
