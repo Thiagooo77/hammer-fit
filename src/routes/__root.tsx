@@ -94,7 +94,18 @@ function RootNotFoundComponent() {
 
 function RootComponent() {
   const ctx = Route.useRouteContext();
-  const [fallbackClient] = React.useState(() => new QueryClient());
+  const [fallbackClient] = React.useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: 2,
+        refetchOnWindowFocus: false,
+        staleTime: 1000 * 30, // 30 seconds
+      },
+      mutations: {
+        retry: 1,
+      },
+    },
+  }));
   const queryClient = ctx?.queryClient ?? fallbackClient;
   return (
     <RootDocument>
