@@ -27,19 +27,23 @@ export const Route = createFileRoute("/_authenticated")({
     console.log('[PERMISSION_VALIDATION] User session verified:', session.user.email);
     
     try {
-      // Fetch role and profile data with a timeout or error handling to prevent infinite loading
-      const [{ data: roleData }, { data: profile }] = await Promise.all([
-        supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", session.user.id)
-          .maybeSingle(),
-        supabase
-          .from("users")
-          .select("*")
-          .eq("id", session.user.id)
-          .maybeSingle()
-      ]);
+      // Fetch role and profile data with a timeout to prevent infinite loading
+      const [{ data: roleData }, { data: profile }] = await withTimeout(
+        Promise.all([
+          supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", session.user.id)
+            .maybeSingle(),
+          supabase
+            .from("users")
+            .select("*")
+            .eq("id", session.user.id)
+            .maybeSingle()
+        ]),
+        8000
+      );
+
 
       // Strict role resolution - no more defaulting to receptionist without verification
       const role = roleData?.role;
