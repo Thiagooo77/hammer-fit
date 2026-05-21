@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getAdminDashboard } from "@/lib/admin-dashboard.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { exportService } from "@/services/exportService";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
   Tooltip, CartesianGrid 
@@ -25,11 +26,28 @@ function AdminDashboard() {
   const { user, signOut, role, loading } = useAuth();
   const fetchDashboard = useServerFn(getAdminDashboard);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin-dashboard"],
     queryFn: () => fetchDashboard(),
     enabled: !!user && (role === "admin" || role === "manager"),
+    refetchInterval: 60000,
   });
+
+  React.useEffect(() => {
+    if (!user || (role !== "admin" && role !== "manager")) return;
+
+    const channel = supabase
+      .channel('admin_updates')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sales' }, () => {
+        console.log('[HAMMER_FIT_AUDIT] Admin Realtime: Update triggered');
+        refetch();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, role, refetch]);
 
   const { data: iaData } = useQuery({
     queryKey: ["ia-predictions"],
