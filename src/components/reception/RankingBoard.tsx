@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Trophy, Medal, Award, Flame, TrendingUp, Star } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Trophy, Medal, Award, Flame, TrendingUp, Star, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -46,82 +47,102 @@ export function RankingBoard({ members }: RankingBoardProps) {
       <CardContent className="pt-2">
         <div className="space-y-3">
           <AnimatePresence mode="popLayout">
-            {sortedMembers.map((member) => (
-              <motion.div
-                key={member.id}
-                layout
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.5, ease: "circOut" }}
-                className={cn(
-                  "flex items-center gap-3 p-3 rounded-xl border transition-all relative overflow-hidden",
-                  member.position === 1 
-                    ? "bg-primary/10 border-primary/40 shadow-xl shadow-primary/10 ring-1 ring-primary/20" 
-                    : "bg-secondary/30 border-primary/5 hover:border-primary/20"
-                )}
-              >
-                {member.position === 1 && (
-                  <motion.div 
-                    animate={{ 
-                      opacity: [0.1, 0.3, 0.1],
-                      scale: [1, 1.1, 1],
-                    }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                    className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 via-primary/10 to-yellow-500/10 pointer-events-none"
-                  />
-                )}
-                <div className="flex-shrink-0">
-                  {getPositionIcon(member.position)}
-                </div>
-
-                <div className="relative">
-                  <Avatar className={cn(
-                    "size-12 border-2",
-                    member.position === 1 ? "border-yellow-500" : "border-primary/20"
-                  )}>
-                    <AvatarImage src={member.avatar} />
-                    <AvatarFallback className="bg-primary/20 text-primary font-bold">
-                      {member.name.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  {member.streak > 2 && (
-                    <div className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full p-1 shadow-lg">
-                      <Flame className="size-3 fill-white" />
-                    </div>
+            {sortedMembers.map((member, i) => {
+              const isTop1 = member.position === 1;
+              const isTop3 = member.position <= 3;
+              
+              return (
+                <motion.div
+                  key={member.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ 
+                    duration: 0.5, 
+                    delay: i * 0.05,
+                    type: "spring",
+                    stiffness: 100 
+                  }}
+                  className={cn(
+                    "flex items-center gap-3 p-3 rounded-xl border transition-all relative overflow-hidden",
+                    isTop1 
+                      ? "bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 border-primary/50 shadow-2xl shadow-primary/10 ring-2 ring-primary/20" 
+                      : isTop3 
+                        ? "bg-secondary/40 border-primary/20"
+                        : "bg-secondary/20 border-primary/5 hover:border-primary/10"
                   )}
-                </div>
+                >
+                  {isTop1 && (
+                    <motion.div 
+                      animate={{ 
+                        x: ['-100%', '200%'],
+                      }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none skew-x-12"
+                    />
+                  )}
+                  
+                  <div className="flex-shrink-0 relative z-10">
+                    {getPositionIcon(member.position)}
+                  </div>
 
-                <div className="flex-grow min-w-0">
-                  <p className="font-bold truncate text-sm">{member.name}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-[10px] bg-secondary px-1.5 py-0.5 rounded text-muted-foreground font-bold">
-                      R$ {member.salesAmount?.toLocaleString('pt-BR') || '0,00'}
-                    </span>
+                  <div className="relative z-10">
+                    <Avatar className={cn(
+                      "size-12 border-2",
+                      isTop1 ? "border-yellow-500 scale-110 shadow-lg shadow-yellow-500/20" : isTop3 ? "border-primary/30" : "border-primary/10"
+                    )}>
+                      <AvatarImage src={member.avatar} />
+                      <AvatarFallback className="bg-primary/20 text-primary font-black">
+                        {member.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
                     {member.streak > 0 && (
-                      <span className="text-[10px] text-red-500 font-black flex items-center gap-0.5">
-                        {member.streak}x STREAK
-                      </span>
+                      <motion.div 
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ repeat: Infinity, duration: 1 }}
+                        className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full p-1 shadow-lg"
+                      >
+                        <Flame className="size-3 fill-white" />
+                      </motion.div>
                     )}
                   </div>
-                </div>
 
-                <div className="text-right flex-shrink-0">
-                  <p className="text-lg font-black text-primary">{member.goalPercentage}%</p>
-                  <p className="text-[9px] text-muted-foreground uppercase font-bold">da meta</p>
-                </div>
-                <div className="absolute bottom-0 left-0 h-1 bg-primary/20 w-full">
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: `${member.goalPercentage}%` }}
-                    className={cn(
-                      "h-full",
-                      member.goalPercentage >= 100 ? "bg-green-500" : "bg-primary"
-                    )}
-                  />
-                </div>
-              </motion.div>
-            ))}
+                  <div className="flex-grow min-w-0 relative z-10">
+                    <p className={cn("font-black truncate text-sm uppercase", isTop1 ? "text-primary" : "text-foreground")}>{member.name}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[10px] bg-black/20 px-1.5 py-0.5 rounded text-muted-foreground font-black">
+                        R$ {member.salesAmount?.toLocaleString('pt-BR') || '0,00'}
+                      </span>
+                      {isTop1 && <Badge className="text-[8px] h-4 bg-yellow-500 text-black font-black px-1 border-0">MVP</Badge>}
+                    </div>
+                  </div>
+
+                  <div className="text-right flex-shrink-0 relative z-10">
+                    <motion.p 
+                      key={member.goalPercentage}
+                      initial={{ scale: 1.2, color: '#b3722d' }}
+                      animate={{ scale: 1, color: isTop1 ? '#b3722d' : 'var(--primary)' }}
+                      className="text-lg font-black"
+                    >
+                      {member.goalPercentage}%
+                    </motion.p>
+                    <p className="text-[8px] text-muted-foreground uppercase font-black tracking-widest">Atingido</p>
+                  </div>
+                  
+                  <div className="absolute bottom-0 left-0 h-1 bg-primary/5 w-full">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min(member.goalPercentage, 100)}%` }}
+                      className={cn(
+                        "h-full",
+                        member.goalPercentage >= 100 ? "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" : "bg-primary"
+                      )}
+                    />
+                  </div>
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         </div>
       </CardContent>
