@@ -3,6 +3,7 @@ import { authService, AppRole } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
+import { recordClientAudit } from "@/lib/audit.functions";
 
 export function useAuth() {
   const queryClient = useQueryClient();
