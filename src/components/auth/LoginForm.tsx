@@ -96,6 +96,7 @@ export function LoginForm() {
     } catch (error) {
       toast.error("Erro ao realizar login");
     } finally {
+      clearTimeout(stuckTimeout);
       setIsLoading(false);
     }
   }
