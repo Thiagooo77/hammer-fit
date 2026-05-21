@@ -32,12 +32,12 @@ export const getAdminDashboard = createServerFn({ method: "GET" })
       { data: dailyGoal },
       { data: sessions }
     ] = await Promise.all([
-      supabaseAdmin.from("sales").select("*").gte("created_at", todayStart.toISOString()),
-      supabaseAdmin.from("sales").select("*").gte("created_at", weekStart.toISOString()),
-      supabaseAdmin.from("goal_progress").select("*, receptionists(name, avatar_url)").order("sold_amount", { ascending: false }),
+      supabaseAdmin.from("sales").select("amount, created_at").gte("created_at", todayStart.toISOString()),
+      supabaseAdmin.from("sales").select("amount, created_at").gte("created_at", weekStart.toISOString()),
+      supabaseAdmin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists(name, avatar_url)").order("sold_amount", { ascending: false }),
       supabaseAdmin.from("receptionists").select("id").eq("active", true),
-      supabaseAdmin.from("goals" as any).select("*").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle() as any,
-      supabaseAdmin.from("cash_sessions").select("*").gte("opened_at", todayStart.toISOString())
+      supabaseAdmin.from("goals" as any).select("goal_amount").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle() as any,
+      supabaseAdmin.from("cash_sessions").select("id").gte("opened_at", todayStart.toISOString())
     ]);
 
     const totalRevenueToday = (todaySales || []).reduce((acc, s) => acc + Number(s.amount), 0);

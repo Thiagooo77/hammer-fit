@@ -1,5 +1,5 @@
 import * as React from "react";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -104,12 +104,12 @@ export const AdvancedCharts = memo(function AdvancedCharts({ salesByHour, paymen
 
       {/* KPIs Grid dentro do Dashboard Avançado */}
       <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
+        {useMemo(() => [
           { label: "Ticket Médio", value: `R$ ${smartStats.ticketMedio.toFixed(2)}`, icon: <DollarSign className="size-4" />, color: "text-blue-500" },
           { label: "Vendas (Qtd)", value: smartStats.vendasCount, icon: <Activity className="size-4" />, color: "text-green-500" },
           { label: "Pico de Vendas", value: smartStats.mostLucrativeHour, icon: <Clock className="size-4" />, color: "text-purple-500" },
           { label: "Projeção", value: `R$ ${((smartStats.totalSoldToday / (new Date().getHours() || 1)) * 24).toFixed(2)}`, icon: <TrendingUp className="size-4" />, color: "text-orange-500" },
-        ].map((kpi, i) => (
+        ], [smartStats.ticketMedio, smartStats.vendasCount, smartStats.mostLucrativeHour, smartStats.totalSoldToday]).map((kpi, i) => (
           <motion.div 
             key={kpi.label}
             initial={{ opacity: 0, y: 10 }}
