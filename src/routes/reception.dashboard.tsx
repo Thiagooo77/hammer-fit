@@ -196,7 +196,7 @@ function ReceptionGoalsDashboard() {
             >
               <Award className="absolute -bottom-4 -right-4 size-32 opacity-10 rotate-12" />
               <div className="relative z-10">
-                <h3 className="text-xl font-black uppercase italic mb-2">Top Vendedor</h3>
+                <h3 className="text-xl font-black uppercase italic mb-2">Status da Clínica</h3>
                 <p className="text-sm opacity-80 mb-4">Mantenha o ritmo para garantir sua medalha de ouro no final do dia!</p>
                 <div className="bg-white/20 backdrop-blur-md rounded-xl p-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">
