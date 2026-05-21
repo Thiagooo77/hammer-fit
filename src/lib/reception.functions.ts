@@ -170,11 +170,9 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
     ]);
 
     // Format ranking
-    // Since complex nested selects can be tricky with types, we'll fetch the names separately if needed or just use receptionist_id as name if missing
-    // But for a better UI, we'll try to get the names in a second pass or assume goal_progress has receptionist details if configured
     const formattedRanking = (ranking || []).map((item, index) => ({
       id: item.receptionist_id,
-      name: "Recepcionista " + (index + 1), // Fallback name
+      name: "Recepcionista " + (index + 1), 
       avatar: "",
       sales: 0,
       streak: 0,
@@ -229,7 +227,7 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
         mostLucrativeHour
       },
       charts: {
-        salesByHour: salesByHour.filter(h => h.count > 0 || new Date().getHours() >= parseInt(h.hour)),
+        salesByHour: salesByHour.filter(h => h.count > 0 || new Date().getHours() >= Number(h.hour.split(':')[0])),
         paymentMethods: paymentChart
       }
     };
