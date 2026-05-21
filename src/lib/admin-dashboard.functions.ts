@@ -3,35 +3,38 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-async function assertAdmin(userId: string) {
-  // Check if role is admin or manager using service role (bypasses RLS)
-  const { data, error } = await supabaseAdmin
+async function assertAdmin(userId: string, email?: string) {
+  // Primary check: read user_roles with service role (bypasses RLS)
+  const { data: roles, error: rolesErr } = await supabaseAdmin
     .from("user_roles")
     .select("role")
-    .eq("user_id", userId)
-    .in("role", ["admin", "manager"]);
-  
-  if (error) {
-    console.error("[HAMMER_FIT_AUDIT] Role check failed:", error);
-    throw new Error("Acesso negado: falha na verificação de permissões");
-  }
-  
-  if (data && data.length > 0) return;
+    .eq("user_id", userId);
 
-  // Fallback for primary admin by email
+  console.log("[ASSERT_ADMIN]", { userId, email, roles, rolesErr });
+
+  if (!rolesErr && roles?.some((r: any) => r.role === "admin" || r.role === "manager")) {
+    return;
+  }
+
+  // Secondary check: users.role
   const { data: userRow } = await supabaseAdmin
     .from("users")
     .select("role, email")
     .eq("id", userId)
     .maybeSingle();
 
-  if (userRow?.email === "admhammer@gmail.com") {
-    // Auto-heal: Ensure role exists in user_roles
-    await supabaseAdmin.from("user_roles").upsert({ user_id: userId, role: "admin" }, { onConflict: 'user_id, role' });
+  console.log("[ASSERT_ADMIN] userRow", userRow);
+
+  if (userRow?.role === "admin" || userRow?.role === "manager") return;
+
+  // Fallback: primary admin by email (auto-heal)
+  const effectiveEmail = email || userRow?.email;
+  if (effectiveEmail === "admhammer@gmail.com") {
+    await supabaseAdmin
+      .from("user_roles")
+      .upsert({ user_id: userId, role: "admin" }, { onConflict: "user_id,role" });
     return;
   }
-  
-  if (userRow?.role === "admin" || userRow?.role === "manager") return;
 
   throw new Error("Acesso negado");
 }
@@ -39,7 +42,7 @@ async function assertAdmin(userId: string) {
 export const getAdminDashboard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertAdmin(context.userId);
+    await assertAdmin(context.userId, (context as any).claims?.email);
 
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
