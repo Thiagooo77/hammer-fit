@@ -22,12 +22,13 @@ import { Button } from "@/components/ui/button";
 export function DashboardSidebar() {
   const { role, signOut, user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = React.useState(true);
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
 
-  const isAdmin = role === "admin" || role === "manager";
+  const isAdmin = useMemo(() => role === "admin" || role === "manager", [role]);
 
-  const menuItems = [
+  const menuItems = useMemo(() => [
     {
       title: "Dashboard",
       icon: LayoutDashboard,
