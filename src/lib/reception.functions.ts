@@ -194,9 +194,9 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
     // Sales by hour
     const salesByHour = Array.from({ length: 24 }, (_, i) => ({ hour: `${i}:00`, amount: 0, count: 0 }));
     sales.forEach(s => {
-      const hour = new Date(s.created_at).getHours();
-      salesByHour[hour].amount += Number(s.amount);
-      salesByHour[hour].count += 1;
+      const h = new Date(s.created_at).getHours();
+      salesByHour[h].amount += Number(s.amount);
+      salesByHour[h].count += 1;
     });
 
     const mostLucrativeHour = [...salesByHour].sort((a, b) => b.amount - a.amount)[0]?.hour || "N/A";
@@ -213,6 +213,10 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
     }));
 
     const currentHour = new Date().getHours();
+    const filteredCharts = salesByHour.filter((_, index) => {
+      return salesByHour[index].count > 0 || currentHour >= index;
+    });
+
     return {
       receptionist,
       currentSession,
@@ -228,10 +232,7 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
         mostLucrativeHour
       },
       charts: {
-        salesByHour: salesByHour.filter(h => {
-          const hNum = parseInt(h.hour.split(':')[0]);
-          return h.count > 0 || currentHour >= hNum;
-        }),
+        salesByHour: filteredCharts,
         paymentMethods: paymentChart
       }
     };
