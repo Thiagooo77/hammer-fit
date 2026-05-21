@@ -6,6 +6,7 @@ export const Route = createFileRoute("/_authenticated")({
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
+      console.log('[HAMMER_FIT_AUDIT] Session validation failed, redirecting to login');
       throw redirect({
         to: "/login",
         search: {
@@ -13,6 +14,8 @@ export const Route = createFileRoute("/_authenticated")({
         },
       });
     }
+    
+    console.log('[PERMISSION_VALIDATION] User session verified:', session.user.email);
     
     // Fetch role and profile data
     const [{ data: roleData }, { data: profile }] = await Promise.all([

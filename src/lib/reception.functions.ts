@@ -36,6 +36,7 @@ export const openCashSession = createServerFn({ method: "POST" })
   .inputValidator((data) => OpenCashSessionSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+    console.log('[SYSTEM_HEALTH] Opening cash session attempt', data.receptionist_id);
     const { logAudit, getClientMeta } = await import("@/lib/audit.server");
 
     // Check if there's already an open session
@@ -142,6 +143,7 @@ export const closeCashSession = createServerFn({ method: "POST" })
   .inputValidator((data) => CloseCashSessionSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+    console.log('[SYSTEM_HEALTH] Closing cash session attempt', data.session_id);
     const { logAudit } = await import("@/lib/audit.server");
 
     // Get all sales for this session to calculate expected balance
