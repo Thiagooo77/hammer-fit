@@ -166,7 +166,7 @@ function ReceptionGoalsDashboard() {
               </div>
             </div>
             {(role === 'admin' || role === 'manager') && (
-              <div className="hidden lg:flex items-center gap-2 pr-6 border-r border-white/10 mr-6">
+              <div className="flex items-center gap-2 px-6 border-x border-white/10 mx-6">
                 <Link to="/admin/dashboard">
                   <Button variant="outline" size="sm" className="gap-2 border-primary/30 text-primary hover:bg-primary/10">
                     <ShieldCheck className="size-4" /> Painel Admin
