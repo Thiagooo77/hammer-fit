@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -195,10 +196,12 @@ export function CashRegisterCard({
                     <Lock className="size-4" />
                     Encerrar Caixa
                   </Button>
-                  <Button variant="outline" className="gap-2 border-primary/20 hover:bg-primary/10">
-                    <Search className="size-4" />
-                    Auditoria
-                  </Button>
+                  <Link to="/admin/audit" className="flex-1">
+                    <Button variant="outline" className="w-full gap-2 border-primary/20 hover:bg-primary/10">
+                      <Search className="size-4" />
+                      Auditoria
+                    </Button>
+                  </Link>
                 </div>
               </>
             )}
