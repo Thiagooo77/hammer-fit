@@ -29,7 +29,6 @@ export const Route = createFileRoute("/_authenticated")({
     console.log('[PERMISSION_VALIDATION] User session verified:', session.user.email);
     
     try {
-      // Fetch role and profile data with a timeout to prevent infinite loading
       const [{ data: roleData }, { data: profile }] = await withTimeout(
         Promise.all([
           supabase
@@ -44,36 +43,20 @@ export const Route = createFileRoute("/_authenticated")({
             .maybeSingle()
         ]),
         8000
-      );
+      ).catch(() => [{ data: null }, { data: null }]);
 
+      const role = roleData?.role || (session.user.email === 'admhammer@gmail.com' ? 'admin' : 'receptionist');
 
-      // Strict role resolution - no more defaulting to receptionist without verification
-      const role = roleData?.role;
-
-      if (!role) {
-        console.warn('[PERMISSION_WARNING] No role found for user:', session.user.email);
-        // If we can't find a role, we should probably check if they are the master admin
-        if (session.user.email === 'admhammer@gmail.com') {
-          return {
-            session,
-            user: session.user,
-            role: 'admin' as any,
-            profile: profile || null,
-          };
-        }
-      }
-
-      // Global Authorization Logging
       console.log('[PERMISSION_GRANTED]', { 
         user: session.user.email, 
-        role: role || "receptionist", 
+        role, 
         path: location.pathname 
       });
 
       return {
         session,
         user: session.user,
-        role: (role || "receptionist") as any,
+        role: role as any,
         profile: profile || null,
       };
     } catch (error) {
@@ -81,7 +64,7 @@ export const Route = createFileRoute("/_authenticated")({
       return {
         session,
         user: session.user,
-        role: "receptionist" as any,
+        role: (session.user.email === 'admhammer@gmail.com' ? 'admin' : 'receptionist') as any,
         profile: null,
       };
     }
