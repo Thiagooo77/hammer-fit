@@ -83,11 +83,17 @@ function ReceptionGoalsDashboard() {
   const smartStats = data?.smartStats || { remaining: 0, percentage: 0, totalSoldToday: 0, vendasCount: 0, ticketMedio: 0, mostLucrativeHour: "N/A" };
   const charts = data?.charts;
 
-  const mockShifts: Shift[] = [
-    { id: "s1", type: "Manhã", receptionist: "Ana Silva", time: "06:00 - 12:00", status: "encerrado" },
-    { id: "s2", type: "Tarde", receptionist: receptionist.name, time: "12:00 - 18:00", status: "ativo" },
-    { id: "s3", type: "Noite", receptionist: "Pendente", time: "18:00 - 22:00", status: "aguardando fechamento" },
-  ];
+  const mockShifts: Shift[] = (data?.todaysSessions || []).map((s: any) => ({
+    id: s.id,
+    type: new Date(s.opened_at).getHours() < 12 ? "Manhã" : new Date(s.opened_at).getHours() < 18 ? "Tarde" : "Noite",
+    receptionist: s.receptionists?.name || "Desconhecido",
+    time: `${new Date(s.opened_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} - ${s.closed_at ? new Date(s.closed_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'Ativo'}`,
+    status: s.status === 'open' ? 'ativo' : s.status === 'pending_review' ? 'aguardando fechamento' : 'encerrado'
+  }));
+
+  if (mockShifts.length === 0) {
+    mockShifts.push({ id: "empty", type: "Manhã", receptionist: "Nenhum turno iniciado", time: "--:--", status: "encerrado" });
+  }
 
   const clinicTarget = dailyGoal ? Number(dailyGoal.goal_amount) : 10000;
   const clinicCurrent = smartStats.totalSoldToday || 4250.00;
