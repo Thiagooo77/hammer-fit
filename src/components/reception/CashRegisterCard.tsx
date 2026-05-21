@@ -45,7 +45,7 @@ export interface CashRegisterCardProps {
   canViewAudit?: boolean;
 }
 
-export function CashRegisterCard({
+export const CashRegisterCard = React.memo(({
   status,
   startTime,
   responsible,
@@ -55,7 +55,7 @@ export function CashRegisterCard({
   receptionistId,
   sessionId,
   canViewAudit,
-}: CashRegisterCardProps) {
+}: CashRegisterCardProps) => {
   const qc = useQueryClient();
   const openFn = useServerFn(openCashSession);
   const closeFn = useServerFn(closeCashSession);
