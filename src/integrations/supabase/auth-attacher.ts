@@ -7,30 +7,13 @@ import { supabase } from './client'
 export const attachSupabaseAuth = createMiddleware({ type: 'function' }).client(
   async ({ next }) => {
     try {
-      const { data, error } = await supabase.auth.getSession()
-      
-      // If there's an error getting the session (like invalid refresh token),
-      // we should clear local storage and force login to avoid infinite loops
-      if (error) {
-        console.error('[AUTH_ATTACH_ERROR] Session invalid:', error.message)
-        if (typeof window !== 'undefined') {
-          Object.keys(localStorage)
-            .filter((k) => k.startsWith('sb-') || k.includes('supabase'))
-            .forEach((k) => localStorage.removeItem(k));
-          sessionStorage.clear();
-          
-          if (window.location.pathname !== '/login') {
-            window.location.href = '/login'
-          }
-        }
-        return next({ headers: {} })
-      }
-
+      const { data } = await supabase.auth.getSession()
       const token = data.session?.access_token
       return next({
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       })
     } catch (e) {
+      console.warn('[AUTH_ATTACH] getSession failed:', e)
       return next({ headers: {} })
     }
   },
