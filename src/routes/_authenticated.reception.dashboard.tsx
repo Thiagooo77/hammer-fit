@@ -7,6 +7,7 @@ import { ShiftTimeline, type Shift } from "@/components/reception/ShiftTimeline"
 import { DailySummary } from "@/components/reception/DailySummary";
 import { AdvancedCharts } from "@/components/reception/AdvancedCharts";
 import { Target, Users, LayoutDashboard, Calendar, Bell, User as UserIcon, Loader2, Award, Zap, LogOut } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
@@ -24,12 +25,33 @@ function ReceptionGoalsDashboard() {
   const { signOut, user, role, loading: authLoading } = useAuth();
   const fetchDashboard = useServerFn(getReceptionDashboard);
   
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["reception-dashboard"],
     queryFn: () => fetchDashboard(),
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 60000, // Reduced polling since we'll use realtime
     enabled: !!user,
   });
+
+  React.useEffect(() => {
+    if (!user) return;
+
+    // Realtime subscription for sales and goals
+    const channel = supabase
+      .channel('reception_updates')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sales' }, () => {
+        console.log('[HAMMER_FIT_AUDIT] Realtime update: Sale detected');
+        refetch();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'goal_progress' }, () => {
+        console.log('[HAMMER_FIT_AUDIT] Realtime update: Goal progress changed');
+        refetch();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, refetch]);
 
   const [currentDate] = React.useState(new Date().toLocaleDateString('pt-BR', { 
     weekday: 'long', 
