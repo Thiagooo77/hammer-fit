@@ -46,6 +46,7 @@ interface Receptionist {
   status: Status;
   avatar_url: string | null;
   user_id: string | null;
+  user_roles?: { role: string }[];
 }
 
 const STATUS_META: Record<Status, { label: string; cls: string; icon: React.ReactNode }> = {
@@ -202,38 +203,73 @@ function CreateForm({ onDone }: { onDone: () => void }) {
   const create = useServerFn(createReceptionist);
   const [form, setForm] = useState({
     name: "", email: "", password: "", phone: "", cpf: "",
+    role_type: "receptionist" as "manager" | "receptionist",
     role_title: "", shift: "", goal_value: 0, status: "active" as Status, avatar_url: "",
   });
   const mut = useMutation({
     mutationFn: () => create({ data: {
       name: form.name, email: form.email, password: form.password,
       phone: form.phone || null, cpf: form.cpf || null,
+      role_type: form.role_type,
       role_title: form.role_title || null, shift: form.shift || null,
       goal_value: Number(form.goal_value) || 0, status: form.status,
       avatar_url: form.avatar_url || null,
     } }),
-    onSuccess: () => { toast.success("Recepcionista criado"); onDone(); },
+    onSuccess: () => { toast.success("Colaborador criado"); onDone(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
   return (
-    <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); mut.mutate(); }}>
-      <Field label="Nome completo" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-      <Field label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-      <Field label="Senha inicial" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required minLength={6} />
-      <div className="grid grid-cols-2 gap-2">
-        <Field label="Telefone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-        <Field label="CPF" value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} />
+    <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); mut.mutate(); }}>
+      <div className="space-y-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Informações Básicas</p>
+        <Field label="Nome completo" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+        <Field label="Email institucional" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+        <Field label="Senha de acesso" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required minLength={6} />
       </div>
-      <div className="grid grid-cols-2 gap-2">
-        <Field label="Cargo" value={form.role_title} onChange={(e) => setForm({ ...form, role_title: e.target.value })} />
-        <Field label="Turno" value={form.shift} onChange={(e) => setForm({ ...form, shift: e.target.value })} placeholder="Manhã / Tarde / Noite" />
+
+      <div className="space-y-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Nível de Acesso & Cargo</p>
+        <div className="space-y-1">
+          <Label className="text-xs uppercase font-bold">Tipo de Colaborador</Label>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              type="button"
+              variant={form.role_type === "receptionist" ? "default" : "outline"}
+              onClick={() => setForm({ ...form, role_type: "receptionist", role_title: "Recepcionista" })}
+              className="uppercase italic font-black text-[10px]"
+            >
+              Recepcionista
+            </Button>
+            <Button
+              type="button"
+              variant={form.role_type === "manager" ? "default" : "outline"}
+              onClick={() => setForm({ ...form, role_type: "manager", role_title: "Gerente" })}
+              className="uppercase italic font-black text-[10px]"
+            >
+              Gerente
+            </Button>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <Field label="Título do Cargo" value={form.role_title} onChange={(e) => setForm({ ...form, role_title: e.target.value })} placeholder="Ex: Recepcionista Jr" />
+          <Field label="Turno" value={form.shift} onChange={(e) => setForm({ ...form, shift: e.target.value })} placeholder="Manhã / Tarde" />
+        </div>
       </div>
-      <Field label="Meta individual (R$)" type="number" step="0.01" value={form.goal_value} onChange={(e) => setForm({ ...form, goal_value: Number(e.target.value) })} />
-      <Field label="URL do avatar" value={form.avatar_url} onChange={(e) => setForm({ ...form, avatar_url: e.target.value })} placeholder="https://..." />
+
+      <div className="space-y-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Dados Adicionais</p>
+        <div className="grid grid-cols-2 gap-2">
+          <Field label="Telefone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(00) 00000-0000" />
+          <Field label="CPF" value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} placeholder="000.000.000-00" />
+        </div>
+        <Field label="Meta mensal (R$)" type="number" step="0.01" value={form.goal_value} onChange={(e) => setForm({ ...form, goal_value: Number(e.target.value) })} />
+      </div>
+
       <StatusSelect value={form.status} onChange={(s) => setForm({ ...form, status: s })} />
-      <Button type="submit" disabled={mut.isPending} className="w-full">
-        {mut.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Criar
+      
+      <Button type="submit" disabled={mut.isPending} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase italic h-12 rounded-xl">
+        {mut.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Finalizar Cadastro
       </Button>
     </form>
   );
@@ -245,6 +281,7 @@ function EditForm({ item, onDone }: { item: Receptionist; onDone: () => void }) 
     name: item.name,
     phone: item.phone ?? "",
     cpf: item.cpf ?? "",
+    role_type: (item.user_roles?.[0]?.role as "manager" | "receptionist") || "receptionist",
     role_title: item.role_title ?? "",
     shift: item.shift ?? "",
     goal_value: Number(item.goal_value ?? 0),
@@ -257,6 +294,7 @@ function EditForm({ item, onDone }: { item: Receptionist; onDone: () => void }) 
       name: form.name,
       phone: form.phone || null,
       cpf: form.cpf || null,
+      role_type: form.role_type,
       role_title: form.role_title || null,
       shift: form.shift || null,
       goal_value: Number(form.goal_value) || 0,
@@ -268,21 +306,53 @@ function EditForm({ item, onDone }: { item: Receptionist; onDone: () => void }) 
   });
 
   return (
-    <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); mut.mutate(); }}>
-      <Field label="Nome completo" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-      <div className="grid grid-cols-2 gap-2">
-        <Field label="Telefone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-        <Field label="CPF" value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} />
+    <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); mut.mutate(); }}>
+      <div className="space-y-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Informações Básicas</p>
+        <Field label="Nome completo" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
       </div>
-      <div className="grid grid-cols-2 gap-2">
-        <Field label="Cargo" value={form.role_title} onChange={(e) => setForm({ ...form, role_title: e.target.value })} />
-        <Field label="Turno" value={form.shift} onChange={(e) => setForm({ ...form, shift: e.target.value })} />
+
+      <div className="space-y-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Nível de Acesso & Cargo</p>
+        <div className="space-y-1">
+          <Label className="text-xs uppercase font-bold">Tipo de Colaborador</Label>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              type="button"
+              variant={form.role_type === "receptionist" ? "default" : "outline"}
+              onClick={() => setForm({ ...form, role_type: "receptionist" })}
+              className="uppercase italic font-black text-[10px]"
+            >
+              Recepcionista
+            </Button>
+            <Button
+              type="button"
+              variant={form.role_type === "manager" ? "default" : "outline"}
+              onClick={() => setForm({ ...form, role_type: "manager" })}
+              className="uppercase italic font-black text-[10px]"
+            >
+              Gerente
+            </Button>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <Field label="Cargo" value={form.role_title} onChange={(e) => setForm({ ...form, role_title: e.target.value })} />
+          <Field label="Turno" value={form.shift} onChange={(e) => setForm({ ...form, shift: e.target.value })} />
+        </div>
       </div>
-      <Field label="Meta individual (R$)" type="number" step="0.01" value={form.goal_value} onChange={(e) => setForm({ ...form, goal_value: Number(e.target.value) })} />
-      <Field label="URL do avatar" value={form.avatar_url} onChange={(e) => setForm({ ...form, avatar_url: e.target.value })} />
+
+      <div className="space-y-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Dados Adicionais</p>
+        <div className="grid grid-cols-2 gap-2">
+          <Field label="Telefone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+          <Field label="CPF" value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} />
+        </div>
+        <Field label="Meta individual (R$)" type="number" step="0.01" value={form.goal_value} onChange={(e) => setForm({ ...form, goal_value: Number(e.target.value) })} />
+      </div>
+
       <StatusSelect value={form.status} onChange={(s) => setForm({ ...form, status: s })} />
-      <Button type="submit" disabled={mut.isPending} className="w-full">
-        {mut.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Salvar alterações
+      <Button type="submit" disabled={mut.isPending} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase italic h-12 rounded-xl">
+        {mut.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Salvar Alterações
       </Button>
     </form>
   );
