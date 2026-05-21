@@ -7,8 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import React from "react";
+import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/reception/tasks")({ // Wait, the path should be tasks
+export const Route = createFileRoute("/_authenticated/reception/tasks")({
   component: TasksPage,
 });
 
@@ -118,8 +119,4 @@ function TaskCard({ title, sector, time, status, description }: any) {
       </CardContent>
     </Card>
   );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
 }
