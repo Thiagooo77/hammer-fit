@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { listAuditLogsData, logAudit } from "@/lib/audit.server";
+// No top-level server imports to avoid bundling issues in the browser
 
 /** Public server fn so the browser can log login/logout/invalid-access. */
 export const recordClientAudit = createServerFn({ method: "POST" })
