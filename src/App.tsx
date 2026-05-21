@@ -3,7 +3,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 
 import LoginPage from "@/pages/routes/Login";
-import SetupPage from "@/pages/routes/Setup";
 import IndexPage from "@/pages/routes/Index";
 import TVDashboard from "@/pages/routes/TVDashboard";
 import { UnauthorizedPage } from "@/pages/Unauthorized";
@@ -49,7 +48,6 @@ export default function App() {
     <Routes>
       <Route path="/" element={<IndexPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/setup" element={<SetupPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route path="/tv-dashboard" element={<TVDashboard />} />
 
