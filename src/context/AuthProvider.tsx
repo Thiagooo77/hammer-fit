@@ -75,6 +75,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (!finalRole && userEmail === 'admhammer@gmail.com') {
         finalRole = 'admin';
+      } else if (!finalRole) {
+        // Fallback to receptionist if no role found in user_roles
+        finalRole = 'receptionist';
       }
       
       setRole(finalRole);
@@ -141,12 +144,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setLoading(false);
       } else if (event === "USER_UPDATED" && !session) {
         // Fallback for failed refreshes or invalid tokens
-        console.warn('[AUTH_REFRESH_FAILED] Force logging out due to invalid state');
-        clearLocalAuthState();
-        queryClient.clear();
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login';
-        }
+        console.warn('[AUTH_REFRESH_FAILED] Invalid session state');
+        // Don't auto-redirect here to avoid loops during login transitions
       }
     });
 

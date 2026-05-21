@@ -112,11 +112,14 @@ export function LoginForm() {
 
       const finalRole = roleData?.role || (values.email === 'admhammer@gmail.com' ? 'admin' : null);
 
-      if (finalRole === "admin" || finalRole === "manager") {
-        window.location.href = "/admin/dashboard";
-      } else {
-        window.location.href = "/reception/dashboard";
-      }
+      // Small delay to let AuthProvider handle the event
+      setTimeout(() => {
+        if (finalRole === "admin" || finalRole === "manager") {
+          window.location.href = "/admin/dashboard";
+        } else {
+          window.location.href = "/reception/dashboard";
+        }
+      }, 100);
     } catch (error) {
       clearSupabaseStorage();
       supabase.auth.signOut().catch(() => {});
