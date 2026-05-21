@@ -62,13 +62,13 @@ export function DashboardSidebar() {
     {
       title: "Metas",
       icon: Target,
-      href: "/admin/dashboard", // Placeholder for now
+      href: "/admin/goals",
       roles: ["admin", "manager"],
     },
     {
       title: "Relatórios",
       icon: FileText,
-      href: "/admin/dashboard", // Placeholder for now
+      href: "/admin/reports",
       roles: ["admin", "manager"],
     },
   ], [isAdmin]);
