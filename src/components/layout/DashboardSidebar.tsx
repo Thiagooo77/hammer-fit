@@ -70,12 +70,17 @@ export function DashboardSidebar() {
       icon: FileText,
       href: "/admin/dashboard", // Placeholder for now
       roles: ["admin", "manager"],
-    },
-  ];
+  ], [isAdmin]);
 
-  const filteredItems = menuItems.filter(item => role && item.roles.includes(role));
+  const filteredItems = useMemo(() => 
+    menuItems.filter(item => role && item.roles.includes(role)),
+  [menuItems, role]);
 
-  const SidebarContent = () => (
+  const handleSignOut = useCallback(async () => {
+    await signOut();
+  }, [signOut]);
+
+  const SidebarContent = useCallback(() => (
     <div className="flex flex-col h-full bg-slate-950 border-r border-white/10 text-slate-50">
       {/* Logo Section */}
       <div className={cn(
