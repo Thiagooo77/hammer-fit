@@ -1,32 +1,41 @@
+## Problema
+
+A tela em branco / "Something went wrong" (React error #310 — "Rendered more hooks than during the previous render") vem de `src/routes/reception.dashboard.tsx`.
+
+O componente faz `return` antecipado nas linhas 34–44 (loading / sem user) **antes** de chamar `React.useState(new Date()...)` na linha 47. No primeiro render `authLoading=true` → retorna cedo → menos hooks. No render seguinte `authLoading=false` → chega ao `useState` → mais hooks → React quebra com #310 e a página fica em branco.
+
+## Correção
+
+Em `src/routes/reception.dashboard.tsx`:
+
+1. Mover **todas** as chamadas de hook (`useAuth`, `useServerFn`, `useQuery`, `React.useState` do `currentDate`) para o topo da função, **antes** de qualquer `return` condicional.
+2. Manter os returns condicionais (auth loading, sem user, loading da query, erro) depois dos hooks.
+
+Ordem correta:
+
 ```text
-HAMMER FIT - Gestão Operacional de Academia
+function ReceptionGoalsDashboard() {
+  const { ... } = useAuth();              // hook
+  const fetchDashboard = useServerFn(...) // hook
+  const { data, isLoading, error } = useQuery(...) // hook
+  const [currentDate] = React.useState(...) // hook  ← sobe pra cá
 
-Arquitetura do Sistema:
-- Frontend: TanStack Start (React 19) + Tailwind CSS (estilo Industrial & Dark).
-- Backend: Lovable Cloud (Supabase) para Banco de Dados, Auth e Storage.
-- Roles: Sistema de permissões via tabela user_roles (ADM vs Funcionário).
+  if (authLoading) return <Loader/>;
+  if (!user) return <Navigate.../>;
+  if (isLoading) return <Loader/>;
+  if (error && !data) return <Loader/>;
 
-Estrutura de Dados (Supabase):
-- profiles: id (UUID), display_name, avatar_url, role, sector (Recepção, Limpeza, etc).
-- tasks: id, title, description, sector, status (todo, done), evidence_url, created_by, approved_by.
-- sales_goals: id, month, target_amount, current_amount, sector.
-- sales_ranking: view baseada em transações ou metas batidas.
-
-Páginas e Rotas:
-- /login: Autenticação via Email/Senha.
-- /_authenticated: Layout protegido com Sidebar lateral.
-- /_authenticated/dashboard: Visão geral de produtividade (ADM vê tudo, Funcionário vê seu setor).
-- /_authenticated/checklists: Lista de tarefas com upload de foto para evidência.
-- /_authenticated/vendas: Ranking e acompanhamento de metas.
-- /_authenticated/admin/approvals: (ADM) Fluxo de aprovação de evidências.
-
-Estética: Industrial & Dark
-- Fundo: Dark (#0a0a0a)
-- Destaque: Laranja Hammer (#f7931e)
-- Tipografia: Robusta e moderna.
+  // ... resto
+}
 ```
 
-Detalhes Técnicos:
-- Implementação de RBAC (Role Based Access Control) no banco de dados.
-- Integração com Supabase Storage para fotos de evidência.
-- Dashboards com gráficos shadcn/ui.
+## Verificação
+
+Após o fix, recarregar `/` e confirmar:
+- sem tela branca,
+- console sem React #310,
+- dashboard renderiza (mesmo com dados vazios usa fallback existente).
+
+## Escopo
+
+Apenas `src/routes/reception.dashboard.tsx`. As outras rotas (`admin.dashboard`, `admin.receptionists`, `admin.audit`, `tv-dashboard`) já chamam os hooks antes dos returns condicionais e não disparam #310.
