@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import { ShieldCheck, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { GlobalErrorBoundary } from "@/components/ui/error-boundary";
+import { AuthProvider } from "@/context/AuthProvider";
 import "../styles.css";
 
 interface RouterContext {
@@ -110,10 +111,12 @@ function RootComponent() {
   return (
     <RootDocument>
       <QueryClientProvider client={queryClient}>
-        <GlobalErrorBoundary>
-          <Outlet />
-        </GlobalErrorBoundary>
-        <Toaster position="top-right" richColors />
+        <AuthProvider>
+          <GlobalErrorBoundary>
+            <Outlet />
+          </GlobalErrorBoundary>
+          <Toaster position="top-right" richColors />
+        </AuthProvider>
       </QueryClientProvider>
     </RootDocument>
   );

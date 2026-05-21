@@ -8,7 +8,7 @@ async function assertAdmin(userId: string) {
     .from("user_roles")
     .select("role")
     .eq("user_id", userId)
-    .in("role", ["admin", "manager"]);
+    .in("role", ["admin", "manager" as any]);
   if (error) throw new Error(error.message);
   if (!data || data.length === 0) throw new Error("Acesso negado");
 }
