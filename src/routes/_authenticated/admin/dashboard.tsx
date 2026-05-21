@@ -167,9 +167,9 @@ function AdminDashboard() {
             delay={0.3}
           />
           <StatCard 
-            title="Gamificação" 
-            value="340 pts" 
-            icon={<Award />} 
+            title="Sessões Ativas" 
+            value={`${kpis.receptionistsCount}`} 
+            icon={<Users />} 
             delay={0.4}
           />
         </div>
