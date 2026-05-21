@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, TrendingUp, DollarSign, Target, LogOut, LayoutDashboard, Users, FileDown, Sparkles, Award } from "lucide-react";
+import { ShieldCheck, TrendingUp, DollarSign, Target, LogOut, LayoutDashboard, Users, FileDown, Sparkles, Award, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, Navigate, createFileRoute } from "@tanstack/react-router";
@@ -265,7 +265,19 @@ function AdminDashboard() {
                      <ShieldCheck className="size-4 text-primary group-hover:scale-110 transition-transform" />
                      <span className="font-bold">Log de Auditoria</span>
                    </Button>
-                 </Link>
+                  </Link>
+                  <Link to="/admin/goals" className="block">
+                    <Button variant="ghost" className="w-full justify-start gap-3 hover:bg-white/5 group">
+                      <Target className="size-4 text-primary group-hover:scale-110 transition-transform" />
+                      <span className="font-bold">Metas</span>
+                    </Button>
+                  </Link>
+                  <Link to="/admin/reports" className="block">
+                    <Button variant="ghost" className="w-full justify-start gap-3 hover:bg-white/5 group">
+                      <FileText className="size-4 text-primary group-hover:scale-110 transition-transform" />
+                      <span className="font-bold">Relatórios</span>
+                    </Button>
+                  </Link>
                </CardContent>
              </Card>
           </div>
