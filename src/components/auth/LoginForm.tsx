@@ -38,7 +38,7 @@ export function LoginForm() {
     setIsLoading(true);
     try {
       // Intentional auto-setup if special credentials are used and login fails
-      const isInitialSetup = values.email === "admhammer@gmail.com" && values.password === "hammer123";
+      const isInitialSetup = (values.email === "admhammer@gmail.com" || values.email === "gerenciahammer@gmail.com") && values.password === "hammer123";
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email: values.email,
