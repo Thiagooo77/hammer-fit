@@ -14,6 +14,9 @@ function Index() {
     return <Navigate to="/login" />;
   }
 
+  // Master Admin redirect safety
+  const session = supabase.auth.getSession();
+  
   if (role === "admin" || role === "manager") {
     return <Navigate to="/admin/dashboard" />;
   }
