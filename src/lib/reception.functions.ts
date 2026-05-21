@@ -145,14 +145,14 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       .maybeSingle();
 
     if (!receptionist) {
-      return { receptionist: null, currentSession: null, dailyGoal: null, goalProgress: null, ranking: [], smartStats: { remaining: 0, percentage: 0 }, charts: null };
+      return { receptionist: null, currentSession: null, dailyGoal: null, goalProgress: null, ranking: [], smartStats: { remaining: 0, percentage: 0, totalSoldToday: 0, vendasCount: 0, ticketMedio: 0, mostLucrativeHour: "N/A" }, charts: null };
     }
 
     // Get today's start and end for filtering
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const tomorrowStart = new Date(todayStart);
+    tomorrowStart.setDate(todayStart.getDate() + 1);
 
     // Concurrent data fetching
     const [
@@ -163,10 +163,10 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       { data: todaySales }
     ] = await Promise.all([
       supabaseAdmin.from("cash_sessions").select("*, receptionists (name)").eq("status", "open").maybeSingle(),
-      supabaseAdmin.from("daily_goals").select("*").eq("goal_date", today.toISOString().split('T')[0]).maybeSingle(),
+      supabaseAdmin.from("daily_goals").select("*").eq("goal_date", todayStart.toISOString().split('T')[0]).maybeSingle(),
       supabaseAdmin.from("goal_progress").select("*").eq("receptionist_id", receptionist.id).maybeSingle(),
       supabaseAdmin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists (name, avatar_url)").order("sold_amount", { ascending: false }).limit(10),
-      supabaseAdmin.from("sales").select("*").gte("created_at", today.toISOString()).lt("created_at", tomorrow.toISOString())
+      supabaseAdmin.from("sales").select("*").gte("created_at", todayStart.toISOString()).lt("created_at", tomorrowStart.toISOString())
     ]);
 
     // Format ranking
@@ -174,7 +174,8 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       id: item.receptionist_id,
       name: (item.receptionists as any)?.name || "N/A",
       avatar: (item.receptionists as any)?.avatar_url || "",
-      salesAmount: Number(item.sold_amount),
+      sales: 0, // Mock count for UI
+      streak: 0, // Mock streak for UI
       goalPercentage: Math.round((Number(item.sold_amount) / Number(item.goal_amount)) * 100),
       position: index + 1
     }));
@@ -226,7 +227,7 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
         mostLucrativeHour
       },
       charts: {
-        salesByHour: salesByHour.filter(h => h.count > 0 || today.getHours() >= parseInt(h.hour)),
+        salesByHour: salesByHour.filter(h => h.count > 0 || new Date().getHours() >= parseInt(h.hour)),
         paymentMethods: paymentChart
       }
     };
