@@ -356,7 +356,7 @@ export const CashRegisterCard = React.memo(({
       </Dialog>
     </>
   );
-}
+});
 
 function PaymentItem({ icon, label, value }: { icon: React.ReactNode, label: string, value: number }) {
   return (
