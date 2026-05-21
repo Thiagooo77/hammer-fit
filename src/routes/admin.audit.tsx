@@ -152,7 +152,7 @@ function AuditPage() {
                           </div>
                         </div>
                       </button>
-                      {isOpen && (log.old_data || log.new_data) && (
+                      {isOpen && Boolean(log.old_data || log.new_data) && (
                         <div className="mt-2 grid md:grid-cols-2 gap-2 ml-8">
                           {log.old_data ? (
                             <pre className="text-[10px] bg-red-500/5 border border-red-500/20 rounded p-2 overflow-auto max-h-60">
