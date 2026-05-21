@@ -14,18 +14,27 @@ export const Route = createFileRoute("/_authenticated")({
       });
     }
     
-    // Fetch role to ensure it's available in context
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", session.user.id)
-      .maybeSingle();
+    // Fetch role and profile data
+    const [{ data: roleData }, { data: profile }] = await Promise.all([
+      supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .maybeSingle(),
+      supabase
+        .from("users")
+        .select("*")
+        .eq("id", session.user.id)
+        .maybeSingle()
+    ]);
 
     return {
       session,
       user: session.user,
       role: roleData?.role || "receptionist",
+      profile: profile || null,
     };
   },
   component: () => <Outlet />,
 });
+
