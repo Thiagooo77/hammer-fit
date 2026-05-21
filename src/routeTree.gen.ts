@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReceptionDashboardRouteImport } from './routes/reception.dashboard'
 import { Route as AdminReceptionistsRouteImport } from './routes/admin.receptionists'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 
 const UnauthorizedRoute = UnauthorizedRouteImport.update({
   id: '/unauthorized',
@@ -52,12 +53,18 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
   path: '/admin/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/admin/audit',
+  path: '/admin/audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/setup': typeof SetupRoute
   '/unauthorized': typeof UnauthorizedRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/receptionists': typeof AdminReceptionistsRoute
   '/reception/dashboard': typeof ReceptionDashboardRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/setup': typeof SetupRoute
   '/unauthorized': typeof UnauthorizedRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/receptionists': typeof AdminReceptionistsRoute
   '/reception/dashboard': typeof ReceptionDashboardRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/setup': typeof SetupRoute
   '/unauthorized': typeof UnauthorizedRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/receptionists': typeof AdminReceptionistsRoute
   '/reception/dashboard': typeof ReceptionDashboardRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/setup'
     | '/unauthorized'
+    | '/admin/audit'
     | '/admin/dashboard'
     | '/admin/receptionists'
     | '/reception/dashboard'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/setup'
     | '/unauthorized'
+    | '/admin/audit'
     | '/admin/dashboard'
     | '/admin/receptionists'
     | '/reception/dashboard'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/setup'
     | '/unauthorized'
+    | '/admin/audit'
     | '/admin/dashboard'
     | '/admin/receptionists'
     | '/reception/dashboard'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   SetupRoute: typeof SetupRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
+  AdminAuditRoute: typeof AdminAuditRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminReceptionistsRoute: typeof AdminReceptionistsRoute
   ReceptionDashboardRoute: typeof ReceptionDashboardRoute
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/admin/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   SetupRoute: SetupRoute,
   UnauthorizedRoute: UnauthorizedRoute,
+  AdminAuditRoute: AdminAuditRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminReceptionistsRoute: AdminReceptionistsRoute,
   ReceptionDashboardRoute: ReceptionDashboardRoute,

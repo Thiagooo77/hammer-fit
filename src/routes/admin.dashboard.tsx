@@ -66,9 +66,11 @@ function AdminDashboard() {
                   <Users className="h-4 w-4" /> Gerenciar Recepcionistas
                 </Button>
               </Link>
-              <Button variant="outline" className="justify-start gap-2">
-                <BarChart3 className="h-4 w-4" /> Relatórios Financeiros
-              </Button>
+              <Link to="/admin/audit">
+                <Button variant="outline" className="justify-start gap-2 w-full">
+                  <ShieldCheck className="h-4 w-4" /> Auditoria
+                </Button>
+              </Link>
               <Button variant="outline" className="justify-start gap-2">
                 <Settings className="h-4 w-4" /> Configurações Globais
               </Button>

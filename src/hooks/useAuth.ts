@@ -3,6 +3,7 @@ import { authService, AppRole } from "@/services/authService";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
+import { recordClientAudit } from "@/lib/audit.functions";
 
 export function useAuth() {
   const queryClient = useQueryClient();
@@ -17,10 +18,23 @@ export function useAuth() {
     });
 
     // Listen for changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       queryClient.invalidateQueries({ queryKey: ["userRole"] });
       queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+      if (event === "SIGNED_IN" && session?.user) {
+        recordClientAudit({ data: {
+          actionType: "login", module: "auth",
+          userId: session.user.id, userName: session.user.email,
+          description: `Login de ${session.user.email}`,
+        } }).catch(() => {});
+      }
+      if (event === "SIGNED_OUT") {
+        recordClientAudit({ data: {
+          actionType: "logout", module: "auth",
+          description: "Logout",
+        } }).catch(() => {});
+      }
     });
 
     return () => subscription.unsubscribe();

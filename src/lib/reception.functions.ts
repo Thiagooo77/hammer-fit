@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { logAudit } from "@/lib/audit.functions";
 
 /**
  * Zod schemas for validation
@@ -58,6 +59,11 @@ export const openCashSession = createServerFn({ method: "POST" })
       .single();
 
     if (error) throw error;
+    await logAudit({
+      userId: context.userId, actionType: "cash_open", module: "cash",
+      description: `Abertura de caixa (saldo inicial R$ ${data.opening_balance})`,
+      newData: session,
+    });
     return session;
   });
 
@@ -83,7 +89,11 @@ export const registerSale = createServerFn({ method: "POST" })
       .single();
 
     if (error) throw error;
-    
+    await logAudit({
+      userId: context.userId, actionType: "sale_create", module: "sales",
+      description: `Venda R$ ${data.amount} (${data.payment_method}) — ${data.service_name}`,
+      newData: sale,
+    });
     return sale;
   });
 
@@ -127,6 +137,14 @@ export const closeCashSession = createServerFn({ method: "POST" })
       .single();
 
     if (error) throw error;
+    await logAudit({
+      userId: context.userId,
+      actionType: difference === 0 ? "cash_close" : "cash_close_with_diff",
+      module: "cash",
+      description: `Fechamento de caixa. Esperado R$ ${expectedBalance.toFixed(2)}, informado R$ ${data.closing_balance}, diferença R$ ${difference.toFixed(2)}`,
+      oldData: { expectedBalance, totalSales },
+      newData: updatedSession,
+    });
     return { session: updatedSession, audit: { expectedBalance, totalSales, difference } };
   });
 
