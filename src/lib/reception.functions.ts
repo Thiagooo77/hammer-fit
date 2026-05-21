@@ -145,7 +145,7 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
     const { data: receptionist } = await supabase
       .from("receptionists")
       .select("*")
-      .eq("email", email)
+      .eq("email", email || "")
       .maybeSingle();
 
     if (!receptionist) throw new Error("Usuário não está cadastrado como recepcionista.");
