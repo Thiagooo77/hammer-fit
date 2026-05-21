@@ -20,6 +20,7 @@ import { Route as AuthenticatedManagerRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as AuthenticatedReceptionTasksRouteImport } from './routes/_authenticated/reception/tasks'
 import { Route as AuthenticatedReceptionDashboardRouteImport } from './routes/_authenticated/reception/dashboard'
+import { Route as AuthenticatedAdminSalesRouteImport } from './routes/_authenticated/admin/sales'
 import { Route as AuthenticatedAdminReceptionistsRouteImport } from './routes/_authenticated/admin/receptionists'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
@@ -80,6 +81,11 @@ const AuthenticatedReceptionDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => AuthenticatedReceptionRoute,
   } as any)
+const AuthenticatedAdminSalesRoute = AuthenticatedAdminSalesRouteImport.update({
+  id: '/sales',
+  path: '/sales',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminReceptionistsRoute =
   AuthenticatedAdminReceptionistsRouteImport.update({
     id: '/receptionists',
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/receptionists': typeof AuthenticatedAdminReceptionistsRoute
+  '/admin/sales': typeof AuthenticatedAdminSalesRoute
   '/reception/dashboard': typeof AuthenticatedReceptionDashboardRoute
   '/reception/tasks': typeof AuthenticatedReceptionTasksRoute
 }
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/receptionists': typeof AuthenticatedAdminReceptionistsRoute
+  '/admin/sales': typeof AuthenticatedAdminSalesRoute
   '/reception/dashboard': typeof AuthenticatedReceptionDashboardRoute
   '/reception/tasks': typeof AuthenticatedReceptionTasksRoute
 }
@@ -142,6 +150,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/receptionists': typeof AuthenticatedAdminReceptionistsRoute
+  '/_authenticated/admin/sales': typeof AuthenticatedAdminSalesRoute
   '/_authenticated/reception/dashboard': typeof AuthenticatedReceptionDashboardRoute
   '/_authenticated/reception/tasks': typeof AuthenticatedReceptionTasksRoute
 }
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/dashboard'
     | '/admin/receptionists'
+    | '/admin/sales'
     | '/reception/dashboard'
     | '/reception/tasks'
   fileRoutesByTo: FileRoutesByTo
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/dashboard'
     | '/admin/receptionists'
+    | '/admin/sales'
     | '/reception/dashboard'
     | '/reception/tasks'
   id:
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/receptionists'
+    | '/_authenticated/admin/sales'
     | '/_authenticated/reception/dashboard'
     | '/_authenticated/reception/tasks'
   fileRoutesById: FileRoutesById
@@ -282,6 +294,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReceptionDashboardRouteImport
       parentRoute: typeof AuthenticatedReceptionRoute
     }
+    '/_authenticated/admin/sales': {
+      id: '/_authenticated/admin/sales'
+      path: '/sales'
+      fullPath: '/admin/sales'
+      preLoaderRoute: typeof AuthenticatedAdminSalesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/receptionists': {
       id: '/_authenticated/admin/receptionists'
       path: '/receptionists'
@@ -310,12 +329,14 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminReceptionistsRoute: typeof AuthenticatedAdminReceptionistsRoute
+  AuthenticatedAdminSalesRoute: typeof AuthenticatedAdminSalesRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminReceptionistsRoute: AuthenticatedAdminReceptionistsRoute,
+  AuthenticatedAdminSalesRoute: AuthenticatedAdminSalesRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
