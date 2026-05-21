@@ -119,6 +119,23 @@ function AdminSalesPage() {
     onError: (err: any) => toast.error(err.message),
   });
 
+  const createMutation = useMutation({
+    mutationFn: () => createSaleFn({ data: {
+      receptionist_id: newSale.receptionist_id,
+      client_name: newSale.client_name || undefined,
+      service_name: newSale.service_name,
+      amount: Number(newSale.amount),
+      payment_method: newSale.payment_method,
+    }}),
+    onSuccess: () => {
+      toast.success("Venda criada com sucesso!");
+      setCreateOpen(false);
+      setNewSale({ receptionist_id: "", client_name: "", service_name: "", amount: "", payment_method: "pix" });
+      qc.invalidateQueries({ queryKey: ["admin-sales"] });
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
   const filteredSales = React.useMemo(() => {
     if (!data?.sales) return [];
     return data.sales.filter((sale: any) => 
