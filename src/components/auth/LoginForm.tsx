@@ -22,6 +22,25 @@ const formSchema = z.object({
   password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
 });
 
+const clearSupabaseStorage = () => {
+  try {
+    Object.keys(localStorage)
+      .filter((k) => k.startsWith('sb-') || k.includes('supabase'))
+      .forEach((k) => localStorage.removeItem(k));
+    sessionStorage.clear();
+  } catch {}
+};
+
+const withTimeout = async <T,>(promise: PromiseLike<T>, ms: number, message: string): Promise<T> => {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(message)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => {
+    if (timeoutId) clearTimeout(timeoutId);
+  });
+};
+
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -40,12 +59,7 @@ export function LoginForm() {
     // Safety net: if login hangs > 10s, clear stale storage and reset
     const stuckTimeout = setTimeout(() => {
       console.warn('[LOGIN_STUCK] Clearing stale session storage');
-      try {
-        Object.keys(localStorage)
-          .filter((k) => k.startsWith('sb-') || k.includes('supabase'))
-          .forEach((k) => localStorage.removeItem(k));
-        sessionStorage.clear();
-      } catch {}
+      clearSupabaseStorage();
       supabase.auth.signOut().catch(() => {});
       setIsLoading(false);
       toast.error("Conexão demorou demais. Sessão local limpa, tente novamente.");
@@ -55,10 +69,14 @@ export function LoginForm() {
       // Intentional auto-setup if special credentials are used and login fails
       const isInitialSetup = (values.email === "admhammer@gmail.com" || values.email === "gerenciahammer@gmail.com") && values.password === "hammer123";
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      });
+      const { data, error } = await withTimeout(
+        supabase.auth.signInWithPassword({
+          email: values.email,
+          password: values.password,
+        }),
+        8000,
+        "Tempo de login excedido"
+      );
 
       if (error) {
         if (isInitialSetup) {
@@ -82,11 +100,15 @@ export function LoginForm() {
 
       toast.success("Login realizado com sucesso!");
       
-      const { data: roleData } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", data.user.id)
-        .maybeSingle();
+      const { data: roleData } = await withTimeout(
+        supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", data.user.id)
+          .maybeSingle(),
+        3000,
+        "Tempo de permissões excedido"
+      ).catch(() => ({ data: null }));
 
       if (roleData?.role === "admin" || roleData?.role === "manager") {
         navigate({ to: "/admin/dashboard" });
@@ -94,7 +116,9 @@ export function LoginForm() {
         navigate({ to: "/reception/dashboard" });
       }
     } catch (error) {
-      toast.error("Erro ao realizar login");
+      clearSupabaseStorage();
+      supabase.auth.signOut().catch(() => {});
+      toast.error(error instanceof Error && error.message.includes("Tempo") ? "Login travou. Sessão limpa, tente novamente." : "Erro ao realizar login");
     } finally {
       clearTimeout(stuckTimeout);
       setIsLoading(false);

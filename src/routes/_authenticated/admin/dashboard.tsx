@@ -88,8 +88,19 @@ function AdminDashboard() {
     }
   };
 
-  const kpis = data?.kpis;
-  const charts = data?.charts;
+  const kpis = data?.kpis ?? {
+    revenueToday: 0,
+    revenueWeek: 0,
+    receptionistsCount: 0,
+    dailyGoalStatus: 0,
+    ticketMedio: 0,
+    vendasCount: 0,
+  };
+  const charts = data?.charts ?? {
+    weeklyEvolution: [],
+    performanceByHour: [],
+    shifts: [],
+  };
   const ranking = data?.ranking || [];
   const COLORS = ['#b3722d', '#8b5e2a', '#e6a15c', '#4a3721'];
 
@@ -137,21 +148,21 @@ function AdminDashboard() {
         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           <StatCard 
             title="Receita Hoje" 
-            value={`R$ ${kpis?.revenueToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} 
+            value={`R$ ${kpis.revenueToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} 
             icon={<DollarSign />} 
             delay={0.1}
           />
           <StatCard 
             title="Vendas" 
-            value={`${kpis?.vendasCount}`} 
+            value={`${kpis.vendasCount}`} 
             icon={<LayoutDashboard />} 
             delay={0.2}
           />
           <StatCard 
             title="Meta do Dia" 
-            value={`${kpis?.dailyGoalStatus}%`} 
+            value={`${kpis.dailyGoalStatus}%`} 
             icon={<Target />} 
-            trend={kpis?.dailyGoalStatus && kpis.dailyGoalStatus >= 100 ? "+12%" : undefined}
+            trend={kpis.dailyGoalStatus >= 100 ? "+12%" : undefined}
             delay={0.3}
           />
           <StatCard 
@@ -176,7 +187,7 @@ function AdminDashboard() {
               </CardHeader>
               <CardContent className="pt-6 h-[250px] sm:h-[350px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={charts?.weeklyEvolution}>
+                  <BarChart data={charts.weeklyEvolution}>
                     <defs>
                       <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#b3722d" stopOpacity={0.8}/>

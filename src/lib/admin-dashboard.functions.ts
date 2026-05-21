@@ -78,18 +78,20 @@ export const getAdminDashboard = createServerFn({ method: "GET" })
       id: item.receptionist_id,
       name: item.receptionists?.name || "Desconhecido",
       avatar: item.receptionists?.avatar_url || "",
-      salesAmount: Number(item.sold_amount),
-      goalPercentage: Math.round((Number(item.sold_amount) / Math.max(Number(item.goal_amount), 1)) * 100),
+      salesAmount: Number(item.sold_amount || 0),
+      goalPercentage: Math.round((Number(item.sold_amount || 0) / Math.max(Number(item.goal_amount || 0), 1)) * 100),
       position: index + 1,
       streak: index === 0 ? 3 : 0
     }));
+
+    const dailyGoalAmount = Number((dailyGoal as any)?.goal_amount || 0);
 
     return {
       kpis: {
         revenueToday: totalRevenueToday,
         revenueWeek: totalRevenueWeek,
         receptionistsCount: activeReceptionists?.length || 0,
-        dailyGoalStatus: dailyGoal ? Math.round((totalRevenueToday / Number((dailyGoal as any).goal_amount)) * 100) : 0,
+        dailyGoalStatus: dailyGoalAmount > 0 ? Math.round((totalRevenueToday / dailyGoalAmount) * 100) : 0,
         ticketMedio: ticketMedioToday,
         vendasCount: salesCountToday
       },
