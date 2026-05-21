@@ -46,15 +46,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('[AUTH_LOGIN]', { email: session.user.email });
         await fetchUserData(session.user.id);
         
-        recordClientAudit({
-          data: {
-            actionType: "login",
-            module: "auth",
-            userId: session.user.id,
-            userName: session.user.email,
-            description: `Login profissional realizado`,
-          }
-        }).catch(err => console.error('[AUDIT_ERROR]', err));
+        // Use setImmediate or setTimeout to avoid blocking the main UI thread during login
+        setTimeout(() => {
+          recordClientAudit({
+            data: {
+              actionType: "login",
+              module: "auth",
+              userId: session.user.id,
+              userName: session.user.email,
+              description: `Login profissional realizado`,
+            }
+          }).catch(err => console.error('[AUDIT_ERROR]', err));
+        }, 0);
         
       } else if (event === "SIGNED_OUT") {
         setRole(null);
