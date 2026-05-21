@@ -106,30 +106,6 @@ export type Database = {
           },
         ]
       }
-      daily_goals: {
-        Row: {
-          created_at: string | null
-          created_by: string | null
-          goal_amount: number
-          goal_date: string
-          id: string
-        }
-        Insert: {
-          created_at?: string | null
-          created_by?: string | null
-          goal_amount: number
-          goal_date?: string
-          id?: string
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string | null
-          goal_amount?: number
-          goal_date?: string
-          id?: string
-        }
-        Relationships: []
-      }
       goal_progress: {
         Row: {
           goal_amount: number
@@ -164,6 +140,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      goals: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          goal_amount: number
+          goal_date: string
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          goal_amount: number
+          goal_date?: string
+          id?: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          goal_amount?: number
+          goal_date?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      permissions: {
+        Row: {
+          can_create: boolean | null
+          can_delete: boolean | null
+          can_edit: boolean | null
+          can_view: boolean | null
+          created_at: string | null
+          id: string
+          module: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          can_create?: boolean | null
+          can_delete?: boolean | null
+          can_edit?: boolean | null
+          can_view?: boolean | null
+          created_at?: string | null
+          id?: string
+          module: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          can_create?: boolean | null
+          can_delete?: boolean | null
+          can_edit?: boolean | null
+          can_view?: boolean | null
+          created_at?: string | null
+          id?: string
+          module?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -297,6 +330,42 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          avatar_url: string | null
+          cpf: string | null
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          role: Database["public"]["Enums"]["app_role"] | null
+          status: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          cpf?: string | null
+          created_at?: string | null
+          email: string
+          id: string
+          name: string
+          phone?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
+          status?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          cpf?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
+          status?: string | null
         }
         Relationships: []
       }
