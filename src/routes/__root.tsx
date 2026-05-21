@@ -1,5 +1,4 @@
-import { Outlet, ScrollRestoration, createRootRoute } from "@tanstack/react-router";
-import { Meta, Scripts } from "@tanstack/react-start";
+import { Outlet, ScrollRestoration, createRootRoute, Meta, Scripts } from "@tanstack/react-router";
 import * as React from "react";
 import "./styles.css";
 
