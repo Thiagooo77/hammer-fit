@@ -110,6 +110,10 @@ export const updateReceptionist = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
     const { id, ...patch } = data;
+
+    const { data: before } = await supabaseAdmin
+      .from("receptionists").select("*").eq("id", id).single();
+
     const updates = {
       ...patch,
       ...(patch.status !== undefined ? { active: patch.status === "active" } : {}),
@@ -123,7 +127,6 @@ export const updateReceptionist = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Error(error.message);
 
-    // Block/unblock auth user if status changes
     if (patch.status !== undefined && rec?.user_id) {
       const banDuration = patch.status === "blocked" ? "876000h" : "none";
       await supabaseAdmin.auth.admin.updateUserById(rec.user_id, {
@@ -131,13 +134,20 @@ export const updateReceptionist = createServerFn({ method: "POST" })
       });
     }
 
+    const action =
+      patch.status === "blocked" ? "user_block" :
+      patch.goal_value !== undefined ? "goal_change" :
+      patch.shift !== undefined ? "shift_change" :
+      "receptionist_update";
+
+    await logAudit({
+      userId: context.userId, actionType: action, module: "users",
+      description: `Atualizou ${rec?.name}`,
+      oldData: before, newData: rec,
+    });
+
     return { receptionist: rec };
   });
-
-const ResetSchema = z.object({
-  id: z.string().uuid(),
-  password: z.string().min(6).max(72),
-});
 
 export const resetReceptionistPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
