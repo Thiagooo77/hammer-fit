@@ -6,25 +6,42 @@ import { RankingBoard } from "@/components/reception/RankingBoard";
 import { ShiftTimeline, type Shift } from "@/components/reception/ShiftTimeline";
 import { DailySummary } from "@/components/reception/DailySummary";
 import { AdvancedCharts } from "@/components/reception/AdvancedCharts";
-import { Target, Users, LayoutDashboard, Calendar, Bell, User as UserIcon, Loader2, Award, Zap } from "lucide-react";
+import { Target, Users, LayoutDashboard, Calendar, Bell, User as UserIcon, Loader2, Award, Zap, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getReceptionDashboard } from "@/lib/reception.functions";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { Navigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/reception/dashboard")({
   component: ReceptionGoalsDashboard,
 });
 
 function ReceptionGoalsDashboard() {
+  const { signOut, user, role, loading: authLoading } = useAuth();
   const fetchDashboard = useServerFn(getReceptionDashboard);
   
   const { data, isLoading, error } = useQuery({
     queryKey: ["reception-dashboard"],
     queryFn: () => fetchDashboard(),
+    enabled: !!user,
   });
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
 
   const [currentDate] = React.useState(new Date().toLocaleDateString('pt-BR', { 
     weekday: 'long', 
@@ -106,10 +123,14 @@ function ReceptionGoalsDashboard() {
                 <p className="text-xs font-black">{receptionist.name}</p>
                 <p className="text-[10px] text-muted-foreground uppercase font-bold">Recepcionista</p>
               </div>
+              <Button variant="ghost" size="icon" className="relative" onClick={() => signOut()}>
+                <LogOut className="size-5" />
+              </Button>
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="size-5" />
                 <span className="absolute top-2 right-2 size-2 bg-primary rounded-full" />
               </Button>
+
               <div className="size-10 rounded-full bg-secondary border border-primary/20 flex items-center justify-center overflow-hidden">
                 {receptionist.avatar_url ? (
                   <img src={receptionist.avatar_url} alt={receptionist.name} className="size-full object-cover" />
