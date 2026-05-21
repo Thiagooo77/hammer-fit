@@ -149,6 +149,11 @@ export const updateReceptionist = createServerFn({ method: "POST" })
     return { receptionist: rec };
   });
 
+const ResetSchema = z.object({
+  id: z.string().uuid(),
+  password: z.string().min(6).max(72),
+});
+
 export const resetReceptionistPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => ResetSchema.parse(input))
@@ -156,7 +161,7 @@ export const resetReceptionistPassword = createServerFn({ method: "POST" })
     await assertAdmin(context.userId);
     const { data: rec, error } = await supabaseAdmin
       .from("receptionists")
-      .select("user_id")
+      .select("user_id, name")
       .eq("id", data.id)
       .single();
     if (error) throw new Error(error.message);
@@ -166,6 +171,10 @@ export const resetReceptionistPassword = createServerFn({ method: "POST" })
       { password: data.password },
     );
     if (updErr) throw new Error(updErr.message);
+    await logAudit({
+      userId: context.userId, actionType: "password_reset", module: "users",
+      description: `Resetou senha de ${rec.name}`,
+    });
     return { ok: true };
   });
 
