@@ -92,4 +92,4 @@ export const ShiftTimeline = React.memo(({ shifts }: ShiftTimelineProps) => {
       </CardContent>
     </Card>
   );
-}
+});
