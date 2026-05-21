@@ -77,20 +77,22 @@ function ReceptionistsAdminPage() {
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin-receptionists"] });
 
   return (
-    <div className="min-h-screen bg-muted/40">
-      <header className="bg-background border-b border-border p-4 sticky top-0 z-10">
-        <div className="container mx-auto flex items-center justify-between gap-4">
+    <div className="min-h-screen bg-slate-950 text-slate-50">
+      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/60 backdrop-blur-xl transition-all h-16 flex items-center">
+        <div className="container mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link to="/admin/dashboard">
-              <Button variant="ghost" size="icon"><ArrowLeft className="h-5 w-5" /></Button>
+              <Button variant="ghost" size="icon" className="hover:bg-white/5"><ArrowLeft className="h-5 w-5" /></Button>
             </Link>
-            <Users className="text-primary h-6 w-6" />
+            <div className="p-2 bg-primary/20 rounded-lg border border-primary/30">
+              <Users className="text-primary h-5 w-5" />
+            </div>
             <h1 className="text-xl font-black uppercase italic tracking-tighter">
-              Recepcionistas
+              Hammer <span className="text-primary">Equipe</span>
             </h1>
           </div>
-          <Button onClick={() => { setCreating(true); setEditing(null); }} className="gap-2">
-            <Plus className="h-4 w-4" /> Novo cadastro
+          <Button onClick={() => { setCreating(true); setEditing(null); }} className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase italic tracking-widest text-xs rounded-xl h-10 px-4">
+            <Plus className="h-4 w-4" /> Novo Cadastro
           </Button>
         </div>
       </header>
@@ -110,7 +112,7 @@ function ReceptionistsAdminPage() {
             ) : items.map((r) => {
               const meta = STATUS_META[r.status] ?? STATUS_META.active;
               return (
-                <div key={r.id} className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/40 transition">
+                <div key={r.id} className="flex items-center gap-4 p-4 rounded-2xl border border-white/5 bg-white/[0.03] hover:bg-white/[0.06] transition-all group">
                   <Avatar className="h-12 w-12">
                     <AvatarImage src={r.avatar_url ?? undefined} />
                     <AvatarFallback>{r.name.slice(0, 2).toUpperCase()}</AvatarFallback>
