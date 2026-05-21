@@ -164,6 +164,14 @@ function ReceptionGoalsDashboard() {
                 current={goalProgress ? Number(goalProgress.sold_amount) : 0}
                 type="individual"
               />
+              <GoalsProgress 
+                title="Meta Clínica"
+                icon={<Users className="size-5" />}
+                target={clinicTarget}
+                current={clinicCurrent}
+                type="general"
+                prediction={clinicPrediction}
+              />
             </div>
 
             {charts && (
