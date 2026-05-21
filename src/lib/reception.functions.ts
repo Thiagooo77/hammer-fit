@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { logAudit, getClientMeta } from "@/lib/audit.server";
 
 /**
  * Zod schemas for validation
@@ -37,6 +36,7 @@ export const openCashSession = createServerFn({ method: "POST" })
   .inputValidator((data) => OpenCashSessionSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+    const { logAudit, getClientMeta } = await import("@/lib/audit.server");
 
     // Check if there's already an open session
     const { data: existingSession } = await supabase
@@ -82,6 +82,7 @@ export const registerSale = createServerFn({ method: "POST" })
   .inputValidator((data) => RegisterSaleSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+    const { logAudit } = await import("@/lib/audit.server");
 
     // 1. Verify if session is still open
     const { data: session } = await supabase
@@ -141,6 +142,7 @@ export const closeCashSession = createServerFn({ method: "POST" })
   .inputValidator((data) => CloseCashSessionSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+    const { logAudit } = await import("@/lib/audit.server");
 
     // Get all sales for this session to calculate expected balance
     const { data: sales } = await supabase
