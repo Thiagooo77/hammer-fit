@@ -13,7 +13,7 @@ import {
   ChevronRight, AlertTriangle,
 } from "lucide-react";
 
-export const Route = createFileRoute("/admin/audit")({
+export const Route = createFileRoute("/_authenticated/admin/audit")({
   component: AuditPage,
 });
 
