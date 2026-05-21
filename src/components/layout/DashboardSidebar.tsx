@@ -173,12 +173,12 @@ export function DashboardSidebar() {
 
   return (
     <>
-      {/* Mobile Menu Toggle */}
-      <div className="md:hidden fixed top-3.5 left-4 z-[60]">
+      {/* Mobile Menu Toggle - Integrated with Header style */}
+      <div className="md:hidden fixed top-0 left-0 z-[60] h-16 w-14 flex items-center justify-center">
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
-          className="bg-slate-950 border-white/10 text-white"
+          className="text-white hover:bg-white/5 active:scale-95 transition-all"
           onClick={() => setIsMobileOpen(!isMobileOpen)}
         >
           {isMobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
