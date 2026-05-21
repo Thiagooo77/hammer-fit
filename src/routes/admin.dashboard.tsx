@@ -53,8 +53,8 @@ function AdminDashboard() {
     if (!data?.ranking) return;
     const exportData = data.ranking.map(r => ({
       Nome: r.name,
-      Vendas: r.salesCount,
-      Total: `R$ ${r.totalAmount.toFixed(2)}`
+      Vendas: r.salesAmount,
+      Meta: `${r.goalPercentage}%`
     }));
 
     try {
