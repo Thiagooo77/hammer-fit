@@ -4,28 +4,35 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 async function assertAdmin(userId: string) {
+  // Check if role is admin or manager using service role (bypasses RLS)
   const { data, error } = await supabaseAdmin
     .from("user_roles")
     .select("role")
     .eq("user_id", userId)
     .in("role", ["admin", "manager"]);
-  if (error) throw new Error(error.message);
+  
+  if (error) {
+    console.error("[HAMMER_FIT_AUDIT] Role check failed:", error);
+    throw new Error("Acesso negado: falha na verificação de permissões");
+  }
+  
   if (data && data.length > 0) return;
 
-  // Fallback: check users table role + self-heal for known admin
+  // Fallback for primary admin by email
   const { data: userRow } = await supabaseAdmin
     .from("users")
     .select("role, email")
     .eq("id", userId)
     .maybeSingle();
 
-  if (userRow?.role === "admin" || userRow?.role === "manager") return;
   if (userRow?.email === "admhammer@gmail.com") {
-    await supabaseAdmin
-      .from("user_roles")
-      .insert({ user_id: userId, role: "admin" });
+    // Auto-heal: Ensure role exists in user_roles
+    await supabaseAdmin.from("user_roles").upsert({ user_id: userId, role: "admin" }, { onConflict: 'user_id, role' });
     return;
   }
+  
+  if (userRow?.role === "admin" || userRow?.role === "manager") return;
+
   throw new Error("Acesso negado");
 }
 
