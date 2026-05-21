@@ -274,7 +274,7 @@ function AdminDashboard() {
   );
 }
 
-function StatCard({ title, value, icon, trend, delay = 0 }: { title: string; value: string; icon: React.ReactNode; trend?: string; delay?: number }) {
+const StatCard = memo(({ title, value, icon, trend, delay = 0 }: { title: string; value: string; icon: React.ReactNode; trend?: string; delay?: number }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -302,5 +302,5 @@ function StatCard({ title, value, icon, trend, delay = 0 }: { title: string; val
       </Card>
     </motion.div>
   );
-}
+});
 
