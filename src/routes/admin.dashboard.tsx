@@ -4,6 +4,7 @@ import { Navigate } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, Users, Settings, LogOut, BarChart3, ShieldCheck } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/admin/dashboard")({
   component: AdminDashboard,
