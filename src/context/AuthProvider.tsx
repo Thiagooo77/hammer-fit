@@ -75,6 +75,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (!finalRole && userEmail === 'admhammer@gmail.com') {
         finalRole = 'admin';
+      } else if (!finalRole) {
+        // Fallback to receptionist if no role found in user_roles
+        finalRole = 'receptionist';
       }
       
       setRole(finalRole);
