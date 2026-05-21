@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
@@ -32,24 +33,37 @@ export const Route = createFileRoute("/_authenticated")({
           .maybeSingle()
       ]);
 
-      const role = roleData?.role || "receptionist";
+      // Strict role resolution - no more defaulting to receptionist without verification
+      const role = roleData?.role;
+
+      if (!role) {
+        console.warn('[PERMISSION_WARNING] No role found for user:', session.user.email);
+        // If we can't find a role, we should probably check if they are the master admin
+        if (session.user.email === 'admhammer@gmail.com') {
+          return {
+            session,
+            user: session.user,
+            role: 'admin' as any,
+            profile: profile || null,
+          };
+        }
+      }
 
       // Global Authorization Logging
       console.log('[PERMISSION_GRANTED]', { 
         user: session.user.email, 
-        role, 
+        role: role || "receptionist", 
         path: location.pathname 
       });
 
       return {
         session,
         user: session.user,
-        role: role as any,
+        role: (role || "receptionist") as any,
         profile: profile || null,
       };
     } catch (error) {
       console.error('[PERMISSION_VALIDATION_ERROR]', error);
-      // Fallback to receptionist if role cannot be determined
       return {
         session,
         user: session.user,
@@ -58,6 +72,18 @@ export const Route = createFileRoute("/_authenticated")({
       };
     }
   },
-  component: () => <Outlet />,
+  component: AuthenticatedLayout,
 });
+
+function AuthenticatedLayout() {
+  return (
+    <div className="flex min-h-screen bg-slate-950">
+      <DashboardSidebar />
+      <main className="flex-1 overflow-x-hidden">
+        <Outlet />
+      </main>
+    </div>
+  );
+}
+
 
