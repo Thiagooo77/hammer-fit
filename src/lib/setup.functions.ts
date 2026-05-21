@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createSupabaseAdminClient } from "@/integrations/supabase/client.server";
+import { supabaseAdmin as supabase } from "@/integrations/supabase/client.server";
 
 export const seedAdminUser = createServerFn({ method: "POST" })
   .handler(async () => {
-    const supabase = createSupabaseAdminClient();
+
     const email = "gerenciahammer@gmail.com";
     const password = "hammer123";
 
