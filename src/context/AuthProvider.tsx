@@ -159,6 +159,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = useCallback(async () => {
     await authService.signOut();
     queryClient.clear();
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
   }, [queryClient]);
 
   const value = useMemo(() => ({
