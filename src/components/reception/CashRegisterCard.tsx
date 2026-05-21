@@ -2,7 +2,7 @@ import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Wallet, Plus, Lock, Search, CreditCard, Banknote, Landmark, HandCoins } from "lucide-react";
+import { Wallet, Plus, Lock, Search, CreditCard, Banknote, Landmark, HandCoins, AlertCircle } from "lucide-react";
 
 export interface CashRegisterCardProps {
   status: "Aberto" | "Em análise" | "Fechado";
