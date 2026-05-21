@@ -20,10 +20,10 @@ export const canAccessModule = (role: string | null | undefined, module: string)
   // Simple logic for module access
   if (role === 'admin') return true;
   if (role === 'manager') {
-    return ['dashboard', 'sales', 'goals', 'receptionists', 'reports'].includes(module);
+    return ['dashboard', 'sales', 'goals', 'receptionists', 'reports', 'tasks'].includes(module);
   }
   if (role === 'receptionist') {
-    return ['reception'].includes(module);
+    return ['reception', 'tasks'].includes(module);
   }
   
   return false;

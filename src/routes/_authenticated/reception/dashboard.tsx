@@ -127,7 +127,7 @@ function ReceptionGoalsDashboard() {
     <div className="min-h-screen bg-slate-950 text-slate-50 pb-12 selection:bg-primary/30">
       {/* Premium Glass Header */}
       <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/60 backdrop-blur-xl transition-all h-16 md:h-20">
-        <div className="container mx-auto px-4 h-full flex items-center justify-between">
+        <div className="container mx-auto px-4 md:px-4 pl-14 h-full flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="p-2 bg-primary/20 rounded-lg border border-primary/30 shadow-[0_0_10px_rgba(179,114,45,0.3)]">
               <LayoutDashboard className="text-primary size-6" />

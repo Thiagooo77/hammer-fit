@@ -72,7 +72,7 @@ function AuditPage() {
   return (
     <div className="min-h-screen bg-muted/40">
       <header className="bg-background border-b p-4 sticky top-0 z-10">
-        <div className="container mx-auto flex items-center gap-3">
+        <div className="container mx-auto flex items-center gap-3 md:px-4 pl-14">
           <Link to="/admin/dashboard">
             <Button variant="ghost" size="icon"><ArrowLeft className="h-5 w-5" /></Button>
           </Link>

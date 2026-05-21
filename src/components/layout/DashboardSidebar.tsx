@@ -11,7 +11,8 @@ import {
   Target,
   FileText,
   Menu,
-  X
+  X,
+  CheckSquare
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
@@ -36,7 +37,13 @@ export function DashboardSidebar() {
     {
       title: "Vendas",
       icon: TrendingUp,
-      href: "/reception/dashboard", // Assuming sales are handled here for now
+      href: "/reception/dashboard",
+      roles: ["admin", "manager", "receptionist"],
+    },
+    {
+      title: "Checklists",
+      icon: CheckSquare,
+      href: "/reception/tasks",
       roles: ["admin", "manager", "receptionist"],
     },
     {
@@ -166,12 +173,12 @@ export function DashboardSidebar() {
 
   return (
     <>
-      {/* Mobile Menu Toggle */}
-      <div className="md:hidden fixed top-4 left-4 z-[60]">
+      {/* Mobile Menu Toggle - Integrated with Header style */}
+      <div className="md:hidden fixed top-0 left-0 z-[60] h-16 w-14 flex items-center justify-center">
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
-          className="bg-slate-950 border-white/10 text-white"
+          className="text-white hover:bg-white/5 active:scale-95 transition-all"
           onClick={() => setIsMobileOpen(!isMobileOpen)}
         >
           {isMobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}

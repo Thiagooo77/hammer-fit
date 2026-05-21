@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedReceptionRouteImport } from './routes/_authenticated.reception'
 import { Route as AuthenticatedManagerRouteImport } from './routes/_authenticated.manager'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
+import { Route as AuthenticatedReceptionTasksRouteImport } from './routes/_authenticated/reception/tasks'
 import { Route as AuthenticatedReceptionDashboardRouteImport } from './routes/_authenticated/reception/dashboard'
 import { Route as AuthenticatedAdminReceptionistsRouteImport } from './routes/_authenticated/admin/receptionists'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
@@ -67,6 +68,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedReceptionTasksRoute =
+  AuthenticatedReceptionTasksRouteImport.update({
+    id: '/tasks',
+    path: '/tasks',
+    getParentRoute: () => AuthenticatedReceptionRoute,
+  } as any)
 const AuthenticatedReceptionDashboardRoute =
   AuthenticatedReceptionDashboardRouteImport.update({
     id: '/dashboard',
@@ -104,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/receptionists': typeof AuthenticatedAdminReceptionistsRoute
   '/reception/dashboard': typeof AuthenticatedReceptionDashboardRoute
+  '/reception/tasks': typeof AuthenticatedReceptionTasksRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -118,6 +126,7 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/receptionists': typeof AuthenticatedAdminReceptionistsRoute
   '/reception/dashboard': typeof AuthenticatedReceptionDashboardRoute
+  '/reception/tasks': typeof AuthenticatedReceptionTasksRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -134,6 +143,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/receptionists': typeof AuthenticatedAdminReceptionistsRoute
   '/_authenticated/reception/dashboard': typeof AuthenticatedReceptionDashboardRoute
+  '/_authenticated/reception/tasks': typeof AuthenticatedReceptionTasksRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/receptionists'
     | '/reception/dashboard'
+    | '/reception/tasks'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/receptionists'
     | '/reception/dashboard'
+    | '/reception/tasks'
   id:
     | '__root__'
     | '/'
@@ -179,6 +191,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/receptionists'
     | '/_authenticated/reception/dashboard'
+    | '/_authenticated/reception/tasks'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -255,6 +268,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/reception/tasks': {
+      id: '/_authenticated/reception/tasks'
+      path: '/tasks'
+      fullPath: '/reception/tasks'
+      preLoaderRoute: typeof AuthenticatedReceptionTasksRouteImport
+      parentRoute: typeof AuthenticatedReceptionRoute
+    }
     '/_authenticated/reception/dashboard': {
       id: '/_authenticated/reception/dashboard'
       path: '/dashboard'
@@ -303,11 +323,13 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedReceptionRouteChildren {
   AuthenticatedReceptionDashboardRoute: typeof AuthenticatedReceptionDashboardRoute
+  AuthenticatedReceptionTasksRoute: typeof AuthenticatedReceptionTasksRoute
 }
 
 const AuthenticatedReceptionRouteChildren: AuthenticatedReceptionRouteChildren =
   {
     AuthenticatedReceptionDashboardRoute: AuthenticatedReceptionDashboardRoute,
+    AuthenticatedReceptionTasksRoute: AuthenticatedReceptionTasksRoute,
   }
 
 const AuthenticatedReceptionRouteWithChildren =

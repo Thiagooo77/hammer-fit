@@ -113,8 +113,15 @@
     border-color: var(--color-border);
   }
 
+  html {
+    scrollbar-gutter: stable;
+    height: 100%;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    min-height: 100%;
+    min-height: 100dvh;
   }
 }
