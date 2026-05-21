@@ -194,7 +194,7 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
     // Sales by hour
     const salesByHour = Array.from({ length: 24 }, (_, i) => ({ hour: `${i}:00`, amount: 0, count: 0 }));
     sales.forEach(s => {
-      const h = new Date(s.created_at).getHours();
+      const h = new Date(s.created_at || '').getHours();
       salesByHour[h].amount += Number(s.amount);
       salesByHour[h].count += 1;
     });
