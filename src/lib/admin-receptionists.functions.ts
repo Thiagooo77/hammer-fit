@@ -20,12 +20,26 @@ export const listReceptionists = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await assertAdmin(context.userId);
-    const { data, error } = await supabaseAdmin
+    const { data: recs, error: recErr } = await supabaseAdmin
       .from("receptionists")
       .select("*")
       .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
-    return { receptionists: data ?? [] };
+
+    if (recErr) throw new Error(recErr.message);
+
+    // Fetch roles for these users
+    const userIds = (recs ?? []).map(r => r.user_id).filter(Boolean);
+    const { data: roles } = await supabaseAdmin
+      .from("user_roles")
+      .select("user_id, role")
+      .in("user_id", userIds as string[]);
+
+    const receptionistsWithRoles = (recs ?? []).map(r => ({
+      ...r,
+      user_roles: (roles ?? []).filter(role => role.user_id === r.user_id)
+    }));
+
+    return { receptionists: receptionistsWithRoles };
   });
 
 const CreateSchema = z.object({
@@ -34,6 +48,7 @@ const CreateSchema = z.object({
   password: z.string().min(6).max(72),
   phone: z.string().trim().max(30).optional().nullable(),
   cpf: z.string().trim().max(20).optional().nullable(),
+  role_type: z.enum(["manager", "receptionist"]).default("receptionist"),
   role_title: z.string().trim().max(80).optional().nullable(),
   shift: z.string().trim().max(40).optional().nullable(),
   goal_value: z.number().min(0).max(10_000_000).default(0),
@@ -61,7 +76,7 @@ export const createReceptionist = createServerFn({ method: "POST" })
 
     await supabaseAdmin
       .from("user_roles")
-      .insert({ user_id: newUserId, role: "user" });
+      .insert({ user_id: newUserId, role: data.role_type });
 
     await (supabaseAdmin
       .from("users" as any)
@@ -99,6 +114,7 @@ const UpdateSchema = z.object({
   name: z.string().trim().min(1).max(120).optional(),
   phone: z.string().trim().max(30).nullable().optional(),
   cpf: z.string().trim().max(20).nullable().optional(),
+  role_type: z.enum(["manager", "receptionist"]).optional(),
   role_title: z.string().trim().max(80).nullable().optional(),
   shift: z.string().trim().max(40).nullable().optional(),
   goal_value: z.number().min(0).max(10_000_000).optional(),
@@ -113,10 +129,16 @@ export const updateReceptionist = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { logAudit } = await import("@/lib/audit.server");
     await assertAdmin(context.userId);
-    const { id, ...patch } = data;
+    const { id, role_type, ...patch } = data;
 
     const { data: before } = await supabaseAdmin
       .from("receptionists").select("*").eq("id", id).single();
+
+    if (role_type && before?.user_id) {
+      await supabaseAdmin
+        .from("user_roles")
+        .upsert({ user_id: before.user_id, role: role_type }, { onConflict: "user_id,role" });
+    }
 
     const updates = {
       ...patch,

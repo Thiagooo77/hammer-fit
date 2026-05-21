@@ -53,13 +53,6 @@ function TasksPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
            <TaskCard 
-             title="Verificação de Limpeza - Banheiros"
-             sector="Limpeza"
-             time="08:00"
-             status="pending"
-             description="Verificar reposição de papel, sabonete e limpeza geral do piso."
-           />
-           <TaskCard 
              title="Abertura de Caixa"
              sector="Recepção"
              time="06:00"
@@ -67,11 +60,18 @@ function TasksPage() {
              description="Conferir saldo inicial e organizar comprovantes."
            />
            <TaskCard 
-             title="Manutenção Preventiva - Esteiras"
-             sector="Manutenção"
-             time="09:00"
-             status="urgent"
-             description="Lubrificação e teste de emergência de todas as unidades."
+             title="Conferência de Matrículas"
+             sector="Recepção"
+             time="08:00"
+             status="pending"
+             description="Validar novos contratos e pendências de documentos do dia anterior."
+           />
+           <TaskCard 
+             title="Check-in de Alunos"
+             sector="Recepção"
+             time="07:00"
+             status="pending"
+             description="Garantir que todos os alunos estão acessando via biometria/QR Code."
            />
         </div>
 
