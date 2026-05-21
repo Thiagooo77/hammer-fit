@@ -9,7 +9,7 @@ export interface RankingMember {
   id: string;
   name: string;
   avatar: string;
-  sales: number;
+  salesAmount?: number; // Valor total vendido
   goalPercentage: number;
   streak: number;
   position: number;
