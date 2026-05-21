@@ -37,7 +37,7 @@ export const exportService = {
     doc.text(title, 14, 15);
     
     const headers = Object.keys(data[0]);
-    const body = data.map(obj => Object.values(obj));
+    const body = data.map(obj => Object.values(obj)) as any[][];
 
     autoTable(doc, {
       head: [headers],
@@ -45,7 +45,7 @@ export const exportService = {
       startY: 20,
       theme: 'grid',
       styles: { fontSize: 8 },
-      headStyles: { fillStyle: 'DF', fillColor: [179, 114, 45] }
+      headStyles: { fillColor: [179, 114, 45] }
     });
 
     doc.save(`${filename}.pdf`);
