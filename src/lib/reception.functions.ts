@@ -165,7 +165,7 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       supabaseAdmin.from("cash_sessions").select("*, receptionists (name)").eq("status", "open").maybeSingle(),
       supabaseAdmin.from("daily_goals").select("*").eq("goal_date", todayStart.toISOString().split('T')[0]).maybeSingle(),
       supabaseAdmin.from("goal_progress").select("*").eq("receptionist_id", receptionist.id).maybeSingle(),
-      supabaseAdmin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists (name, avatar_url)").order("sold_amount", { ascending: false }).limit(10),
+      supabaseAdmin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists:receptionist_id (name, avatar_url)").order("sold_amount", { ascending: false }).limit(10),
       supabaseAdmin.from("sales").select("*").gte("created_at", todayStart.toISOString()).lt("created_at", tomorrowStart.toISOString())
     ]);
 
