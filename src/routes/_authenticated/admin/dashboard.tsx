@@ -265,7 +265,19 @@ function AdminDashboard() {
                      <ShieldCheck className="size-4 text-primary group-hover:scale-110 transition-transform" />
                      <span className="font-bold">Log de Auditoria</span>
                    </Button>
-                 </Link>
+                  </Link>
+                  <Link to="/admin/goals" className="block">
+                    <Button variant="ghost" className="w-full justify-start gap-3 hover:bg-white/5 group">
+                      <Target className="size-4 text-primary group-hover:scale-110 transition-transform" />
+                      <span className="font-bold">Metas</span>
+                    </Button>
+                  </Link>
+                  <Link to="/admin/reports" className="block">
+                    <Button variant="ghost" className="w-full justify-start gap-3 hover:bg-white/5 group">
+                      <FileText className="size-4 text-primary group-hover:scale-110 transition-transform" />
+                      <span className="font-bold">Relatórios</span>
+                    </Button>
+                  </Link>
                </CardContent>
              </Card>
           </div>
