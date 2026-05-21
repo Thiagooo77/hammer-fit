@@ -16,7 +16,7 @@ import {
 import { RankingBoard } from "@/components/reception/RankingBoard";
 import { toast } from "sonner";
 import { iaService } from "@/services/iaService";
-import React from "react";
+import React, { memo, useCallback } from "react";
 
 export const Route = createFileRoute("/_authenticated/admin/dashboard")({
   component: AdminDashboard,
@@ -30,8 +30,10 @@ function AdminDashboard() {
     queryKey: ["admin-dashboard"],
     queryFn: () => fetchDashboard(),
     enabled: !!user && (role === "admin" || role === "manager"),
-    refetchInterval: 300000, // Aumentado para 5 minutos (o realtime cuida das atualizações)
-    staleTime: 60000, // Dados considerados frescos por 1 minuto
+    refetchInterval: 300000, 
+    staleTime: 1000 * 60 * 2, // 2 minutes stale time for dashboard
+    gcTime: 1000 * 60 * 10, // 10 minutes cache cleanup
+
   });
 
   React.useEffect(() => {
@@ -71,7 +73,7 @@ function AdminDashboard() {
     return <Navigate to="/unauthorized" />;
   }
 
-  const handleExport = async (type: 'pdf' | 'excel' | 'csv') => {
+  const handleExport = useCallback(async (type: 'pdf' | 'excel' | 'csv') => {
     if (!data?.ranking) return;
     const exportData = data.ranking.map(r => ({
       Nome: r.name,
@@ -87,7 +89,7 @@ function AdminDashboard() {
     } catch (e) {
       toast.error("Erro na exportação");
     }
-  };
+  }, [data?.ranking]);
 
   const kpis = data?.kpis ?? {
     revenueToday: 0,
@@ -272,7 +274,7 @@ function AdminDashboard() {
   );
 }
 
-function StatCard({ title, value, icon, trend, delay = 0 }: { title: string; value: string; icon: React.ReactNode; trend?: string; delay?: number }) {
+const StatCard = memo(({ title, value, icon, trend, delay = 0 }: { title: string; value: string; icon: React.ReactNode; trend?: string; delay?: number }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -300,5 +302,5 @@ function StatCard({ title, value, icon, trend, delay = 0 }: { title: string; val
       </Card>
     </motion.div>
   );
-}
+});
 

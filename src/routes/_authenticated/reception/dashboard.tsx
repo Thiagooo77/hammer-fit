@@ -28,8 +28,10 @@ function ReceptionGoalsDashboard() {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["reception-dashboard"],
     queryFn: () => fetchDashboard(),
-    refetchInterval: 300000, // 5 minutos (realtime ativo)
-    staleTime: 60000, // 1 minuto de cache local
+    refetchInterval: 300000, 
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+
     enabled: !!user,
   });
 

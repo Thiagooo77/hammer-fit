@@ -16,7 +16,7 @@ interface ShiftTimelineProps {
   shifts: Shift[];
 }
 
-export function ShiftTimeline({ shifts }: ShiftTimelineProps) {
+export const ShiftTimeline = React.memo(({ shifts }: ShiftTimelineProps) => {
   const getIcon = (type: string) => {
     switch (type) {
       case "Manhã": return <Sun className="size-4 text-orange-400" />;
@@ -92,4 +92,4 @@ export function ShiftTimeline({ shifts }: ShiftTimelineProps) {
       </CardContent>
     </Card>
   );
-}
+});

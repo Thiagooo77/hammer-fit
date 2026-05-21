@@ -1,5 +1,5 @@
-import React from "react";
-import { Link, useLocation } from "@tanstack/react-router";
+import React, { useCallback, useMemo } from "react";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { 
   LayoutDashboard, 
   Users, 
@@ -22,12 +22,13 @@ import { Button } from "@/components/ui/button";
 export function DashboardSidebar() {
   const { role, signOut, user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = React.useState(true);
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
 
-  const isAdmin = role === "admin" || role === "manager";
+  const isAdmin = useMemo(() => role === "admin" || role === "manager", [role]);
 
-  const menuItems = [
+  const menuItems = useMemo(() => [
     {
       title: "Dashboard",
       icon: LayoutDashboard,
@@ -70,11 +71,17 @@ export function DashboardSidebar() {
       href: "/admin/dashboard", // Placeholder for now
       roles: ["admin", "manager"],
     },
-  ];
+  ], [isAdmin]);
 
-  const filteredItems = menuItems.filter(item => role && item.roles.includes(role));
+  const filteredItems = useMemo(() => 
+    menuItems.filter(item => role && item.roles.includes(role)),
+  [menuItems, role]);
 
-  const SidebarContent = () => (
+  const handleSignOut = useCallback(async () => {
+    await signOut();
+  }, [signOut]);
+
+  const SidebarContent = useCallback(() => (
     <div className="flex flex-col h-full bg-slate-950 border-r border-white/10 text-slate-50">
       {/* Logo Section */}
       <div className={cn(
@@ -154,7 +161,7 @@ export function DashboardSidebar() {
             "w-full justify-start gap-3 text-slate-400 hover:text-red-400 hover:bg-red-400/10 transition-colors",
             !isOpen && "justify-center"
           )}
-          onClick={() => signOut()}
+          onClick={handleSignOut}
         >
           <LogOut className="size-4" />
           {isOpen && <span className="text-xs font-black uppercase italic">Sair</span>}
@@ -169,7 +176,7 @@ export function DashboardSidebar() {
         <ChevronRight className={cn("size-3 transition-transform", isOpen && "rotate-180")} />
       </button>
     </div>
-  );
+  ), [isOpen, filteredItems, location.pathname, user?.email, role, handleSignOut]);
 
   return (
     <>
