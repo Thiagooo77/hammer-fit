@@ -18,11 +18,11 @@ export const GoalsProgress = React.memo(({ title, icon, target, current, type, p
   const percentage = Math.min(Math.round((current / target) * 100), 100);
   const remaining = Math.max(target - current, 0);
 
-  const getBarColor = (pct: number) => {
+  const getBarColor = React.useCallback((pct: number) => {
     if (pct >= 80) return "bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)]";
     if (pct >= 40) return "bg-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.4)]";
     return "bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]";
-  };
+  }, []);
 
   const isComplete = percentage >= 100;
 
