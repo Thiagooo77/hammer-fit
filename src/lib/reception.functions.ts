@@ -200,10 +200,17 @@ export const closeCashSession = createServerFn({ method: "POST" })
 export const getReceptionDashboard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const { supabase: userSupabase } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Fetch receptionist data for the current user
-    const { data: receptionist } = await supabaseAdmin
+    // Concurrent check for receptionist and open session
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const tomorrowStart = new Date(todayStart);
+    tomorrowStart.setDate(todayStart.getDate() + 1);
+
+    // 1. Get receptionist first to resolve IDs for subsequent queries
+    const { data: receptionist } = await userSupabase
       .from("receptionists")
       .select("*")
       .eq("user_id", context.userId)
@@ -213,13 +220,7 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       return { receptionist: null, currentSession: null, dailyGoal: null, goalProgress: null, ranking: [], smartStats: { remaining: 0, percentage: 0, totalSoldToday: 0, vendasCount: 0, ticketMedio: 0, mostLucrativeHour: "N/A" }, charts: null, todaysSessions: [] };
     }
 
-    // Get today's start and end for filtering
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const tomorrowStart = new Date(todayStart);
-    tomorrowStart.setDate(todayStart.getDate() + 1);
-
-    // Concurrent data fetching
+    // 2. Fetch all other data in parallel
     const [
       { data: currentSession },
       { data: dailyGoal },
@@ -228,13 +229,15 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       { data: todaySales },
       { data: todaysSessions }
     ] = await Promise.all([
-      supabaseAdmin.from("cash_sessions").select("*, receptionists (name, avatar_url)").eq("status", "open").maybeSingle(),
+      userSupabase.from("cash_sessions").select("*, receptionists (name, avatar_url)").eq("status", "open").maybeSingle(),
       supabaseAdmin.from("goals" as any).select("*").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle() as any,
       supabaseAdmin.from("goal_progress").select("*").eq("receptionist_id", receptionist.id).maybeSingle(),
       supabaseAdmin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists(name, avatar_url)").order("sold_amount", { ascending: false }).limit(10),
       supabaseAdmin.from("sales").select("*").gte("created_at", todayStart.toISOString()).lt("created_at", tomorrowStart.toISOString()),
       supabaseAdmin.from("cash_sessions").select("*, receptionists(name)").gte("opened_at", todayStart.toISOString()).order("opened_at", { ascending: true })
     ]);
+
+
 
     // Format ranking
     const formattedRanking = (ranking || []).map((item: any, index) => ({
