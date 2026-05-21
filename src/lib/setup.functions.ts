@@ -36,7 +36,7 @@ export const seedAdminUser = createServerFn({ method: "POST" })
         // Add profile
         const { error: profileError } = await supabase
           .from("users")
-          .insert({ id: user.user.id, full_name: "Administrador Master" });
+          .insert({ id: user.user.id, name: "Administrador Master", email: user.user.email! });
 
         if (profileError) {
           console.error("Error adding profile:", profileError);

@@ -65,7 +65,7 @@ export const createReceptionist = createServerFn({ method: "POST" })
 
     await supabaseAdmin
       .from("users")
-      .upsert({ id: newUserId, full_name: data.name, avatar_url: data.avatar_url ?? null });
+      .upsert({ id: newUserId, name: data.name, email: data.email, avatar_url: data.avatar_url ?? null });
 
     const { data: rec, error: recErr } = await supabaseAdmin
       .from("receptionists")
