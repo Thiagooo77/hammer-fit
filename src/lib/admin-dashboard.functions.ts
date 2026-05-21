@@ -10,7 +10,23 @@ async function assertAdmin(userId: string) {
     .eq("user_id", userId)
     .in("role", ["admin", "manager"]);
   if (error) throw new Error(error.message);
-  if (!data || data.length === 0) throw new Error("Acesso negado");
+  if (data && data.length > 0) return;
+
+  // Fallback: check users table role + self-heal for known admin
+  const { data: userRow } = await supabaseAdmin
+    .from("users")
+    .select("role, email")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (userRow?.role === "admin" || userRow?.role === "manager") return;
+  if (userRow?.email === "admhammer@gmail.com") {
+    await supabaseAdmin
+      .from("user_roles")
+      .insert({ user_id: userId, role: "admin" });
+    return;
+  }
+  throw new Error("Acesso negado");
 }
 
 export const getAdminDashboard = createServerFn({ method: "GET" })
