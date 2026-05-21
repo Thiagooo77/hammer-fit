@@ -14,10 +14,11 @@ const withTimeout = async <T,>(promise: PromiseLike<T>, ms: number): Promise<T> 
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
+    // Check session via getSession for SSR/Initial load
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
-      console.log('[HAMMER_FIT_AUDIT] No session, redirecting to login');
+      console.log('[HAMMER_FIT_AUDIT] No session found, redirecting');
       throw redirect({
         to: "/login",
         search: {
