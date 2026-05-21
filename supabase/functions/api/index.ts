@@ -96,10 +96,18 @@ async function logAudit(entry: {
 
 const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta: { ip: string | null; ua: string | null } }) => Promise<any>> = {
   // ---------- audit ----------
-  "audit.record": async ({ data, meta }) => {
+  "audit.record": async ({ user, data, meta }) => {
+    if (!user) throw new Error("Unauthorized");
+    // Identity is derived server-side; client-supplied userId/userName are ignored.
+    const { data: u } = await admin
+      .from("users")
+      .select("name, email")
+      .eq("id", user.id)
+      .maybeSingle();
+    const userName = u?.name ?? u?.email ?? user.email ?? null;
     await logAudit({
-      userId: data.userId ?? null,
-      userName: data.userName ?? null,
+      userId: user.id,
+      userName,
       actionType: data.actionType,
       module: data.module ?? "auth",
       description: data.description,
@@ -118,23 +126,6 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
     const { data: logs, error } = await q;
     if (error) throw new Error(error.message);
     return { logs: logs ?? [] };
-  },
-
-  // ---------- setup ----------
-  "setup.seedAdmin": async () => {
-    const email = "admhammer@gmail.com";
-    const { data: existing } = await admin.from("user_roles").select("user_id").eq("role", "admin").limit(1);
-    if (existing && existing.length > 0) return { message: "O sistema já possui um Administrador Master." };
-    const { data: user, error } = await admin.auth.admin.createUser({
-      email, password: "hammer123", email_confirm: true, user_metadata: { full_name: "Administrador Master" },
-    });
-    if (error) throw new Error(error.message);
-    if (user.user) {
-      await admin.from("user_roles").upsert({ user_id: user.user.id, role: "admin" });
-      await admin.from("users").upsert({ id: user.user.id, name: "Administrador Master", email, role: "admin" });
-      return { message: "Administrador Master criado com sucesso!" };
-    }
-    return { message: "O Administrador Master já existe." };
   },
 
   // ---------- admin dashboard ----------
