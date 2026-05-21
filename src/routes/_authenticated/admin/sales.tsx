@@ -170,11 +170,19 @@ function AdminSalesPage() {
           </p>
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col items-end min-w-[200px]">
-          <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">Total Filtrado</span>
-          <span className="text-2xl font-black text-primary italic">
-            R$ {totalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-          </span>
+        <div className="flex items-center gap-3">
+          <Button
+            className="h-12 rounded-2xl gap-2 font-black uppercase italic tracking-widest bg-primary text-primary-foreground hover:bg-primary/90"
+            onClick={() => setCreateOpen(true)}
+          >
+            <Plus className="size-4" /> Nova Venda
+          </Button>
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col items-end min-w-[200px]">
+            <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">Total Filtrado</span>
+            <span className="text-2xl font-black text-primary italic">
+              R$ {totalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </span>
+          </div>
         </div>
       </div>
 
