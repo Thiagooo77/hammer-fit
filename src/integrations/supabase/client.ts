@@ -27,7 +27,14 @@ function createSupabaseClient() {
       storage: typeof window !== 'undefined' ? localStorage : undefined,
       persistSession: true,
       autoRefreshToken: true,
-    }
+      detectSessionInUrl: false, // Otimização: evita processar URL desnecessariamente
+    },
+    global: {
+      headers: { 'x-application-name': 'hammer-fit' },
+    },
+    db: {
+      schema: 'public',
+    },
   });
 }
 

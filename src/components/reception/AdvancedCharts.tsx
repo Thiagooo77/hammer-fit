@@ -1,4 +1,5 @@
 import * as React from "react";
+import { memo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -15,7 +16,7 @@ interface AdvancedChartsProps {
 
 const COLORS = ['#8b5cf6', '#d946ef', '#f97316', '#0ea5e9', '#10b981'];
 
-export function AdvancedCharts({ salesByHour, paymentMethods, smartStats }: AdvancedChartsProps) {
+export const AdvancedCharts = memo(function AdvancedCharts({ salesByHour, paymentMethods, smartStats }: AdvancedChartsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
       {/* Vendas por Hora - Area Chart */}
@@ -126,4 +127,4 @@ export function AdvancedCharts({ salesByHour, paymentMethods, smartStats }: Adva
       </div>
     </div>
   );
-}
+});
