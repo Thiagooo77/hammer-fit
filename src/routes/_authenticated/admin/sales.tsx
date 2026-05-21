@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listAllSales, updateSaleAsAdmin, deleteSaleAsAdmin } from "@/lib/admin-sales.functions";
+import { listAllSales, updateSaleAsAdmin, deleteSaleAsAdmin, createSaleAsAdmin, listReceptionistsForAdmin } from "@/lib/admin-sales.functions";
 import { 
   Table, 
   TableBody, 
@@ -22,7 +22,8 @@ import {
   Calendar,
   User as UserIcon,
   DollarSign,
-  AlertCircle
+  AlertCircle,
+  Plus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -72,14 +73,30 @@ function AdminSalesPage() {
   const fetchSales = useServerFn(listAllSales);
   const updateSaleFn = useServerFn(updateSaleAsAdmin);
   const deleteSaleFn = useServerFn(deleteSaleAsAdmin);
+  const createSaleFn = useServerFn(createSaleAsAdmin);
+  const fetchReceptionists = useServerFn(listReceptionistsForAdmin);
 
   const [searchTerm, setSearchTerm] = React.useState("");
   const [editingSale, setEditingSale] = React.useState<any>(null);
   const [deletingSaleId, setDeletingSaleId] = React.useState<string | null>(null);
+  const [createOpen, setCreateOpen] = React.useState(false);
+  const [newSale, setNewSale] = React.useState({
+    receptionist_id: "",
+    client_name: "",
+    service_name: "",
+    amount: "",
+    payment_method: "pix" as "pix" | "dinheiro" | "cartao" | "convenio" | "outros",
+  });
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin-sales"],
     queryFn: () => fetchSales(),
+    refetchInterval: 15000,
+  });
+
+  const { data: receptionistsData } = useQuery({
+    queryKey: ["admin-receptionists-list"],
+    queryFn: () => fetchReceptionists(),
   });
 
   const updateMutation = useMutation({
@@ -97,6 +114,23 @@ function AdminSalesPage() {
     onSuccess: () => {
       toast.success("Venda excluída permanentemente.");
       setDeletingSaleId(null);
+      qc.invalidateQueries({ queryKey: ["admin-sales"] });
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: () => createSaleFn({ data: {
+      receptionist_id: newSale.receptionist_id,
+      client_name: newSale.client_name || undefined,
+      service_name: newSale.service_name,
+      amount: Number(newSale.amount),
+      payment_method: newSale.payment_method,
+    }}),
+    onSuccess: () => {
+      toast.success("Venda criada com sucesso!");
+      setCreateOpen(false);
+      setNewSale({ receptionist_id: "", client_name: "", service_name: "", amount: "", payment_method: "pix" });
       qc.invalidateQueries({ queryKey: ["admin-sales"] });
     },
     onError: (err: any) => toast.error(err.message),
@@ -136,11 +170,19 @@ function AdminSalesPage() {
           </p>
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col items-end min-w-[200px]">
-          <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">Total Filtrado</span>
-          <span className="text-2xl font-black text-primary italic">
-            R$ {totalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-          </span>
+        <div className="flex items-center gap-3">
+          <Button
+            className="h-12 rounded-2xl gap-2 font-black uppercase italic tracking-widest bg-primary text-primary-foreground hover:bg-primary/90"
+            onClick={() => setCreateOpen(true)}
+          >
+            <Plus className="size-4" /> Nova Venda
+          </Button>
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col items-end min-w-[200px]">
+            <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">Total Filtrado</span>
+            <span className="text-2xl font-black text-primary italic">
+              R$ {totalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -325,6 +367,76 @@ function AdminSalesPage() {
               disabled={updateMutation.isPending}
             >
               {updateMutation.isPending ? <Loader2 className="animate-spin size-4" /> : "Salvar Alterações"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de Criação */}
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="bg-slate-900 border-white/10 text-white sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black uppercase italic tracking-tight">
+              Nova <span className="text-primary">Venda</span>
+            </DialogTitle>
+            <DialogDescription className="text-slate-400">
+              Registre uma nova venda em nome de um recepcionista.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Recepcionista</Label>
+              <Select value={newSale.receptionist_id} onValueChange={(val) => setNewSale({ ...newSale, receptionist_id: val })}>
+                <SelectTrigger className="bg-white/5 border-white/10">
+                  <SelectValue placeholder="Selecione o recepcionista" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-white/10">
+                  {(receptionistsData?.receptionists || []).map((r: any) => (
+                    <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Cliente</Label>
+                <Input value={newSale.client_name} onChange={(e) => setNewSale({ ...newSale, client_name: e.target.value })} className="bg-white/5 border-white/10" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Serviço</Label>
+                <Input value={newSale.service_name} onChange={(e) => setNewSale({ ...newSale, service_name: e.target.value })} className="bg-white/5 border-white/10" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Valor (R$)</Label>
+                <Input type="number" step="0.01" value={newSale.amount} onChange={(e) => setNewSale({ ...newSale, amount: e.target.value })} className="bg-white/5 border-white/10" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Pagamento</Label>
+                <Select value={newSale.payment_method} onValueChange={(val: any) => setNewSale({ ...newSale, payment_method: val })}>
+                  <SelectTrigger className="bg-white/5 border-white/10">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-900 border-white/10">
+                    <SelectItem value="pix">PIX</SelectItem>
+                    <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                    <SelectItem value="cartao">Cartão</SelectItem>
+                    <SelectItem value="convenio">Convênio</SelectItem>
+                    <SelectItem value="outros">Outros</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateOpen(false)} className="border-white/10">Cancelar</Button>
+            <Button
+              className="bg-primary hover:bg-primary/90 font-black uppercase italic"
+              onClick={() => createMutation.mutate()}
+              disabled={createMutation.isPending || !newSale.receptionist_id || !newSale.service_name || !newSale.amount}
+            >
+              {createMutation.isPending ? <Loader2 className="animate-spin size-4" /> : "Registrar Venda"}
             </Button>
           </DialogFooter>
         </DialogContent>

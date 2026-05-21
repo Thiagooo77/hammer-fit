@@ -85,6 +85,84 @@ export const updateSaleAsAdmin = createServerFn({ method: "POST" })
     return { sale: updated };
   });
 
+const CreateSaleSchema = z.object({
+  receptionist_id: z.string().uuid(),
+  client_name: z.string().max(255).optional(),
+  service_name: z.string().min(1).max(255),
+  amount: z.number().positive(),
+  payment_method: z.enum(["pix", "dinheiro", "cartao", "convenio", "outros"]),
+});
+
+export const createSaleAsAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => CreateSaleSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { logAudit } = await import("@/lib/audit.server");
+
+    // Find an open cash session for the receptionist; create one if none exists
+    let { data: session } = await supabaseAdmin
+      .from("cash_sessions")
+      .select("*")
+      .eq("receptionist_id", data.receptionist_id)
+      .eq("status", "open")
+      .order("opened_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!session) {
+      const { data: newSession, error: sessionErr } = await supabaseAdmin
+        .from("cash_sessions")
+        .insert({
+          receptionist_id: data.receptionist_id,
+          opening_balance: 0,
+          status: "open",
+        })
+        .select()
+        .single();
+      if (sessionErr) throw new Error(sessionErr.message);
+      session = newSession;
+    }
+
+    const { data: sale, error } = await supabaseAdmin
+      .from("sales")
+      .insert({
+        cash_session_id: session!.id,
+        receptionist_id: data.receptionist_id,
+        client_name: data.client_name,
+        service_name: data.service_name,
+        amount: data.amount,
+        payment_method: data.payment_method,
+      })
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    await logAudit({
+      userId: context.userId,
+      actionType: "sale_create",
+      module: "sales",
+      description: `Administrador criou venda de R$ ${data.amount} para recepcionista ${data.receptionist_id}`,
+      newData: sale,
+    });
+
+    return { sale };
+  });
+
+export const listReceptionistsForAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const { data, error } = await supabaseAdmin
+      .from("receptionists")
+      .select("id, name")
+      .eq("active", true)
+      .order("name");
+    if (error) throw new Error(error.message);
+    return { receptionists: data || [] };
+  });
+
 export const deleteSaleAsAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))

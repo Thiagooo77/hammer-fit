@@ -12,7 +12,8 @@ import {
   FileText,
   Menu,
   X,
-  CheckSquare
+  CheckSquare,
+  Building2
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
@@ -33,6 +34,12 @@ export function DashboardSidebar() {
       title: "Dashboard",
       icon: LayoutDashboard,
       href: isAdmin ? "/admin/dashboard" : "/reception/dashboard",
+      roles: ["admin", "manager", "receptionist"],
+    },
+    {
+      title: "Recepção",
+      icon: Building2,
+      href: "/reception/dashboard",
       roles: ["admin", "manager", "receptionist"],
     },
     {
