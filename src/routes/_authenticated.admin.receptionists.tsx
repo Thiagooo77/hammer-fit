@@ -28,7 +28,7 @@ import {
   Palmtree,
 } from "lucide-react";
 
-export const Route = createFileRoute("/admin/receptionists")({
+export const Route = createFileRoute("/_authenticated/admin/receptionists")({
   component: ReceptionistsAdminPage,
 });
 

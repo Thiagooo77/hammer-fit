@@ -438,31 +438,42 @@ export type Database = {
     Views: {
       vw_ia_performance_prediction: {
         Row: {
-          avg_amount: number | null
-          hour_bucket: string | null
-          receptionist_id: string | null
-          sales_count: number | null
-          total_revenue: number | null
+          goal_amount: number | null
+          id: string | null
+          percentage: number | null
+          sold_amount: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "sales_receptionist_id_fkey"
-            columns: ["receptionist_id"]
-            isOneToOne: false
-            referencedRelation: "receptionists"
-            referencedColumns: ["id"]
-          },
-        ]
+        Insert: {
+          goal_amount?: number | null
+          id?: string | null
+          percentage?: never
+          sold_amount?: number | null
+        }
+        Update: {
+          goal_amount?: number | null
+          id?: string | null
+          percentage?: never
+          sold_amount?: number | null
+        }
+        Relationships: []
       }
     }
     Functions: {
-      hammer_has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["hammer_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      hammer_has_role:
+        | {
+            Args: {
+              _role: Database["public"]["Enums"]["app_role"]
+              _user_id: string
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              _role: Database["public"]["Enums"]["hammer_role"]
+              _user_id: string
+            }
+            Returns: boolean
+          }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

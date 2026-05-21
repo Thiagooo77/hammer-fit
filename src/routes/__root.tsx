@@ -4,6 +4,7 @@ import * as React from "react";
 import { Toaster } from "sonner";
 import { ShieldCheck, Zap } from "lucide-react";
 import { motion } from "framer-motion";
+import { GlobalErrorBoundary } from "@/components/ui/error-boundary";
 import "../styles.css";
 
 interface RouterContext {
@@ -98,7 +99,9 @@ function RootComponent() {
   return (
     <RootDocument>
       <QueryClientProvider client={queryClient}>
-        <Outlet />
+        <GlobalErrorBoundary>
+          <Outlet />
+        </GlobalErrorBoundary>
         <Toaster position="top-right" richColors />
       </QueryClientProvider>
     </RootDocument>

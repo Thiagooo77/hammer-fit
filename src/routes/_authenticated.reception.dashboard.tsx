@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/reception/dashboard")({
+export const Route = createFileRoute("/_authenticated/reception/dashboard")({
   component: ReceptionGoalsDashboard,
 });
 

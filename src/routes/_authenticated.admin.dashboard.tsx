@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { iaService } from "@/services/iaService";
 import React from "react";
 
-export const Route = createFileRoute("/admin/dashboard")({
+export const Route = createFileRoute("/_authenticated/admin/dashboard")({
   component: AdminDashboard,
 });
 
@@ -78,8 +78,8 @@ function AdminDashboard() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50 selection:bg-primary/30">
       {/* Premium Glass Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/60 backdrop-blur-xl transition-all">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/60 backdrop-blur-xl transition-all h-16 md:h-20">
+        <div className="container mx-auto px-4 h-full flex items-center justify-between">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -109,7 +109,7 @@ function AdminDashboard() {
 
       <main className="container mx-auto p-4 md:p-8 space-y-8">
         {/* KPI Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           <StatCard 
             title="Receita Hoje" 
             value={`R$ ${kpis?.revenueToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} 
@@ -149,7 +149,7 @@ function AdminDashboard() {
                    <Button variant="outline" size="icon" className="size-8 border-white/10 hover:bg-primary/20" onClick={() => handleExport('pdf')}><FileDown className="size-4" /></Button>
                 </div>
               </CardHeader>
-              <CardContent className="pt-6 h-[350px]">
+              <CardContent className="pt-6 h-[250px] sm:h-[350px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={charts?.weeklyEvolution}>
                     <defs>

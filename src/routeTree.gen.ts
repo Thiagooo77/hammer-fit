@@ -13,11 +13,14 @@ import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
 import { Route as TvDashboardRouteImport } from './routes/tv-dashboard'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ReceptionDashboardRouteImport } from './routes/reception.dashboard'
-import { Route as AdminReceptionistsRouteImport } from './routes/admin.receptionists'
-import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
-import { Route as AdminAuditRouteImport } from './routes/admin.audit'
+import { Route as AuthenticatedReceptionRouteImport } from './routes/_authenticated.reception'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
+import { Route as AuthenticatedReceptionDashboardRouteImport } from './routes/_authenticated.reception.dashboard'
+import { Route as AuthenticatedAdminReceptionistsRouteImport } from './routes/_authenticated.admin.receptionists'
+import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated.admin.dashboard'
+import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated.admin.audit'
 
 const UnauthorizedRoute = UnauthorizedRouteImport.update({
   id: '/unauthorized',
@@ -39,30 +42,47 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReceptionDashboardRoute = ReceptionDashboardRouteImport.update({
-  id: '/reception/dashboard',
-  path: '/reception/dashboard',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedReceptionRoute = AuthenticatedReceptionRouteImport.update({
+  id: '/reception',
+  path: '/reception',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AdminReceptionistsRoute = AdminReceptionistsRouteImport.update({
-  id: '/admin/receptionists',
-  path: '/admin/receptionists',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AdminDashboardRoute = AdminDashboardRouteImport.update({
-  id: '/admin/dashboard',
-  path: '/admin/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminAuditRoute = AdminAuditRouteImport.update({
-  id: '/admin/audit',
-  path: '/admin/audit',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedReceptionDashboardRoute =
+  AuthenticatedReceptionDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedReceptionRoute,
+  } as any)
+const AuthenticatedAdminReceptionistsRoute =
+  AuthenticatedAdminReceptionistsRouteImport.update({
+    id: '/receptionists',
+    path: '/receptionists',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminDashboardRoute =
+  AuthenticatedAdminDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -71,10 +91,12 @@ export interface FileRoutesByFullPath {
   '/setup': typeof SetupRoute
   '/tv-dashboard': typeof TvDashboardRoute
   '/unauthorized': typeof UnauthorizedRoute
-  '/admin/audit': typeof AdminAuditRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
-  '/admin/receptionists': typeof AdminReceptionistsRoute
-  '/reception/dashboard': typeof ReceptionDashboardRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/reception': typeof AuthenticatedReceptionRouteWithChildren
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/receptionists': typeof AuthenticatedAdminReceptionistsRoute
+  '/reception/dashboard': typeof AuthenticatedReceptionDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -82,22 +104,27 @@ export interface FileRoutesByTo {
   '/setup': typeof SetupRoute
   '/tv-dashboard': typeof TvDashboardRoute
   '/unauthorized': typeof UnauthorizedRoute
-  '/admin/audit': typeof AdminAuditRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
-  '/admin/receptionists': typeof AdminReceptionistsRoute
-  '/reception/dashboard': typeof ReceptionDashboardRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/reception': typeof AuthenticatedReceptionRouteWithChildren
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/receptionists': typeof AuthenticatedAdminReceptionistsRoute
+  '/reception/dashboard': typeof AuthenticatedReceptionDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/setup': typeof SetupRoute
   '/tv-dashboard': typeof TvDashboardRoute
   '/unauthorized': typeof UnauthorizedRoute
-  '/admin/audit': typeof AdminAuditRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
-  '/admin/receptionists': typeof AdminReceptionistsRoute
-  '/reception/dashboard': typeof ReceptionDashboardRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/reception': typeof AuthenticatedReceptionRouteWithChildren
+  '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/_authenticated/admin/receptionists': typeof AuthenticatedAdminReceptionistsRoute
+  '/_authenticated/reception/dashboard': typeof AuthenticatedReceptionDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,6 +134,8 @@ export interface FileRouteTypes {
     | '/setup'
     | '/tv-dashboard'
     | '/unauthorized'
+    | '/admin'
+    | '/reception'
     | '/admin/audit'
     | '/admin/dashboard'
     | '/admin/receptionists'
@@ -118,6 +147,8 @@ export interface FileRouteTypes {
     | '/setup'
     | '/tv-dashboard'
     | '/unauthorized'
+    | '/admin'
+    | '/reception'
     | '/admin/audit'
     | '/admin/dashboard'
     | '/admin/receptionists'
@@ -125,26 +156,26 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/login'
     | '/setup'
     | '/tv-dashboard'
     | '/unauthorized'
-    | '/admin/audit'
-    | '/admin/dashboard'
-    | '/admin/receptionists'
-    | '/reception/dashboard'
+    | '/_authenticated/admin'
+    | '/_authenticated/reception'
+    | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/dashboard'
+    | '/_authenticated/admin/receptionists'
+    | '/_authenticated/reception/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   SetupRoute: typeof SetupRoute
   TvDashboardRoute: typeof TvDashboardRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
-  AdminAuditRoute: typeof AdminAuditRoute
-  AdminDashboardRoute: typeof AdminDashboardRoute
-  AdminReceptionistsRoute: typeof AdminReceptionistsRoute
-  ReceptionDashboardRoute: typeof ReceptionDashboardRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -177,6 +208,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -184,47 +222,101 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reception/dashboard': {
-      id: '/reception/dashboard'
-      path: '/reception/dashboard'
+    '/_authenticated/reception': {
+      id: '/_authenticated/reception'
+      path: '/reception'
+      fullPath: '/reception'
+      preLoaderRoute: typeof AuthenticatedReceptionRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/reception/dashboard': {
+      id: '/_authenticated/reception/dashboard'
+      path: '/dashboard'
       fullPath: '/reception/dashboard'
-      preLoaderRoute: typeof ReceptionDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedReceptionDashboardRouteImport
+      parentRoute: typeof AuthenticatedReceptionRoute
     }
-    '/admin/receptionists': {
-      id: '/admin/receptionists'
-      path: '/admin/receptionists'
+    '/_authenticated/admin/receptionists': {
+      id: '/_authenticated/admin/receptionists'
+      path: '/receptionists'
       fullPath: '/admin/receptionists'
-      preLoaderRoute: typeof AdminReceptionistsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedAdminReceptionistsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/admin/dashboard': {
-      id: '/admin/dashboard'
-      path: '/admin/dashboard'
+    '/_authenticated/admin/dashboard': {
+      id: '/_authenticated/admin/dashboard'
+      path: '/dashboard'
       fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof AdminDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/admin/audit': {
-      id: '/admin/audit'
-      path: '/admin/audit'
+    '/_authenticated/admin/audit': {
+      id: '/_authenticated/admin/audit'
+      path: '/audit'
       fullPath: '/admin/audit'
-      preLoaderRoute: typeof AdminAuditRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
+  AuthenticatedAdminReceptionistsRoute: typeof AuthenticatedAdminReceptionistsRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+  AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
+  AuthenticatedAdminReceptionistsRoute: AuthenticatedAdminReceptionistsRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedReceptionRouteChildren {
+  AuthenticatedReceptionDashboardRoute: typeof AuthenticatedReceptionDashboardRoute
+}
+
+const AuthenticatedReceptionRouteChildren: AuthenticatedReceptionRouteChildren =
+  {
+    AuthenticatedReceptionDashboardRoute: AuthenticatedReceptionDashboardRoute,
+  }
+
+const AuthenticatedReceptionRouteWithChildren =
+  AuthenticatedReceptionRoute._addFileChildren(
+    AuthenticatedReceptionRouteChildren,
+  )
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedReceptionRoute: typeof AuthenticatedReceptionRouteWithChildren
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedReceptionRoute: AuthenticatedReceptionRouteWithChildren,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   SetupRoute: SetupRoute,
   TvDashboardRoute: TvDashboardRoute,
   UnauthorizedRoute: UnauthorizedRoute,
-  AdminAuditRoute: AdminAuditRoute,
-  AdminDashboardRoute: AdminDashboardRoute,
-  AdminReceptionistsRoute: AdminReceptionistsRoute,
-  ReceptionDashboardRoute: ReceptionDashboardRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
