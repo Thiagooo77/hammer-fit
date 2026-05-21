@@ -9,13 +9,13 @@ export interface DailySummaryProps {
   bestHour: string;
 }
 
-export function DailySummary({ totalSold, salesCount, ticketMedio, bestHour }: DailySummaryProps) {
-  const stats = [
+export const DailySummary = React.memo(({ totalSold, salesCount, ticketMedio, bestHour }: DailySummaryProps) => {
+  const stats = React.useMemo(() => [
     { label: "Vendas Totais", value: `R$ ${totalSold.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, icon: <DollarSign className="size-4" />, color: "text-green-500" },
     { label: "Vendas Realizadas", value: salesCount.toString(), icon: <Users className="size-4" />, color: "text-blue-500" },
     { label: "Ticket Médio", value: `R$ ${ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, icon: <ArrowUpRight className="size-4" />, color: "text-primary" },
     { label: "Pico de Vendas", value: bestHour, icon: <Calendar className="size-4" />, color: "text-indigo-500" },
-  ];
+  ], [totalSold, salesCount, ticketMedio, bestHour]);
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
