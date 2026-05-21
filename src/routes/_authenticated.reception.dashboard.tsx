@@ -132,7 +132,7 @@ function ReceptionGoalsDashboard() {
               <LayoutDashboard className="text-primary size-6" />
             </div>
             <div>
-              <h1 className="text-xl font-black tracking-tighter uppercase italic">Hammer <span className="text-primary">Clinic</span></h1>
+              <h1 className="text-xl font-black tracking-tighter uppercase italic">Hammer <span className="text-primary">FIT</span></h1>
               <div className="flex items-center gap-2 text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
                 <Calendar className="size-3" />
                 {currentDate}

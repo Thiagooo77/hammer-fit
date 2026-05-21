@@ -107,7 +107,7 @@ function AdminDashboard() {
               <ShieldCheck className="text-primary h-6 w-6" />
             </div>
             <h1 className="text-xl font-black uppercase italic tracking-tighter">
-              Hammer <span className="text-primary">Clinic</span>
+              Hammer <span className="text-primary">FIT</span>
             </h1>
           </motion.div>
 

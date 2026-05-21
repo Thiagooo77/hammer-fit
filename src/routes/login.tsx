@@ -26,7 +26,7 @@ function LoginPage() {
               <ShieldCheck className="text-primary size-8" />
             </div>
             <CardTitle className="text-4xl font-black uppercase italic tracking-tighter text-white">
-              Hammer <span className="text-primary">Clinic</span>
+              Hammer <span className="text-primary">FIT</span>
             </CardTitle>
             <CardDescription className="text-slate-400 font-medium uppercase tracking-widest text-[10px]">
               Sistema de Gestão de Alta Performance
