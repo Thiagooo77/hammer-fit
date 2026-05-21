@@ -444,14 +444,9 @@ Deno.serve(async (req) => {
     const data = body?.data;
     if (!action || !handlers[action]) return json({ error: `Unknown action: ${action}` }, 400);
 
-    // audit.record is the only public action
-    let user = null as any;
-    if (action !== "audit.record" && action !== "setup.seedAdmin") {
-      user = await getUser(req);
-      if (!user) return json({ error: "Unauthorized" }, 401);
-    } else if (action === "audit.record") {
-      user = await getUser(req).catch(() => null); // optional
-    }
+    // All actions require authentication
+    const user = await getUser(req);
+    if (!user) return json({ error: "Unauthorized" }, 401);
 
     const meta = clientMeta(req);
     const result = await handlers[action]({ req, user, data, meta });
