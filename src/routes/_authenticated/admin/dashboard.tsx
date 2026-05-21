@@ -30,8 +30,10 @@ function AdminDashboard() {
     queryKey: ["admin-dashboard"],
     queryFn: () => fetchDashboard(),
     enabled: !!user && (role === "admin" || role === "manager"),
-    refetchInterval: 300000, // Aumentado para 5 minutos (o realtime cuida das atualizações)
-    staleTime: 60000, // Dados considerados frescos por 1 minuto
+    refetchInterval: 300000, 
+    staleTime: 1000 * 60 * 2, // 2 minutes stale time for dashboard
+    gcTime: 1000 * 60 * 10, // 10 minutes cache cleanup
+
   });
 
   React.useEffect(() => {
