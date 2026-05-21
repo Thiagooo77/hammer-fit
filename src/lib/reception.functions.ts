@@ -89,7 +89,11 @@ export const registerSale = createServerFn({ method: "POST" })
       .single();
 
     if (error) throw error;
-    
+    await logAudit({
+      userId: context.userId, actionType: "sale_create", module: "sales",
+      description: `Venda R$ ${data.amount} (${data.payment_method}) — ${data.service_name}`,
+      newData: sale,
+    });
     return sale;
   });
 
