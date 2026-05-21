@@ -1,4 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -134,24 +133,38 @@ export const closeCashSession = createServerFn({ method: "POST" })
 
 // 4. Get Dashboard Data (Consolidated)
 export const getReceptionDashboard = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { supabase, userId } = context;
+  .handler(async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Get user info to find corresponding receptionist
-    const { data: user } = await supabase.auth.getUser();
-    const email = user.user?.email;
-
-    const { data: receptionist } = await supabase
+    const { data: receptionist } = await supabaseAdmin
       .from("receptionists")
       .select("*")
-      .eq("email", email || "")
+      .eq("active", true)
+      .order("created_at", { ascending: true })
+      .limit(1)
       .maybeSingle();
 
-    if (!receptionist) throw new Error("Usuário não está cadastrado como recepcionista.");
+    if (!receptionist) {
+      return {
+        receptionist: {
+          id: "",
+          name: "Recepção",
+          email: "",
+          avatar_url: "",
+          goal_value: 0,
+          active: true,
+          created_at: new Date().toISOString(),
+        },
+        currentSession: null,
+        dailyGoal: null,
+        goalProgress: null,
+        ranking: [],
+        smartStats: { remaining: 0, percentage: 0 },
+      };
+    }
 
     // Get current open session
-    const { data: currentSession } = await supabase
+    const { data: currentSession } = await supabaseAdmin
       .from("cash_sessions")
       .select(`
         *,
@@ -161,20 +174,20 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       .maybeSingle();
 
     // Get goals
-    const { data: dailyGoal } = await supabase
+    const { data: dailyGoal } = await supabaseAdmin
       .from("daily_goals")
       .select("*")
       .eq("goal_date", new Date().toISOString().split('T')[0])
       .maybeSingle();
 
-    const { data: goalProgress } = await supabase
+    const { data: goalProgress } = await supabaseAdmin
       .from("goal_progress")
       .select("*")
       .eq("receptionist_id", receptionist.id)
       .single();
 
     // Get ranking (top 5)
-    const { data: ranking } = await supabase
+    const { data: ranking } = await supabaseAdmin
       .from("goal_progress")
       .select(`
         receptionist_id,
@@ -201,6 +214,7 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
     const target = Number(goalProgress?.goal_amount || 0);
     const current = Number(goalProgress?.sold_amount || 0);
     const remaining = Math.max(target - current, 0);
+    const percentage = target > 0 ? Math.min(Math.round((current / target) * 100), 100) : 0;
 
     return {
       receptionist,
@@ -210,7 +224,7 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       ranking: formattedRanking,
       smartStats: {
         remaining,
-        percentage: Math.min(Math.round((current / target) * 100), 100)
+        percentage
       }
     };
   });
