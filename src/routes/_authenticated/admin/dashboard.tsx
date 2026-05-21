@@ -73,7 +73,7 @@ function AdminDashboard() {
     return <Navigate to="/unauthorized" />;
   }
 
-  const handleExport = async (type: 'pdf' | 'excel' | 'csv') => {
+  const handleExport = useCallback(async (type: 'pdf' | 'excel' | 'csv') => {
     if (!data?.ranking) return;
     const exportData = data.ranking.map(r => ({
       Nome: r.name,
@@ -89,7 +89,7 @@ function AdminDashboard() {
     } catch (e) {
       toast.error("Erro na exportação");
     }
-  };
+  }, [data?.ranking]);
 
   const kpis = data?.kpis ?? {
     revenueToday: 0,
