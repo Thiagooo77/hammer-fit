@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listAllSales, updateSaleAsAdmin, deleteSaleAsAdmin } from "@/lib/admin-sales.functions";
+import { listAllSales, updateSaleAsAdmin, deleteSaleAsAdmin, createSaleAsAdmin, listReceptionistsForAdmin } from "@/lib/admin-sales.functions";
 import { 
   Table, 
   TableBody, 
