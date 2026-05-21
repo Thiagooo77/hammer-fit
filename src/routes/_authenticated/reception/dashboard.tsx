@@ -241,12 +241,12 @@ function ReceptionGoalsDashboard() {
                 type="individual"
               />
               <GoalsProgress 
-                title="Meta Clínica"
+                title="Meta da Academia"
                 icon={<Users className="size-5" />}
-                target={clinicTarget}
-                current={clinicCurrent}
+                target={gymTarget}
+                current={gymCurrent}
                 type="general"
-                prediction={clinicPrediction}
+                prediction={gymPrediction}
               />
             </div>
 
