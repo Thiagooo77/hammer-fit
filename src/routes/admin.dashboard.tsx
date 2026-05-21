@@ -1,22 +1,25 @@
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, TrendingUp, DollarSign, Target, Monitor, LogOut, LayoutDashboard, Users, FileDown, Sparkles, Award } from "lucide-react";
+import { ShieldCheck, TrendingUp, DollarSign, Target, LogOut, LayoutDashboard, Users, FileDown, Sparkles, Award } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link, Navigate } from "@tanstack/react-router";
+import { Link, Navigate, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getAdminDashboard } from "@/lib/admin-dashboard.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { exportService } from "@/services/exportService";
 import { 
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
-  Tooltip, PieChart, Pie, Cell, LineChart, Line, CartesianGrid 
+  Tooltip, CartesianGrid 
 } from "recharts";
 import { RankingBoard } from "@/components/reception/RankingBoard";
 import { toast } from "sonner";
 import { iaService } from "@/services/iaService";
+import React from "react";
 
-export const Route = ({ component: AdminDashboard });
+export const Route = createFileRoute("/admin/dashboard")({
+  component: AdminDashboard,
+});
 
 function AdminDashboard() {
   const { user, signOut, role, loading } = useAuth();
