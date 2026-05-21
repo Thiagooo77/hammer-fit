@@ -55,12 +55,22 @@ export function RankingBoard({ members }: RankingBoardProps) {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.5, ease: "circOut" }}
                 className={cn(
-                  "flex items-center gap-3 p-3 rounded-xl border transition-all",
+                  "flex items-center gap-3 p-3 rounded-xl border transition-all relative overflow-hidden",
                   member.position === 1 
-                    ? "bg-primary/10 border-primary/30 shadow-lg shadow-primary/5" 
+                    ? "bg-primary/10 border-primary/40 shadow-xl shadow-primary/10 ring-1 ring-primary/20" 
                     : "bg-secondary/30 border-primary/5 hover:border-primary/20"
                 )}
               >
+                {member.position === 1 && (
+                  <motion.div 
+                    animate={{ 
+                      opacity: [0.1, 0.3, 0.1],
+                      scale: [1, 1.1, 1],
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                    className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 via-primary/10 to-yellow-500/10 pointer-events-none"
+                  />
+                )}
                 <div className="flex-shrink-0">
                   {getPositionIcon(member.position)}
                 </div>
