@@ -84,6 +84,11 @@ export const createReceptionist = createServerFn({ method: "POST" })
       .single();
     if (recErr) throw new Error(recErr.message);
 
+    await logAudit({
+      userId: context.userId, actionType: "receptionist_create", module: "users",
+      description: `Criou recepcionista ${data.name} (${data.email})`,
+      newData: rec,
+    });
     return { receptionist: rec };
   });
 
