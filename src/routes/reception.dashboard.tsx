@@ -259,7 +259,12 @@ function ReceptionGoalsDashboard() {
               </div>
             </motion.div>
 
-            <DailySummary />
+            <DailySummary 
+              totalSold={smartStats.totalSoldToday}
+              salesCount={smartStats.vendasCount}
+              ticketMedio={smartStats.ticketMedio}
+              bestHour={smartStats.mostLucrativeHour}
+            />
           </div>
         </div>
       </main>
