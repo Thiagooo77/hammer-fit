@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getReceptionDashboard } from "@/lib/reception.functions";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/reception/dashboard")({
   component: ReceptionGoalsDashboard,
