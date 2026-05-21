@@ -48,7 +48,7 @@ function TVDashboard() {
             <LayoutDashboard className="text-black size-8" />
           </div>
           <div>
-            <h1 className="text-4xl font-black uppercase italic tracking-tighter">Hammer <span className="text-primary">Clinic</span></h1>
+            <h1 className="text-4xl font-black uppercase italic tracking-tighter">Hammer <span className="text-primary">FIT</span></h1>
             <p className="text-primary font-black uppercase italic tracking-widest text-sm">Painel Executivo em Tempo Real</p>
           </div>
         </div>
