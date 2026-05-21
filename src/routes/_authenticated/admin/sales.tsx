@@ -132,7 +132,7 @@ function AdminSalesPage() {
             Gestão de <span className="text-primary">Vendas</span>
           </h1>
           <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest mt-1">
-            Controle total sobre as transações da clínica
+            Controle total sobre as transações da academia
           </p>
         </div>
 
