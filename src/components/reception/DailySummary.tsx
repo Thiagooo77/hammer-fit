@@ -32,4 +32,4 @@ export const DailySummary = React.memo(({ totalSold, salesCount, ticketMedio, be
       ))}
     </div>
   );
-}
+});
