@@ -118,6 +118,7 @@ export const getAdminDashboard = createServerFn({ method: "GET" })
         revenueWeek: totalRevenueWeek,
         receptionistsCount: activeReceptionists?.length || 0,
         dailyGoalStatus: dailyGoalAmount > 0 ? Math.round((totalRevenueToday / dailyGoalAmount) * 100) : 0,
+        dailyGoalAmount,
         ticketMedio: ticketMedioToday,
         vendasCount: salesCountToday
       },
