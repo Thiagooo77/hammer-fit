@@ -119,7 +119,7 @@ export const registerSale = createServerFn({ method: "POST" })
         client_name: data.client_name,
         payment_method: data.payment_method,
         amount: data.amount,
-        notes: data.notes,
+        notes: data.notes as never,
       })
       .select()
       .single();
