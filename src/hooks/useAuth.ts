@@ -18,10 +18,23 @@ export function useAuth() {
     });
 
     // Listen for changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       queryClient.invalidateQueries({ queryKey: ["userRole"] });
       queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+      if (event === "SIGNED_IN" && session?.user) {
+        recordClientAudit({ data: {
+          actionType: "login", module: "auth",
+          userId: session.user.id, userName: session.user.email,
+          description: `Login de ${session.user.email}`,
+        } }).catch(() => {});
+      }
+      if (event === "SIGNED_OUT") {
+        recordClientAudit({ data: {
+          actionType: "logout", module: "auth",
+          description: "Logout",
+        } }).catch(() => {});
+      }
     });
 
     return () => subscription.unsubscribe();
