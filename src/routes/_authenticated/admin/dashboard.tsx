@@ -16,7 +16,7 @@ import {
 import { RankingBoard } from "@/components/reception/RankingBoard";
 import { toast } from "sonner";
 import { iaService } from "@/services/iaService";
-import React from "react";
+import React, { memo, useCallback } from "react";
 
 export const Route = createFileRoute("/_authenticated/admin/dashboard")({
   component: AdminDashboard,
