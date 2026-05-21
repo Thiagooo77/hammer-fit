@@ -29,56 +29,25 @@ export function DashboardSidebar() {
 
   const isAdmin = useMemo(() => role === "admin" || role === "manager", [role]);
 
-  const menuItems = useMemo(() => [
-    {
-      title: "Dashboard",
-      icon: LayoutDashboard,
-      href: isAdmin ? "/admin/dashboard" : "/reception/dashboard",
-      roles: ["admin", "manager", "receptionist"],
-    },
-    {
-      title: "Recepção",
-      icon: Building2,
-      href: "/reception/dashboard",
-      roles: ["admin", "manager", "receptionist"],
-    },
-    {
-      title: "Vendas",
-      icon: TrendingUp,
-      href: isAdmin ? "/admin/sales" : "/reception/dashboard",
-      roles: ["admin", "manager", "receptionist"],
-    },
-    {
-      title: "Checklists",
-      icon: CheckSquare,
-      href: "/reception/tasks",
-      roles: ["admin", "manager", "receptionist"],
-    },
-    {
-      title: "Colaboradores",
-      icon: Users,
-      href: "/admin/receptionists",
-      roles: ["admin", "manager"],
-    },
-    {
-      title: "Log de Auditoria",
-      icon: ShieldCheck,
-      href: "/admin/audit",
-      roles: ["admin", "manager"],
-    },
-    {
-      title: "Metas",
-      icon: Target,
-      href: "/admin/goals",
-      roles: ["admin", "manager"],
-    },
-    {
-      title: "Relatórios",
-      icon: FileText,
-      href: "/admin/reports",
-      roles: ["admin", "manager"],
-    },
-  ], [isAdmin]);
+  const menuItems = useMemo(() => {
+    if (isAdmin) {
+      return [
+        { title: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard", roles: ["admin", "manager"] },
+        { title: "Vendas", icon: TrendingUp, href: "/admin/sales", roles: ["admin", "manager"] },
+        { title: "Recepção", icon: Building2, href: "/reception/dashboard", roles: ["admin", "manager"] },
+        { title: "Checklists", icon: CheckSquare, href: "/reception/tasks", roles: ["admin", "manager"] },
+        { title: "Colaboradores", icon: Users, href: "/admin/receptionists", roles: ["admin", "manager"] },
+        { title: "Metas", icon: Target, href: "/admin/goals", roles: ["admin", "manager"] },
+        { title: "Relatórios", icon: FileText, href: "/admin/reports", roles: ["admin", "manager"] },
+        { title: "Log de Auditoria", icon: ShieldCheck, href: "/admin/audit", roles: ["admin", "manager"] },
+      ];
+    }
+    // Receptionist menu — sem duplicações
+    return [
+      { title: "Meu Caixa", icon: LayoutDashboard, href: "/reception/dashboard", roles: ["receptionist"] },
+      { title: "Checklists", icon: CheckSquare, href: "/reception/tasks", roles: ["receptionist"] },
+    ];
+  }, [isAdmin]);
 
   const filteredItems = useMemo(() => 
     menuItems.filter(item => role && item.roles.includes(role)),
