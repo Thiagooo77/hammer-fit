@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { ShieldCheck, LayoutDashboard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,9 +24,14 @@ function AdminDashboardPage() {
           <div className="p-2 bg-primary/20 rounded-xl border border-primary/30 shadow-[0_0_15px_rgba(179,114,45,0.3)]">
             <ShieldCheck className="text-primary size-6" />
           </div>
-          <h1 className="text-2xl font-black italic uppercase tracking-tighter">Hammer <span className="text-primary">FIT</span> | {role?.toUpperCase()}</h1>
+          <h1 className="text-2xl font-black italic uppercase tracking-tighter">Hammer <span className="text-primary">FIT</span></h1>
         </div>
         <div className="flex items-center gap-4">
+           <Link to="/reception/dashboard">
+              <Button variant="outline" size="sm" className="gap-2 border-primary/30 text-primary hover:bg-primary/10">
+                <LayoutDashboard className="size-4" /> Ir p/ Recepção
+              </Button>
+           </Link>
            <Button variant="ghost" onClick={() => signOut()} className="gap-2 hover:bg-red-500/10 hover:text-red-500 transition-all">
              <LogOut className="size-4" /> Sair
            </Button>

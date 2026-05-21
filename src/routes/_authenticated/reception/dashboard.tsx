@@ -125,8 +125,8 @@ function ReceptionGoalsDashboard() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50 pb-12 selection:bg-primary/30">
       {/* Premium Glass Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/60 backdrop-blur-xl transition-all">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/60 backdrop-blur-xl transition-all h-16 md:h-20">
+        <div className="container mx-auto px-4 h-full flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="p-2 bg-primary/20 rounded-lg border border-primary/30 shadow-[0_0_10px_rgba(179,114,45,0.3)]">
               <LayoutDashboard className="text-primary size-6" />
@@ -151,7 +151,7 @@ function ReceptionGoalsDashboard() {
             <div className="flex items-center gap-3 pl-6 border-l border-white/10">
               <div className="text-right hidden sm:block">
                 <p className="text-xs font-black">{receptionist.name}</p>
-                <p className="text-[10px] text-primary uppercase font-black italic tracking-widest">Recepcionista</p>
+                <p className="text-[10px] text-primary uppercase font-black italic tracking-widest">{role}</p>
               </div>
               <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-colors" onClick={() => signOut()}>
                 <LogOut className="size-5" />
@@ -165,6 +165,15 @@ function ReceptionGoalsDashboard() {
                 )}
               </div>
             </div>
+            {(role === 'admin' || role === 'manager') && (
+              <div className="hidden lg:flex items-center gap-2 pr-6 border-r border-white/10 mr-6">
+                <Link to="/admin/dashboard">
+                  <Button variant="outline" size="sm" className="gap-2 border-primary/30 text-primary hover:bg-primary/10">
+                    <ShieldCheck className="size-4" /> Painel Admin
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </header>
