@@ -20,6 +20,16 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const withTimeout = async <T,>(promise: PromiseLike<T>, ms: number, message: string): Promise<T> => {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(message)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => {
+    if (timeoutId) clearTimeout(timeoutId);
+  });
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
@@ -71,7 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (event === "SIGNED_IN" && session?.user) {
         console.log('[AUTH_LOGIN]', { email: session.user.email });
-        setLoading(false);
+        setLoading(true);
         setTimeout(() => {
           fetchUserData(session.user.id).catch(err => console.error('[AUTH_USER_DATA_ERROR]', err));
         }, 0);
@@ -105,8 +115,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fetchUserData = async (userId: string) => {
     try {
       const [userRole, userProfile] = await Promise.all([
-        authService.getUserRole(userId),
-        authService.getProfile(userId)
+        withTimeout(authService.getUserRole(userId), 5000, "Tempo de permissões excedido"),
+        withTimeout(authService.getProfile(userId), 5000, "Tempo de perfil excedido")
       ]);
       setRole(userRole);
       setProfile(userProfile);
