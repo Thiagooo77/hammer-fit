@@ -100,11 +100,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const stuckTimer = setTimeout(() => {
-      console.warn('[AUTH_STUCK] Loading exceeded 8s');
-      if (loading) clearLocalAuthState();
-    }, 8000);
+      if (loading) {
+        console.warn('[AUTH_STUCK] Loading exceeded 10s - User may be on slow connection');
+        // Do NOT clear state automatically, it's too destructive. 
+        // Just let it try to finish.
+      }
+    }, 10000);
 
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('[AUTH_INIT] Initial session check:', !!session);
       setSession(session);
       if (session?.user) {
         fetchUserData(session.user.id, session).finally(() => clearTimeout(stuckTimer));
