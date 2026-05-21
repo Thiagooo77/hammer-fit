@@ -98,7 +98,7 @@ function ReceptionistsAdminPage() {
       </header>
 
       <main className="container mx-auto p-4 sm:p-6 grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-white/5 border-white/10 backdrop-blur-xl rounded-3xl overflow-hidden">
           <CardHeader>
             <CardTitle className="uppercase italic text-lg">Equipe ({items.length})</CardTitle>
           </CardHeader>
@@ -145,7 +145,7 @@ function ReceptionistsAdminPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white/5 border-white/10 backdrop-blur-xl rounded-3xl overflow-hidden">
           <CardHeader>
             <CardTitle className="uppercase italic text-lg">
               {creating ? "Novo recepcionista" : editing ? "Editar" : resetting ? "Resetar senha" : "Painel"}
@@ -171,7 +171,7 @@ function Field({ label, ...rest }: React.InputHTMLAttributes<HTMLInputElement> &
   return (
     <div className="space-y-1">
       <Label className="text-xs uppercase font-bold">{label}</Label>
-      <Input {...rest} />
+      <Input {...rest} className="bg-white/5 border-white/10 text-white placeholder:text-slate-600 focus:border-primary/50 transition-all rounded-xl" />
     </div>
   );
 }
