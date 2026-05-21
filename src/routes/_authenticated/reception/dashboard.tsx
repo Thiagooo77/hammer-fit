@@ -118,9 +118,9 @@ function ReceptionGoalsDashboard() {
     mockShifts.push({ id: "empty", type: "Manhã", receptionist: "Nenhum turno iniciado", time: "--:--", status: "encerrado" });
   }
 
-  const clinicTarget = dailyGoal ? Number(dailyGoal.goal_amount) : 10000;
-  const clinicCurrent = smartStats.totalSoldToday || 4250.00;
-  const clinicPercentage = Math.round((clinicCurrent / clinicTarget) * 100);
+  const clinicTarget = dailyGoal ? Number(dailyGoal.goal_amount) : 0;
+  const clinicCurrent = smartStats.totalSoldToday || 0;
+  const clinicPercentage = clinicTarget > 0 ? Math.round((clinicCurrent / clinicTarget) * 100) : 0;
   const clinicPrediction = clinicCurrent > 0 ? (clinicCurrent / (new Date().getHours() || 1)) * 18 : 0;
 
   return (
