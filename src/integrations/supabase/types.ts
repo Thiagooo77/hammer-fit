@@ -56,6 +56,33 @@ export type Database = {
         }
         Relationships: []
       }
+      badges: {
+        Row: {
+          created_at: string | null
+          criteria_json: Json | null
+          description: string | null
+          icon_url: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          criteria_json?: Json | null
+          description?: string | null
+          icon_url?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          criteria_json?: Json | null
+          description?: string | null
+          icon_url?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       cash_sessions: {
         Row: {
           closed_at: string | null
@@ -315,6 +342,35 @@ export type Database = {
           },
         ]
       }
+      user_badges: {
+        Row: {
+          awarded_at: string | null
+          badge_id: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          awarded_at?: string | null
+          badge_id?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          awarded_at?: string | null
+          badge_id?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -340,10 +396,13 @@ export type Database = {
           created_at: string | null
           email: string
           id: string
+          last_sale_at: string | null
           name: string
           phone: string | null
+          points: number | null
           role: Database["public"]["Enums"]["app_role"] | null
           status: string | null
+          streak_days: number | null
         }
         Insert: {
           avatar_url?: string | null
@@ -351,10 +410,13 @@ export type Database = {
           created_at?: string | null
           email: string
           id: string
+          last_sale_at?: string | null
           name: string
           phone?: string | null
+          points?: number | null
           role?: Database["public"]["Enums"]["app_role"] | null
           status?: string | null
+          streak_days?: number | null
         }
         Update: {
           avatar_url?: string | null
@@ -362,16 +424,36 @@ export type Database = {
           created_at?: string | null
           email?: string
           id?: string
+          last_sale_at?: string | null
           name?: string
           phone?: string | null
+          points?: number | null
           role?: Database["public"]["Enums"]["app_role"] | null
           status?: string | null
+          streak_days?: number | null
         }
         Relationships: []
       }
     }
     Views: {
-      [_ in never]: never
+      vw_ia_performance_prediction: {
+        Row: {
+          avg_amount: number | null
+          hour_bucket: string | null
+          receptionist_id: string | null
+          sales_count: number | null
+          total_revenue: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_receptionist_id_fkey"
+            columns: ["receptionist_id"]
+            isOneToOne: false
+            referencedRelation: "receptionists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       hammer_has_role: {

@@ -33,15 +33,17 @@ export function RankingBoard({ members }: RankingBoardProps) {
   };
 
   return (
-    <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg font-bold flex items-center gap-2">
-          <Trophy className="size-5 text-primary" />
-          Ranking do Dia
+    <Card className="bg-white/5 border-white/10 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl">
+      <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-white/5">
+        <CardTitle className="text-sm font-black flex items-center gap-3 uppercase italic tracking-widest text-white">
+          <div className="p-2 bg-yellow-500/20 rounded-lg border border-yellow-500/30">
+            <Trophy className="size-4 text-yellow-500" />
+          </div>
+          Ranking de Elite
         </CardTitle>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <TrendingUp className="size-3 text-green-500" />
-          Em tempo real
+        <div className="flex items-center gap-2 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
+          <div className="size-1.5 bg-green-500 rounded-full animate-pulse" />
+          <span className="text-[10px] font-black text-green-400 uppercase tracking-tighter">Live</span>
         </div>
       </CardHeader>
       <CardContent className="pt-2">
@@ -65,12 +67,12 @@ export function RankingBoard({ members }: RankingBoardProps) {
                     stiffness: 100 
                   }}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-xl border transition-all relative overflow-hidden",
+                    "flex items-center gap-4 p-4 rounded-2xl border transition-all relative overflow-hidden group",
                     isTop1 
-                      ? "bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 border-primary/50 shadow-2xl shadow-primary/10 ring-2 ring-primary/20" 
+                      ? "bg-white/10 border-primary/40 shadow-[0_0_30px_rgba(179,114,45,0.1)] scale-[1.02]" 
                       : isTop3 
-                        ? "bg-secondary/40 border-primary/20"
-                        : "bg-secondary/20 border-primary/5 hover:border-primary/10"
+                        ? "bg-white/5 border-white/10"
+                        : "bg-white/[0.02] border-white/5 hover:border-white/10"
                   )}
                 >
                   {isTop1 && (

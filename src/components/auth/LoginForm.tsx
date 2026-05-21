@@ -77,17 +77,21 @@ export function LoginForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">Email Corporativo</FormLabel>
               <FormControl>
-                <Input placeholder="email@exemplo.com" {...field} />
+                <Input 
+                  placeholder="exemplo@hammerclinic.com.br" 
+                  {...field} 
+                  className="bg-white/5 border-white/10 text-white placeholder:text-slate-600 focus:border-primary/50 transition-all rounded-xl h-12"
+                />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-[10px] font-bold text-red-400" />
             </FormItem>
           )}
         />
@@ -96,16 +100,25 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Senha</FormLabel>
+              <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">Chave de Acesso</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="******" {...field} />
+                <Input 
+                  type="password" 
+                  placeholder="••••••••" 
+                  {...field} 
+                  className="bg-white/5 border-white/10 text-white placeholder:text-slate-600 focus:border-primary/50 transition-all rounded-xl h-12"
+                />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-[10px] font-bold text-red-400" />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Entrar"}
+        <Button 
+          type="submit" 
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase italic tracking-widest h-12 rounded-xl shadow-[0_0_20px_rgba(179,114,45,0.2)] transition-all hover:scale-[1.02] active:scale-[0.98]" 
+          disabled={isLoading}
+        >
+          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Acessar Sistema"}
         </Button>
       </form>
     </Form>

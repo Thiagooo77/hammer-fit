@@ -2,6 +2,8 @@ import { Link, Outlet, createRootRouteWithContext, HeadContent, Scripts, useRout
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as React from "react";
 import { Toaster } from "sonner";
+import { ShieldCheck, Zap } from "lucide-react";
+import { motion } from "framer-motion";
 import "../styles.css";
 
 interface RouterContext {
@@ -27,29 +29,37 @@ function RootErrorComponent({ error, reset }: { error: Error; reset: () => void 
 
   return (
     <RootDocument>
-      <main className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
-        <section className="w-full max-w-xl rounded-lg border border-border bg-card p-6 shadow-sm">
-          <p className="text-sm font-bold uppercase tracking-widest text-primary">Sistema protegido</p>
-          <h1 className="mt-3 text-2xl font-black tracking-tight">Encontramos uma falha temporária</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            A aplicação capturou o erro para evitar tela branca. Tente recarregar os dados ou volte ao início.
+      <main className="min-h-screen bg-slate-950 text-slate-50 flex items-center justify-center p-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full scale-150" />
+        <section className="w-full max-w-xl rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-2xl shadow-2xl relative z-10">
+          <div className="size-12 bg-primary/20 rounded-2xl flex items-center justify-center mb-6 border border-primary/30">
+            <ShieldCheck className="text-primary size-6" />
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Sistema Protegido</p>
+          <h1 className="text-3xl font-black tracking-tighter uppercase italic text-white leading-tight">
+            Interrupção de <span className="text-primary">Segurança</span>
+          </h1>
+          <p className="mt-4 text-slate-400 text-sm leading-relaxed">
+            A aplicação capturou uma falha inesperada. Por segurança, o sistema isolou a área para evitar perda de dados.
           </p>
-          <pre className="mt-4 max-h-36 overflow-auto rounded-md bg-muted p-3 text-xs text-muted-foreground">
-            {error.message}
-          </pre>
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className="mt-6 bg-black/40 rounded-xl p-4 border border-white/5">
+            <pre className="max-h-32 overflow-auto text-[10px] font-mono text-slate-500 scrollbar-hide">
+              {error.message}
+            </pre>
+          </div>
+          <div className="mt-8 flex flex-wrap gap-4">
             <button
               type="button"
-              className="rounded-md bg-primary px-4 py-2 text-sm font-bold text-primary-foreground"
+              className="rounded-xl bg-primary px-6 py-3 text-xs font-black uppercase italic tracking-widest text-primary-foreground hover:scale-105 transition-transform active:scale-95 shadow-[0_0_20px_rgba(179,114,45,0.3)]"
               onClick={() => {
                 router.invalidate();
                 reset();
               }}
             >
-              Tentar novamente
+              Reiniciar Módulo
             </button>
-            <Link to="/" className="rounded-md border border-border px-4 py-2 text-sm font-bold">
-              Ir para o início
+            <Link to="/" className="rounded-xl border border-white/10 px-6 py-3 text-xs font-black uppercase italic tracking-widest text-white hover:bg-white/5 transition-colors">
+              Voltar ao Início
             </Link>
           </div>
         </section>
@@ -60,13 +70,21 @@ function RootErrorComponent({ error, reset }: { error: Error; reset: () => void 
 
 function RootNotFoundComponent() {
   return (
-    <main className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
-      <section className="w-full max-w-xl rounded-lg border border-border bg-card p-6 shadow-sm">
-        <p className="text-sm font-bold uppercase tracking-widest text-primary">404</p>
-        <h1 className="mt-3 text-2xl font-black tracking-tight">Página não encontrada</h1>
-        <p className="mt-2 text-sm text-muted-foreground">O endereço acessado não existe neste sistema.</p>
-        <Link to="/" className="mt-5 inline-flex rounded-md bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">
-          Voltar ao início
+    <main className="min-h-screen bg-slate-950 text-slate-50 flex items-center justify-center p-6 relative overflow-hidden">
+      <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full scale-150" />
+      <section className="w-full max-w-xl rounded-3xl border border-white/10 bg-white/5 p-10 backdrop-blur-2xl shadow-2xl relative z-10 text-center">
+        <div className="mx-auto size-20 bg-primary/10 rounded-full flex items-center justify-center mb-8 border border-primary/20 animate-pulse">
+           <Zap className="text-primary size-10" />
+        </div>
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-primary mb-4">Erro 404</p>
+        <h1 className="text-4xl font-black tracking-tighter uppercase italic text-white mb-4">
+          Área <span className="text-primary">Inexistente</span>
+        </h1>
+        <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-sm mx-auto">
+          O módulo que você está tentando acessar não foi encontrado ou está temporariamente indisponível.
+        </p>
+        <Link to="/" className="inline-flex rounded-xl bg-primary px-10 py-4 text-sm font-black uppercase italic tracking-widest text-primary-foreground hover:scale-105 transition-transform active:scale-95 shadow-[0_0_30px_rgba(179,114,45,0.4)]">
+          Retornar à Base
         </Link>
       </section>
     </main>
