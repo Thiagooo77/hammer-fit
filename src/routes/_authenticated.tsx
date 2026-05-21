@@ -1,6 +1,8 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useRouter } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
+import { useAuth } from "@/hooks/useAuth";
 
 const withTimeout = async <T,>(promise: PromiseLike<T>, ms: number): Promise<T> => {
   const timeout = new Promise<never>((_, reject) => {
