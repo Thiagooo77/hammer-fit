@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, TrendingUp, DollarSign, Target, LogOut, LayoutDashboard, Users, FileDown, Sparkles, Award } from "lucide-react";
+import { ShieldCheck, TrendingUp, DollarSign, Target, LogOut, LayoutDashboard, Users, FileDown, Sparkles, Award, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, Navigate, createFileRoute } from "@tanstack/react-router";
