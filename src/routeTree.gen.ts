@@ -9,243 +9,38 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
-import { Route as AuthenticatedDashboardVendasRouteImport } from './routes/_authenticated/dashboard.vendas'
-import { Route as AuthenticatedDashboardSetoresRouteImport } from './routes/_authenticated/dashboard.setores'
-import { Route as AuthenticatedDashboardRankingRouteImport } from './routes/_authenticated/dashboard.ranking'
-import { Route as AuthenticatedDashboardNotificacoesRouteImport } from './routes/_authenticated/dashboard.notificacoes'
-import { Route as AuthenticatedDashboardMinhasAtividadesRouteImport } from './routes/_authenticated/dashboard.minhas-atividades'
-import { Route as AuthenticatedDashboardMetasRouteImport } from './routes/_authenticated/dashboard.metas'
-import { Route as AuthenticatedDashboardFuncionariosRouteImport } from './routes/_authenticated/dashboard.funcionarios'
-import { Route as AuthenticatedDashboardConfiguracoesRouteImport } from './routes/_authenticated/dashboard.configuracoes'
-import { Route as AuthenticatedDashboardChecklistsRouteImport } from './routes/_authenticated/dashboard.checklists'
-import { Route as AuthenticatedDashboardAprovacoesRouteImport } from './routes/_authenticated/dashboard.aprovacoes'
-import { Route as AuthenticatedDashboardSetoresIdRouteImport } from './routes/_authenticated/dashboard.setores.$id'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedDashboardIndexRoute =
-  AuthenticatedDashboardIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardVendasRoute =
-  AuthenticatedDashboardVendasRouteImport.update({
-    id: '/vendas',
-    path: '/vendas',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardSetoresRoute =
-  AuthenticatedDashboardSetoresRouteImport.update({
-    id: '/setores',
-    path: '/setores',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardRankingRoute =
-  AuthenticatedDashboardRankingRouteImport.update({
-    id: '/ranking',
-    path: '/ranking',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardNotificacoesRoute =
-  AuthenticatedDashboardNotificacoesRouteImport.update({
-    id: '/notificacoes',
-    path: '/notificacoes',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardMinhasAtividadesRoute =
-  AuthenticatedDashboardMinhasAtividadesRouteImport.update({
-    id: '/minhas-atividades',
-    path: '/minhas-atividades',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardMetasRoute =
-  AuthenticatedDashboardMetasRouteImport.update({
-    id: '/metas',
-    path: '/metas',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardFuncionariosRoute =
-  AuthenticatedDashboardFuncionariosRouteImport.update({
-    id: '/funcionarios',
-    path: '/funcionarios',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardConfiguracoesRoute =
-  AuthenticatedDashboardConfiguracoesRouteImport.update({
-    id: '/configuracoes',
-    path: '/configuracoes',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardChecklistsRoute =
-  AuthenticatedDashboardChecklistsRouteImport.update({
-    id: '/checklists',
-    path: '/checklists',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardAprovacoesRoute =
-  AuthenticatedDashboardAprovacoesRouteImport.update({
-    id: '/aprovacoes',
-    path: '/aprovacoes',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardSetoresIdRoute =
-  AuthenticatedDashboardSetoresIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedDashboardSetoresRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
-  '/dashboard/aprovacoes': typeof AuthenticatedDashboardAprovacoesRoute
-  '/dashboard/checklists': typeof AuthenticatedDashboardChecklistsRoute
-  '/dashboard/configuracoes': typeof AuthenticatedDashboardConfiguracoesRoute
-  '/dashboard/funcionarios': typeof AuthenticatedDashboardFuncionariosRoute
-  '/dashboard/metas': typeof AuthenticatedDashboardMetasRoute
-  '/dashboard/minhas-atividades': typeof AuthenticatedDashboardMinhasAtividadesRoute
-  '/dashboard/notificacoes': typeof AuthenticatedDashboardNotificacoesRoute
-  '/dashboard/ranking': typeof AuthenticatedDashboardRankingRoute
-  '/dashboard/setores': typeof AuthenticatedDashboardSetoresRouteWithChildren
-  '/dashboard/vendas': typeof AuthenticatedDashboardVendasRoute
-  '/dashboard/': typeof AuthenticatedDashboardIndexRoute
-  '/dashboard/setores/$id': typeof AuthenticatedDashboardSetoresIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/dashboard/aprovacoes': typeof AuthenticatedDashboardAprovacoesRoute
-  '/dashboard/checklists': typeof AuthenticatedDashboardChecklistsRoute
-  '/dashboard/configuracoes': typeof AuthenticatedDashboardConfiguracoesRoute
-  '/dashboard/funcionarios': typeof AuthenticatedDashboardFuncionariosRoute
-  '/dashboard/metas': typeof AuthenticatedDashboardMetasRoute
-  '/dashboard/minhas-atividades': typeof AuthenticatedDashboardMinhasAtividadesRoute
-  '/dashboard/notificacoes': typeof AuthenticatedDashboardNotificacoesRoute
-  '/dashboard/ranking': typeof AuthenticatedDashboardRankingRoute
-  '/dashboard/setores': typeof AuthenticatedDashboardSetoresRouteWithChildren
-  '/dashboard/vendas': typeof AuthenticatedDashboardVendasRoute
-  '/dashboard': typeof AuthenticatedDashboardIndexRoute
-  '/dashboard/setores/$id': typeof AuthenticatedDashboardSetoresIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/login': typeof LoginRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
-  '/_authenticated/dashboard/aprovacoes': typeof AuthenticatedDashboardAprovacoesRoute
-  '/_authenticated/dashboard/checklists': typeof AuthenticatedDashboardChecklistsRoute
-  '/_authenticated/dashboard/configuracoes': typeof AuthenticatedDashboardConfiguracoesRoute
-  '/_authenticated/dashboard/funcionarios': typeof AuthenticatedDashboardFuncionariosRoute
-  '/_authenticated/dashboard/metas': typeof AuthenticatedDashboardMetasRoute
-  '/_authenticated/dashboard/minhas-atividades': typeof AuthenticatedDashboardMinhasAtividadesRoute
-  '/_authenticated/dashboard/notificacoes': typeof AuthenticatedDashboardNotificacoesRoute
-  '/_authenticated/dashboard/ranking': typeof AuthenticatedDashboardRankingRoute
-  '/_authenticated/dashboard/setores': typeof AuthenticatedDashboardSetoresRouteWithChildren
-  '/_authenticated/dashboard/vendas': typeof AuthenticatedDashboardVendasRoute
-  '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
-  '/_authenticated/dashboard/setores/$id': typeof AuthenticatedDashboardSetoresIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/login'
-    | '/dashboard'
-    | '/dashboard/aprovacoes'
-    | '/dashboard/checklists'
-    | '/dashboard/configuracoes'
-    | '/dashboard/funcionarios'
-    | '/dashboard/metas'
-    | '/dashboard/minhas-atividades'
-    | '/dashboard/notificacoes'
-    | '/dashboard/ranking'
-    | '/dashboard/setores'
-    | '/dashboard/vendas'
-    | '/dashboard/'
-    | '/dashboard/setores/$id'
+  fullPaths: '/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/login'
-    | '/dashboard/aprovacoes'
-    | '/dashboard/checklists'
-    | '/dashboard/configuracoes'
-    | '/dashboard/funcionarios'
-    | '/dashboard/metas'
-    | '/dashboard/minhas-atividades'
-    | '/dashboard/notificacoes'
-    | '/dashboard/ranking'
-    | '/dashboard/setores'
-    | '/dashboard/vendas'
-    | '/dashboard'
-    | '/dashboard/setores/$id'
-  id:
-    | '__root__'
-    | '/'
-    | '/_authenticated'
-    | '/login'
-    | '/_authenticated/dashboard'
-    | '/_authenticated/dashboard/aprovacoes'
-    | '/_authenticated/dashboard/checklists'
-    | '/_authenticated/dashboard/configuracoes'
-    | '/_authenticated/dashboard/funcionarios'
-    | '/_authenticated/dashboard/metas'
-    | '/_authenticated/dashboard/minhas-atividades'
-    | '/_authenticated/dashboard/notificacoes'
-    | '/_authenticated/dashboard/ranking'
-    | '/_authenticated/dashboard/setores'
-    | '/_authenticated/dashboard/vendas'
-    | '/_authenticated/dashboard/'
-    | '/_authenticated/dashboard/setores/$id'
+  to: '/'
+  id: '__root__' | '/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -253,171 +48,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/': {
-      id: '/_authenticated/dashboard/'
-      path: '/'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/vendas': {
-      id: '/_authenticated/dashboard/vendas'
-      path: '/vendas'
-      fullPath: '/dashboard/vendas'
-      preLoaderRoute: typeof AuthenticatedDashboardVendasRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/setores': {
-      id: '/_authenticated/dashboard/setores'
-      path: '/setores'
-      fullPath: '/dashboard/setores'
-      preLoaderRoute: typeof AuthenticatedDashboardSetoresRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/ranking': {
-      id: '/_authenticated/dashboard/ranking'
-      path: '/ranking'
-      fullPath: '/dashboard/ranking'
-      preLoaderRoute: typeof AuthenticatedDashboardRankingRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/notificacoes': {
-      id: '/_authenticated/dashboard/notificacoes'
-      path: '/notificacoes'
-      fullPath: '/dashboard/notificacoes'
-      preLoaderRoute: typeof AuthenticatedDashboardNotificacoesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/minhas-atividades': {
-      id: '/_authenticated/dashboard/minhas-atividades'
-      path: '/minhas-atividades'
-      fullPath: '/dashboard/minhas-atividades'
-      preLoaderRoute: typeof AuthenticatedDashboardMinhasAtividadesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/metas': {
-      id: '/_authenticated/dashboard/metas'
-      path: '/metas'
-      fullPath: '/dashboard/metas'
-      preLoaderRoute: typeof AuthenticatedDashboardMetasRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/funcionarios': {
-      id: '/_authenticated/dashboard/funcionarios'
-      path: '/funcionarios'
-      fullPath: '/dashboard/funcionarios'
-      preLoaderRoute: typeof AuthenticatedDashboardFuncionariosRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/configuracoes': {
-      id: '/_authenticated/dashboard/configuracoes'
-      path: '/configuracoes'
-      fullPath: '/dashboard/configuracoes'
-      preLoaderRoute: typeof AuthenticatedDashboardConfiguracoesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/checklists': {
-      id: '/_authenticated/dashboard/checklists'
-      path: '/checklists'
-      fullPath: '/dashboard/checklists'
-      preLoaderRoute: typeof AuthenticatedDashboardChecklistsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/aprovacoes': {
-      id: '/_authenticated/dashboard/aprovacoes'
-      path: '/aprovacoes'
-      fullPath: '/dashboard/aprovacoes'
-      preLoaderRoute: typeof AuthenticatedDashboardAprovacoesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/setores/$id': {
-      id: '/_authenticated/dashboard/setores/$id'
-      path: '/$id'
-      fullPath: '/dashboard/setores/$id'
-      preLoaderRoute: typeof AuthenticatedDashboardSetoresIdRouteImport
-      parentRoute: typeof AuthenticatedDashboardSetoresRoute
-    }
   }
 }
-
-interface AuthenticatedDashboardSetoresRouteChildren {
-  AuthenticatedDashboardSetoresIdRoute: typeof AuthenticatedDashboardSetoresIdRoute
-}
-
-const AuthenticatedDashboardSetoresRouteChildren: AuthenticatedDashboardSetoresRouteChildren =
-  {
-    AuthenticatedDashboardSetoresIdRoute: AuthenticatedDashboardSetoresIdRoute,
-  }
-
-const AuthenticatedDashboardSetoresRouteWithChildren =
-  AuthenticatedDashboardSetoresRoute._addFileChildren(
-    AuthenticatedDashboardSetoresRouteChildren,
-  )
-
-interface AuthenticatedDashboardRouteChildren {
-  AuthenticatedDashboardAprovacoesRoute: typeof AuthenticatedDashboardAprovacoesRoute
-  AuthenticatedDashboardChecklistsRoute: typeof AuthenticatedDashboardChecklistsRoute
-  AuthenticatedDashboardConfiguracoesRoute: typeof AuthenticatedDashboardConfiguracoesRoute
-  AuthenticatedDashboardFuncionariosRoute: typeof AuthenticatedDashboardFuncionariosRoute
-  AuthenticatedDashboardMetasRoute: typeof AuthenticatedDashboardMetasRoute
-  AuthenticatedDashboardMinhasAtividadesRoute: typeof AuthenticatedDashboardMinhasAtividadesRoute
-  AuthenticatedDashboardNotificacoesRoute: typeof AuthenticatedDashboardNotificacoesRoute
-  AuthenticatedDashboardRankingRoute: typeof AuthenticatedDashboardRankingRoute
-  AuthenticatedDashboardSetoresRoute: typeof AuthenticatedDashboardSetoresRouteWithChildren
-  AuthenticatedDashboardVendasRoute: typeof AuthenticatedDashboardVendasRoute
-  AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
-}
-
-const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
-  {
-    AuthenticatedDashboardAprovacoesRoute:
-      AuthenticatedDashboardAprovacoesRoute,
-    AuthenticatedDashboardChecklistsRoute:
-      AuthenticatedDashboardChecklistsRoute,
-    AuthenticatedDashboardConfiguracoesRoute:
-      AuthenticatedDashboardConfiguracoesRoute,
-    AuthenticatedDashboardFuncionariosRoute:
-      AuthenticatedDashboardFuncionariosRoute,
-    AuthenticatedDashboardMetasRoute: AuthenticatedDashboardMetasRoute,
-    AuthenticatedDashboardMinhasAtividadesRoute:
-      AuthenticatedDashboardMinhasAtividadesRoute,
-    AuthenticatedDashboardNotificacoesRoute:
-      AuthenticatedDashboardNotificacoesRoute,
-    AuthenticatedDashboardRankingRoute: AuthenticatedDashboardRankingRoute,
-    AuthenticatedDashboardSetoresRoute:
-      AuthenticatedDashboardSetoresRouteWithChildren,
-    AuthenticatedDashboardVendasRoute: AuthenticatedDashboardVendasRoute,
-    AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
-  }
-
-const AuthenticatedDashboardRouteWithChildren =
-  AuthenticatedDashboardRoute._addFileChildren(
-    AuthenticatedDashboardRouteChildren,
-  )
-
-interface AuthenticatedRouteChildren {
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
-}
-
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
-}
-
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
