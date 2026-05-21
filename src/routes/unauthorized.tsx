@@ -1,6 +1,4 @@
-import { createFileRoute, Navigate, Outlet } from "@tanstack/react-router";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { RoleGuard } from "@/components/auth/RoleGuard";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/unauthorized")({
   component: UnauthorizedPage,
