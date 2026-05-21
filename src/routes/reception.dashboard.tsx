@@ -147,31 +147,32 @@ function ReceptionGoalsDashboard() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 space-y-8">
+      <main className="container mx-auto px-4 py-8 space-y-10">
         {/* Welcome & KPIs Header */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6"
+          className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl relative overflow-hidden group"
         >
-          <div>
-            <h2 className="text-4xl font-black tracking-tighter uppercase italic flex items-center gap-3">
-              <Zap className="size-8 text-primary animate-pulse" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="relative z-10">
+            <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic flex items-center gap-4">
+              <Zap className="size-10 text-primary animate-pulse" />
               BOAS VINDAS, {receptionist.name.split(' ')[0]}!
             </h2>
-            <p className="text-muted-foreground mt-1">
-              O seu turno está <span className="font-bold text-primary uppercase">{currentSession ? "Em andamento" : "Aguardando início"}</span>.
+            <p className="text-slate-400 mt-2 text-lg">
+              Status: <span className="font-black text-primary uppercase italic tracking-widest">{currentSession ? "Turno Ativo" : "Aguardando Início"}</span>
             </p>
           </div>
           
-          <div className="flex flex-wrap gap-4">
-            <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 flex flex-col items-center">
-              <span className="text-[10px] font-black uppercase text-muted-foreground">Vendido Hoje</span>
-              <span className="text-2xl font-black text-primary">R$ {smartStats.totalSoldToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+          <div className="flex flex-wrap gap-6 relative z-10">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center min-w-[160px] hover:border-primary/50 transition-colors shadow-2xl">
+              <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">Vendido Hoje</span>
+              <span className="text-3xl font-black text-primary italic">R$ {smartStats.totalSoldToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
             </div>
-            <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 flex flex-col items-center">
-              <span className="text-[10px] font-black uppercase text-muted-foreground">Progresso Meta</span>
-              <span className="text-2xl font-black">{smartStats.percentage}%</span>
+            <div className="bg-primary/10 border border-primary/30 rounded-2xl p-6 flex flex-col items-center min-w-[160px] shadow-[0_0_20px_rgba(179,114,45,0.2)]">
+              <span className="text-[10px] font-black uppercase text-primary/70 tracking-widest mb-1">Seu Progresso</span>
+              <span className="text-3xl font-black italic">{smartStats.percentage}%</span>
             </div>
           </div>
         </motion.div>
