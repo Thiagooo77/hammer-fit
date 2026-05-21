@@ -36,6 +36,21 @@ export function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
+
+    // Safety net: if login hangs > 10s, clear stale storage and reset
+    const stuckTimeout = setTimeout(() => {
+      console.warn('[LOGIN_STUCK] Clearing stale session storage');
+      try {
+        Object.keys(localStorage)
+          .filter((k) => k.startsWith('sb-') || k.includes('supabase'))
+          .forEach((k) => localStorage.removeItem(k));
+        sessionStorage.clear();
+      } catch {}
+      supabase.auth.signOut().catch(() => {});
+      setIsLoading(false);
+      toast.error("Conexão demorou demais. Sessão local limpa, tente novamente.");
+    }, 10000);
+
     try {
       // Intentional auto-setup if special credentials are used and login fails
       const isInitialSetup = (values.email === "admhammer@gmail.com" || values.email === "gerenciahammer@gmail.com") && values.password === "hammer123";
@@ -81,6 +96,7 @@ export function LoginForm() {
     } catch (error) {
       toast.error("Erro ao realizar login");
     } finally {
+      clearTimeout(stuckTimeout);
       setIsLoading(false);
     }
   }
