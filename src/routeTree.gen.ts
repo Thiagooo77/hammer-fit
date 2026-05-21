@@ -21,6 +21,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.
 import { Route as AuthenticatedReceptionTasksRouteImport } from './routes/_authenticated/reception/tasks'
 import { Route as AuthenticatedReceptionDashboardRouteImport } from './routes/_authenticated/reception/dashboard'
 import { Route as AuthenticatedAdminSalesRouteImport } from './routes/_authenticated/admin/sales'
+import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin/reports'
 import { Route as AuthenticatedAdminReceptionistsRouteImport } from './routes/_authenticated/admin/receptionists'
 import { Route as AuthenticatedAdminGoalsRouteImport } from './routes/_authenticated/admin/goals'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
@@ -87,6 +88,12 @@ const AuthenticatedAdminSalesRoute = AuthenticatedAdminSalesRouteImport.update({
   path: '/sales',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminReportsRoute =
+  AuthenticatedAdminReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminReceptionistsRoute =
   AuthenticatedAdminReceptionistsRouteImport.update({
     id: '/receptionists',
@@ -123,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/goals': typeof AuthenticatedAdminGoalsRoute
   '/admin/receptionists': typeof AuthenticatedAdminReceptionistsRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/sales': typeof AuthenticatedAdminSalesRoute
   '/reception/dashboard': typeof AuthenticatedReceptionDashboardRoute
   '/reception/tasks': typeof AuthenticatedReceptionTasksRoute
@@ -140,6 +148,7 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/goals': typeof AuthenticatedAdminGoalsRoute
   '/admin/receptionists': typeof AuthenticatedAdminReceptionistsRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/sales': typeof AuthenticatedAdminSalesRoute
   '/reception/dashboard': typeof AuthenticatedReceptionDashboardRoute
   '/reception/tasks': typeof AuthenticatedReceptionTasksRoute
@@ -159,6 +168,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/goals': typeof AuthenticatedAdminGoalsRoute
   '/_authenticated/admin/receptionists': typeof AuthenticatedAdminReceptionistsRoute
+  '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/sales': typeof AuthenticatedAdminSalesRoute
   '/_authenticated/reception/dashboard': typeof AuthenticatedReceptionDashboardRoute
   '/_authenticated/reception/tasks': typeof AuthenticatedReceptionTasksRoute
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/goals'
     | '/admin/receptionists'
+    | '/admin/reports'
     | '/admin/sales'
     | '/reception/dashboard'
     | '/reception/tasks'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/goals'
     | '/admin/receptionists'
+    | '/admin/reports'
     | '/admin/sales'
     | '/reception/dashboard'
     | '/reception/tasks'
@@ -213,6 +225,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/goals'
     | '/_authenticated/admin/receptionists'
+    | '/_authenticated/admin/reports'
     | '/_authenticated/admin/sales'
     | '/_authenticated/reception/dashboard'
     | '/_authenticated/reception/tasks'
@@ -313,6 +326,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSalesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/reports': {
+      id: '/_authenticated/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/receptionists': {
       id: '/_authenticated/admin/receptionists'
       path: '/receptionists'
@@ -349,6 +369,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminGoalsRoute: typeof AuthenticatedAdminGoalsRoute
   AuthenticatedAdminReceptionistsRoute: typeof AuthenticatedAdminReceptionistsRoute
+  AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminSalesRoute: typeof AuthenticatedAdminSalesRoute
 }
 
@@ -357,6 +378,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminGoalsRoute: AuthenticatedAdminGoalsRoute,
   AuthenticatedAdminReceptionistsRoute: AuthenticatedAdminReceptionistsRoute,
+  AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
   AuthenticatedAdminSalesRoute: AuthenticatedAdminSalesRoute,
 }
 
@@ -406,3 +428,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
