@@ -81,7 +81,7 @@ export const getAdminDashboard = createServerFn({ method: "GET" })
       salesAmount: Number(item.sold_amount || 0),
       goalPercentage: Math.round((Number(item.sold_amount || 0) / Math.max(Number(item.goal_amount || 0), 1)) * 100),
       position: index + 1,
-      streak: index === 0 ? 3 : 0
+      streak: 0
     }));
 
     const dailyGoalAmount = Number((dailyGoal as any)?.goal_amount || 0);

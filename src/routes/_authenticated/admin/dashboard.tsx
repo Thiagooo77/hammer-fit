@@ -167,9 +167,9 @@ function AdminDashboard() {
             delay={0.3}
           />
           <StatCard 
-            title="Gamificação" 
-            value="340 pts" 
-            icon={<Award />} 
+            title="Sessões Ativas" 
+            value={`${kpis.receptionistsCount}`} 
+            icon={<Users />} 
             delay={0.4}
           />
         </div>
@@ -208,7 +208,7 @@ function AdminDashboard() {
               </CardContent>
             </Card>
 
-            {/* IA Insights */}
+            {/* IA Insights Section */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -217,21 +217,29 @@ function AdminDashboard() {
               <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/20 to-transparent border border-primary/20 relative overflow-hidden group">
                 <Sparkles className="absolute -right-4 -top-4 size-24 text-primary/5 group-hover:scale-110 transition-transform" />
                 <h4 className="font-black italic uppercase text-primary mb-2 flex items-center gap-2">
-                   Insight de IA
+                   Projeção de IA
                 </h4>
                 <p className="text-sm text-slate-300 leading-relaxed">
-                  Baseado no fluxo das últimas 24h, prevemos um pico de demanda às <strong>14:00</strong>. Recomendamos reforço na recepção.
+                  {iaData && iaData.length > 0 
+                    ? `Baseado no ritmo atual, a projeção de fechamento global é de R$ ${iaData.reduce((acc: number, p: any) => acc + p.projection, 0).toLocaleString('pt-BR')}.`
+                    : "Aguardando dados suficientes para gerar projeções de performance."}
                 </p>
               </div>
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-primary/30 transition-colors">
                 <h4 className="font-black italic uppercase text-slate-400 mb-2">Destaque do Dia</h4>
-                <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center font-bold text-primary">HR</div>
-                  <div>
-                    <p className="text-sm font-bold">Helena Rocha</p>
-                    <p className="text-[10px] text-slate-500 uppercase">12 vendas hoje • Streak: 5 dias</p>
+                {ranking && ranking.length > 0 ? (
+                  <div className="flex items-center gap-3">
+                    <div className="size-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center font-bold text-primary">
+                      {ranking[0].name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold">{ranking[0].name}</p>
+                      <p className="text-[10px] text-slate-500 uppercase">Líder de vendas hoje com R$ {ranking[0].salesAmount.toLocaleString('pt-BR')}</p>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <p className="text-xs text-slate-500 italic">Nenhuma venda registrada hoje.</p>
+                )}
               </div>
             </motion.div>
           </div>

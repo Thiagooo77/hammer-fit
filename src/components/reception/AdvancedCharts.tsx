@@ -108,7 +108,7 @@ export const AdvancedCharts = memo(function AdvancedCharts({ salesByHour, paymen
           { label: "Ticket Médio", value: `R$ ${smartStats.ticketMedio.toFixed(2)}`, icon: <DollarSign className="size-4" />, color: "text-blue-500" },
           { label: "Vendas (Qtd)", value: smartStats.vendasCount, icon: <Activity className="size-4" />, color: "text-green-500" },
           { label: "Pico de Vendas", value: smartStats.mostLucrativeHour, icon: <Clock className="size-4" />, color: "text-purple-500" },
-          { label: "Crescimento", value: "+12%", icon: <TrendingUp className="size-4" />, color: "text-orange-500" },
+          { label: "Projeção", value: `R$ ${((smartStats.totalSoldToday / (new Date().getHours() || 1)) * 24).toFixed(2)}`, icon: <TrendingUp className="size-4" />, color: "text-orange-500" },
         ].map((kpi, i) => (
           <motion.div 
             key={kpi.label}

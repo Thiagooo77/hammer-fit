@@ -92,7 +92,7 @@ function ReceptionGoalsDashboard() {
   // Fallback receptionist for demo / empty database state
   const receptionist = data?.receptionist || {
     id: "",
-    name: "Recepcionista",
+    name: "Aguardando...",
     email: "",
     avatar_url: "",
     goal_value: 0,
@@ -106,7 +106,7 @@ function ReceptionGoalsDashboard() {
   const smartStats = data?.smartStats || { remaining: 0, percentage: 0, totalSoldToday: 0, vendasCount: 0, ticketMedio: 0, mostLucrativeHour: "N/A" };
   const charts = data?.charts;
 
-  const mockShifts: Shift[] = (data?.todaysSessions || []).map((s: any) => ({
+  const formattedShifts: Shift[] = (data?.todaysSessions || []).map((s: any) => ({
     id: s.id,
     type: new Date(s.opened_at).getHours() < 12 ? "Manhã" : new Date(s.opened_at).getHours() < 18 ? "Tarde" : "Noite",
     receptionist: s.receptionists?.name || "Desconhecido",
@@ -114,13 +114,13 @@ function ReceptionGoalsDashboard() {
     status: s.status === 'open' ? 'ativo' : s.status === 'pending_review' ? 'aguardando fechamento' : 'encerrado'
   }));
 
-  if (mockShifts.length === 0) {
-    mockShifts.push({ id: "empty", type: "Manhã", receptionist: "Nenhum turno iniciado", time: "--:--", status: "encerrado" });
+  if (formattedShifts.length === 0) {
+    formattedShifts.push({ id: "empty", type: "Manhã", receptionist: "Nenhum turno iniciado", time: "--:--", status: "encerrado" });
   }
 
-  const clinicTarget = dailyGoal ? Number(dailyGoal.goal_amount) : 10000;
-  const clinicCurrent = smartStats.totalSoldToday || 4250.00;
-  const clinicPercentage = Math.round((clinicCurrent / clinicTarget) * 100);
+  const clinicTarget = dailyGoal ? Number(dailyGoal.goal_amount) : 0;
+  const clinicCurrent = smartStats.totalSoldToday || 0;
+  const clinicPercentage = clinicTarget > 0 ? Math.round((clinicCurrent / clinicTarget) * 100) : 0;
   const clinicPrediction = clinicCurrent > 0 ? (clinicCurrent / (new Date().getHours() || 1)) * 18 : 0;
 
   return (
@@ -256,7 +256,7 @@ function ReceptionGoalsDashboard() {
               />
             )}
             
-            <ShiftTimeline shifts={mockShifts} />
+            <ShiftTimeline shifts={formattedShifts} />
           </div>
 
           {/* Coluna Direita: Ranking e Outros */}
