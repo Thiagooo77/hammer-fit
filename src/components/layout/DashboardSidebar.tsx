@@ -174,7 +174,7 @@ export function DashboardSidebar() {
   return (
     <>
       {/* Mobile Menu Toggle */}
-      <div className="md:hidden fixed top-4 left-4 z-[60]">
+      <div className="md:hidden fixed top-4 right-4 z-[60]">
         <Button
           variant="outline"
           size="icon"
