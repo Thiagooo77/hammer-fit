@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import React from "react";
 
-export const Route = createFileRoute("/_authenticated/reception/dashboard")({ // Wait, the path should be tasks
+export const Route = createFileRoute("/_authenticated/reception/tasks")({ // Wait, the path should be tasks
   component: TasksPage,
 });
 
