@@ -58,21 +58,6 @@ function AdminDashboard() {
     enabled: !!user,
   });
 
-  if (loading || isLoading) return (
-    <div className="min-h-screen flex items-center justify-center bg-background/50 backdrop-blur-xl">
-      <motion.div 
-        animate={{ rotate: 360 }}
-        transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-      >
-        <ShieldCheck className="size-12 text-primary shadow-[0_0_15px_rgba(179,114,45,0.5)]" />
-      </motion.div>
-    </div>
-  );
-
-  if (!user || (role !== "admin" && role !== "manager")) {
-    return <Navigate to="/unauthorized" />;
-  }
-
   const handleExport = useCallback(async (type: 'pdf' | 'excel' | 'csv') => {
     if (!data?.ranking) return;
     const exportData = data.ranking.map(r => ({
@@ -90,6 +75,22 @@ function AdminDashboard() {
       toast.error("Erro na exportação");
     }
   }, [data?.ranking]);
+
+  if (loading || isLoading) return (
+    <div className="min-h-screen flex items-center justify-center bg-background/50 backdrop-blur-xl">
+      <motion.div 
+        animate={{ rotate: 360 }}
+        transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+      >
+        <ShieldCheck className="size-12 text-primary shadow-[0_0_15px_rgba(179,114,45,0.5)]" />
+      </motion.div>
+    </div>
+  );
+
+  if (!user || (role !== "admin" && role !== "manager")) {
+    return <Navigate to="/unauthorized" />;
+  }
+
 
   const kpis = data?.kpis ?? {
     revenueToday: 0,
