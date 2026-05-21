@@ -121,7 +121,9 @@ function ReceptionGoalsDashboard() {
           <div className="flex items-center gap-6">
             <div className="hidden md:flex flex-col items-end">
               <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Turno Ativo</span>
-              <span className="text-sm font-black text-primary">TARDE (12:00 - 18:00)</span>
+              <span className="text-sm font-black text-primary">
+                {currentSession ? (new Date(currentSession.opened_at).getHours() < 12 ? "MANHÃ" : new Date(currentSession.opened_at).getHours() < 18 ? "TARDE" : "NOITE") : "NENHUM"}
+              </span>
             </div>
             
             <div className="flex items-center gap-3 pl-6 border-l border-primary/10">
