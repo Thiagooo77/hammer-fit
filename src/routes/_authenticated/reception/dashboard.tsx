@@ -120,10 +120,10 @@ function ReceptionGoalsDashboard() {
     formattedShifts.push({ id: "empty", type: "Manhã", receptionist: "Nenhum turno iniciado", time: "--:--", status: "encerrado" });
   }
 
-  const clinicTarget = dailyGoal ? Number(dailyGoal.goal_amount) : 0;
-  const clinicCurrent = smartStats.totalSoldToday || 0;
-  const clinicPercentage = clinicTarget > 0 ? Math.round((clinicCurrent / clinicTarget) * 100) : 0;
-  const clinicPrediction = clinicCurrent > 0 ? (clinicCurrent / (new Date().getHours() || 1)) * 18 : 0;
+  const gymTarget = dailyGoal ? Number(dailyGoal.goal_amount) : 0;
+  const gymCurrent = smartStats.totalSoldToday || 0;
+  const gymPercentage = gymTarget > 0 ? Math.round((gymCurrent / gymTarget) * 100) : 0;
+  const gymPrediction = gymCurrent > 0 ? (gymCurrent / (new Date().getHours() || 1)) * 18 : 0;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50 pb-12 selection:bg-primary/30">
