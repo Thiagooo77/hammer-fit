@@ -17,35 +17,46 @@ export const Route = createFileRoute("/_authenticated")({
     
     console.log('[PERMISSION_VALIDATION] User session verified:', session.user.email);
     
-    // Fetch role and profile data
-    const [{ data: roleData }, { data: profile }] = await Promise.all([
-      supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", session.user.id)
-        .maybeSingle(),
-      supabase
-        .from("users")
-        .select("*")
-        .eq("id", session.user.id)
-        .maybeSingle()
-    ]);
+    try {
+      // Fetch role and profile data with a timeout or error handling to prevent infinite loading
+      const [{ data: roleData }, { data: profile }] = await Promise.all([
+        supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id)
+          .maybeSingle(),
+        supabase
+          .from("users")
+          .select("*")
+          .eq("id", session.user.id)
+          .maybeSingle()
+      ]);
 
-    const role = roleData?.role || "receptionist";
+      const role = roleData?.role || "receptionist";
 
-    // Global Authorization Logging
-    console.log('[PERMISSION_GRANTED]', { 
-      user: session.user.email, 
-      role, 
-      path: location.pathname 
-    });
+      // Global Authorization Logging
+      console.log('[PERMISSION_GRANTED]', { 
+        user: session.user.email, 
+        role, 
+        path: location.pathname 
+      });
 
-    return {
-      session,
-      user: session.user,
-      role: role as any,
-      profile: profile || null,
-    };
+      return {
+        session,
+        user: session.user,
+        role: role as any,
+        profile: profile || null,
+      };
+    } catch (error) {
+      console.error('[PERMISSION_VALIDATION_ERROR]', error);
+      // Fallback to receptionist if role cannot be determined
+      return {
+        session,
+        user: session.user,
+        role: "receptionist" as any,
+        profile: null,
+      };
+    }
   },
   component: () => <Outlet />,
 });
