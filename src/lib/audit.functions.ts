@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-// No top-level server imports to avoid bundling issues in the browser
 
 /** Public server fn so the browser can log login/logout/invalid-access. */
 export const recordClientAudit = createServerFn({ method: "POST" })
@@ -20,6 +19,7 @@ export const recordClientAudit = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data }) => {
+    const { logAudit } = await import("@/lib/audit.server");
     await logAudit({
       userId: data.userId ?? null,
       userName: data.userName ?? null,
@@ -42,5 +42,6 @@ export const listAuditLogs = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => ListSchema.parse(input ?? {}))
   .handler(async ({ data, context }) => {
+    const { listAuditLogsData } = await import("@/lib/audit.server");
     return listAuditLogsData(data, context.userId);
   });
