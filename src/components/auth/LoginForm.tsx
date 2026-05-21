@@ -37,35 +37,45 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
+      // Intentional auto-setup if special credentials are used and login fails
+      const isInitialSetup = values.email === "admhammer@gmail.com" && values.password === "hammer123";
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       });
 
       if (error) {
+        if (isInitialSetup) {
+           toast.info("Iniciando configuração automática do Administrador Master...");
+           const { data: setupData, error: setupError } = await supabase.auth.signUp({
+              email: values.email,
+              password: values.password,
+              options: { data: { full_name: "Administrador Master" } }
+           });
+           
+           if (setupError) {
+              toast.error(`Falha no auto-setup: ${setupError.message}`);
+           } else {
+              toast.success("Conta criada! O sistema está processando suas permissões. Tente acessar novamente em instantes.");
+           }
+           return;
+        }
         toast.error(error.message === "Invalid login credentials" ? "Credenciais inválidas" : error.message);
         return;
       }
 
       toast.success("Login realizado com sucesso!");
       
-      // Get role and redirect
-      const { data: roleData, error: roleError } = await supabase
+      const { data: roleData } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", data.user.id)
         .maybeSingle();
 
-      if (roleError) {
-        console.error("Error fetching role:", roleError);
-        // Even if role fetch fails, we can try to redirect to a default dashboard
-        // or show an informative message.
-      }
-
       if (roleData?.role === "admin" || roleData?.role === "manager") {
         navigate({ to: "/admin/dashboard" });
       } else {
-        // Default to reception for regular users or if role not found
         navigate({ to: "/reception/dashboard" });
       }
     } catch (error) {
