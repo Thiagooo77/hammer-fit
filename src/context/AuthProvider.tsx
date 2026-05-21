@@ -139,6 +139,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(null);
         queryClient.clear();
         setLoading(false);
+      } else if (event === "USER_UPDATED" && !session) {
+        // Fallback for failed refreshes or invalid tokens
+        console.warn('[AUTH_REFRESH_FAILED] Force logging out due to invalid state');
+        clearLocalAuthState();
+        queryClient.clear();
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
       }
     });
 

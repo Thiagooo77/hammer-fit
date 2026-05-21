@@ -14,10 +14,19 @@ const withTimeout = async <T,>(promise: PromiseLike<T>, ms: number): Promise<T> 
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session }, error } = await supabase.auth.getSession();
     
-    if (!session) {
-      console.log('[HAMMER_FIT_AUDIT] Session validation failed, redirecting to login');
+    if (error || !session) {
+      console.log('[HAMMER_FIT_AUDIT] Session invalid or missing, cleaning up');
+      
+      // Cleanup stale data
+      if (typeof window !== 'undefined') {
+        Object.keys(localStorage)
+          .filter((k) => k.startsWith('sb-') || k.includes('supabase'))
+          .forEach((k) => localStorage.removeItem(k));
+        sessionStorage.clear();
+      }
+
       throw redirect({
         to: "/login",
         search: {
