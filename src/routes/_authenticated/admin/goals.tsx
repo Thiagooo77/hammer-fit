@@ -41,6 +41,8 @@ function AdminGoals() {
 
   const kpis = data?.kpis ?? {
     dailyGoalStatus: 0,
+    dailyGoalAmount: 0,
+    revenueToday: 0,
     vendasCount: 0,
   };
   
@@ -67,9 +69,9 @@ function AdminGoals() {
               <CardContent>
                 <GoalsProgress 
                   title="Progresso da Unidade"
-                  current={kpis.dailyGoalStatus}
-                  target={100}
-                  type="global"
+                  current={kpis.revenueToday}
+                  target={kpis.dailyGoalAmount || 1000} // Fallback to 1000 if not set
+                  type="general"
                   icon={<Target className="size-4" />}
                 />
               </CardContent>
