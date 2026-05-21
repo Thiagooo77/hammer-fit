@@ -1,5 +1,5 @@
-import React from "react";
-import { Link, useLocation } from "@tanstack/react-router";
+import React, { useCallback, useMemo } from "react";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { 
   LayoutDashboard, 
   Users, 
