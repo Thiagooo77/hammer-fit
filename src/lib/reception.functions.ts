@@ -59,6 +59,11 @@ export const openCashSession = createServerFn({ method: "POST" })
       .single();
 
     if (error) throw error;
+    await logAudit({
+      userId: context.userId, actionType: "cash_open", module: "cash",
+      description: `Abertura de caixa (saldo inicial R$ ${data.opening_balance})`,
+      newData: session,
+    });
     return session;
   });
 
