@@ -148,29 +148,47 @@ export type Database = {
         Row: {
           active: boolean | null
           avatar_url: string | null
+          cpf: string | null
           created_at: string | null
           email: string
           goal_value: number | null
           id: string
           name: string
+          phone: string | null
+          role_title: string | null
+          shift: string | null
+          status: Database["public"]["Enums"]["receptionist_status"]
+          user_id: string | null
         }
         Insert: {
           active?: boolean | null
           avatar_url?: string | null
+          cpf?: string | null
           created_at?: string | null
           email: string
           goal_value?: number | null
           id?: string
           name: string
+          phone?: string | null
+          role_title?: string | null
+          shift?: string | null
+          status?: Database["public"]["Enums"]["receptionist_status"]
+          user_id?: string | null
         }
         Update: {
           active?: boolean | null
           avatar_url?: string | null
+          cpf?: string | null
           created_at?: string | null
           email?: string
           goal_value?: number | null
           id?: string
           name?: string
+          phone?: string | null
+          role_title?: string | null
+          shift?: string | null
+          status?: Database["public"]["Enums"]["receptionist_status"]
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -265,6 +283,7 @@ export type Database = {
       cash_session_status: "open" | "pending_review" | "closed"
       hammer_role: "admin" | "employee"
       payment_method: "pix" | "dinheiro" | "cartao" | "convenio" | "outros"
+      receptionist_status: "active" | "vacation" | "blocked"
       user_role: "admin" | "professor" | "aluno"
     }
     CompositeTypes: {
@@ -397,6 +416,7 @@ export const Constants = {
       cash_session_status: ["open", "pending_review", "closed"],
       hammer_role: ["admin", "employee"],
       payment_method: ["pix", "dinheiro", "cartao", "convenio", "outros"],
+      receptionist_status: ["active", "vacation", "blocked"],
       user_role: ["admin", "professor", "aluno"],
     },
   },
