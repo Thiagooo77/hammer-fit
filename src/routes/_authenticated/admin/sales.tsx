@@ -244,7 +244,7 @@ function AdminSalesPage() {
       </div>
 
       {/* Dialog de Edição */}
-      <Dialog open={!!editingSale} onOpenChange={(open) => !open && setEditingSale(null)}>
+      <Dialog open={!!editingSale} onOpenChange={(open: boolean) => !open && setEditingSale(null)}>
         <DialogContent className="bg-slate-900 border-white/10 text-white sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle className="text-2xl font-black uppercase italic tracking-tight">
