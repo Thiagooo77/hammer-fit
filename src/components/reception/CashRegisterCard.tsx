@@ -196,12 +196,14 @@ export function CashRegisterCard({
                     <Lock className="size-4" />
                     Encerrar Caixa
                   </Button>
-                  <Link to="/admin/audit" className="flex-1">
-                    <Button variant="outline" className="w-full gap-2 border-primary/20 hover:bg-primary/10">
-                      <Search className="size-4" />
-                      Auditoria
-                    </Button>
-                  </Link>
+                  {(window as any).__HAMMER_ROLE__ === 'admin' || (window as any).__HAMMER_ROLE__ === 'manager' ? (
+                    <Link to="/admin/audit" className="flex-1">
+                      <Button variant="outline" className="w-full gap-2 border-primary/20 hover:bg-primary/10">
+                        <Search className="size-4" />
+                        Auditoria
+                      </Button>
+                    </Link>
+                  ) : null}
                 </div>
               </>
             )}
