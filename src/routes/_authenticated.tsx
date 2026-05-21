@@ -14,7 +14,17 @@ const withTimeout = async <T,>(promise: PromiseLike<T>, ms: number): Promise<T> 
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
-    // Check session via getSession for SSR/Initial load
+    // CRITICAL: Skip session check during SSR (no localStorage on server)
+    // Client-side AuthProvider will handle the real check
+    if (typeof window === "undefined") {
+      return {
+        session: null,
+        user: null,
+        role: null as any,
+        profile: null,
+      };
+    }
+
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
