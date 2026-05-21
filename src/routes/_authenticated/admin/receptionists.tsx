@@ -121,14 +121,19 @@ function ReceptionistsAdminPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-bold truncate">{r.name}</p>
-                      <Badge variant="outline" className={`gap-1 ${meta.cls}`}>
+                      <Badge variant="outline" className={`gap-1 ${meta.cls} text-[10px] h-5`}>
                         {meta.icon}{meta.label}
                       </Badge>
+                      {r.user_roles?.[0]?.role === "manager" && (
+                        <Badge variant="secondary" className="bg-purple-500/10 text-purple-400 border-purple-500/20 text-[10px] h-5">
+                          Gerente
+                        </Badge>
+                      )}
                     </div>
-                    <p className="text-xs text-muted-foreground truncate">
+                    <p className="text-[10px] text-muted-foreground truncate uppercase font-bold tracking-tight">
                       {r.email} {r.shift ? `• ${r.shift}` : ""} {r.role_title ? `• ${r.role_title}` : ""}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-[10px] text-muted-foreground font-medium">
                       Meta: R$ {Number(r.goal_value ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </p>
                   </div>
