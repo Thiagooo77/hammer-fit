@@ -20,7 +20,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 });
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
+  const ctx = Route.useRouteContext();
+  const [fallbackClient] = React.useState(() => new QueryClient());
+  const queryClient = ctx?.queryClient ?? fallbackClient;
   return (
     <RootDocument>
       <QueryClientProvider client={queryClient}>
@@ -28,7 +30,6 @@ function RootComponent() {
         <Toaster position="top-right" richColors />
       </QueryClientProvider>
     </RootDocument>
-
   );
 }
 
