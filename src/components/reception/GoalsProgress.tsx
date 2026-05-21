@@ -14,7 +14,7 @@ interface GoalCardProps {
   prediction?: number;
 }
 
-export function GoalsProgress({ title, icon, target, current, type, prediction }: GoalCardProps) {
+export const GoalsProgress = React.memo(({ title, icon, target, current, type, prediction }: GoalCardProps) => {
   const percentage = Math.min(Math.round((current / target) * 100), 100);
   const remaining = Math.max(target - current, 0);
 
@@ -104,4 +104,4 @@ export function GoalsProgress({ title, icon, target, current, type, prediction }
       </CardContent>
     </Card>
   );
-}
+});
