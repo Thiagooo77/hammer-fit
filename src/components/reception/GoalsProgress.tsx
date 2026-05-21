@@ -2,7 +2,7 @@ import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
-import { Target, Users, TrendingUp } from "lucide-react";
+import { Target, Users, TrendingUp, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface GoalCardProps {
