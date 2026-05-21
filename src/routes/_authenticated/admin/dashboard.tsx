@@ -119,11 +119,11 @@ function AdminDashboard() {
               </motion.div>
             </AnimatePresence>
             
-            <Link to="/reception/dashboard">
+           <Link to="/reception/dashboard">
               <Button variant="outline" size="sm" className="hidden sm:flex gap-2 border-primary/30 text-primary hover:bg-primary/10">
-                <LayoutDashboard className="size-4" /> Recepção
+                <LayoutDashboard className="size-4" /> Ir p/ Recepção
               </Button>
-            </Link>
+           </Link>
 
             <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-colors" onClick={() => signOut()}>
               <LogOut className="h-5 w-5" />
