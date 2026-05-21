@@ -92,7 +92,7 @@ function ReceptionGoalsDashboard() {
   // Fallback receptionist for demo / empty database state
   const receptionist = data?.receptionist || {
     id: "",
-    name: "Recepcionista",
+    name: "Aguardando...",
     email: "",
     avatar_url: "",
     goal_value: 0,
