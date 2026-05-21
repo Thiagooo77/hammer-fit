@@ -1,26 +1,25 @@
 import { defineConfig } from "vite";
-import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import viteReact from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import tsConfigPaths from "vite-tsconfig-paths";
+import tsconfigPaths from "vite-tsconfig-paths";
 import path from "node:path";
 
 export default defineConfig({
+  plugins: [tsconfigPaths(), tailwindcss(), react()],
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-    dedupe: ["react", "react-dom", "@tanstack/react-router", "@tanstack/react-start"],
+    alias: { "@": path.resolve(__dirname, "./src") },
   },
-  plugins: [
-    tsConfigPaths(),
-    tailwindcss(),
-    tanstackStart(),
-    viteReact(),
-  ],
   server: {
     host: "::",
     port: 8080,
     strictPort: true,
+  },
+  preview: {
+    host: "::",
+    port: 8080,
+  },
+  build: {
+    outDir: "dist",
+    sourcemap: false,
   },
 });
