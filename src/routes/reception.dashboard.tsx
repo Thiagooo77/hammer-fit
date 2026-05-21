@@ -204,12 +204,12 @@ function ReceptionGoalsDashboard() {
                       <Trophy className="size-5 text-white" />
                     </div>
                     <div>
-                      <p className="text-xs font-black uppercase">Próximo Nível</p>
-                      <p className="text-sm font-bold italic">Gold Star II</p>
+                      <p className="text-xs font-black uppercase">Progresso Global</p>
+                      <p className="text-sm font-bold italic">{clinicPercentage}% da Meta</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-black tracking-tighter">85%</p>
+                    <p className="text-lg font-black tracking-tighter">{clinicPercentage}%</p>
                   </div>
                 </div>
               </div>
