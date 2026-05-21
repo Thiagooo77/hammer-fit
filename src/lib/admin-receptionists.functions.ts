@@ -20,15 +20,26 @@ export const listReceptionists = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await assertAdmin(context.userId);
-    const { data, error } = await supabaseAdmin
+    const { data: recs, error: recErr } = await supabaseAdmin
       .from("receptionists")
-      .select(`
-        *,
-        user_roles!inner(role)
-      `)
+      .select("*")
       .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
-    return { receptionists: data ?? [] };
+
+    if (recErr) throw new Error(recErr.message);
+
+    // Fetch roles for these users
+    const userIds = (recs ?? []).map(r => r.user_id).filter(Boolean);
+    const { data: roles } = await supabaseAdmin
+      .from("user_roles")
+      .select("user_id, role")
+      .in("user_id", userIds as string[]);
+
+    const receptionistsWithRoles = (recs ?? []).map(r => ({
+      ...r,
+      user_roles: (roles ?? []).filter(role => role.user_id === r.user_id)
+    }));
+
+    return { receptionists: receptionistsWithRoles };
   });
 
 const CreateSchema = z.object({
