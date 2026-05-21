@@ -1,4 +1,3 @@
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -135,6 +134,8 @@ export const closeCashSession = createServerFn({ method: "POST" })
 // 4. Get Dashboard Data (Consolidated)
 export const getReceptionDashboard = createServerFn({ method: "GET" })
   .handler(async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
     const { data: receptionist } = await supabaseAdmin
       .from("receptionists")
       .select("*")
