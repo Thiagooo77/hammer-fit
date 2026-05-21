@@ -31,10 +31,19 @@ export const Route = createFileRoute("/_authenticated")({
         .maybeSingle()
     ]);
 
+    const role = roleData?.role || "receptionist";
+
+    // Global Authorization Logging
+    console.log('[PERMISSION_GRANTED]', { 
+      user: session.user.email, 
+      role, 
+      path: location.pathname 
+    });
+
     return {
       session,
       user: session.user,
-      role: roleData?.role || "receptionist",
+      role: role as any,
       profile: profile || null,
     };
   },
