@@ -86,14 +86,19 @@ export function GoalsProgress({ title, icon, target, current, type, prediction }
                 <Clock className="size-3" /> Est. Conclusão
               </p>
               <p className="text-sm font-black text-center">
-                {percentage >= 100 ? "Concluído! 🎉" : "17:42"}
+                {percentage >= 100 ? "Concluído! 🎉" : percentage > 20 ? "17:42" : "Aguardando ritmo..."}
               </p>
             </div>
           )}
         </div>
-        {type === "individual" && percentage < 100 && (
+        {type === "individual" && percentage < 100 && percentage > 20 && (
           <div className="mt-2 text-[11px] text-muted-foreground bg-secondary/20 p-2 rounded border border-primary/5 text-center">
             Mantendo esse ritmo, a meta será atingida às <span className="text-primary font-bold">17:42</span>.
+          </div>
+        )}
+        {type === "individual" && percentage >= 100 && (
+          <div className="mt-2 text-[11px] text-green-500 bg-green-500/10 p-2 rounded border border-green-500/20 text-center font-bold animate-bounce">
+            META ATINGIDA! EXCELENTE TRABALHO! 🚀
           </div>
         )}
       </CardContent>

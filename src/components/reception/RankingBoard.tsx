@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Trophy, Medal, Award, Flame, TrendingUp } from "lucide-react";
+import { Trophy, Medal, Award, Flame, TrendingUp, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +9,7 @@ export interface RankingMember {
   id: string;
   name: string;
   avatar: string;
-  sales: number;
+  salesAmount?: number; // Valor total vendido
   goalPercentage: number;
   streak: number;
   position: number;
@@ -55,12 +55,22 @@ export function RankingBoard({ members }: RankingBoardProps) {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.5, ease: "circOut" }}
                 className={cn(
-                  "flex items-center gap-3 p-3 rounded-xl border transition-all",
+                  "flex items-center gap-3 p-3 rounded-xl border transition-all relative overflow-hidden",
                   member.position === 1 
-                    ? "bg-primary/10 border-primary/30 shadow-lg shadow-primary/5" 
+                    ? "bg-primary/10 border-primary/40 shadow-xl shadow-primary/10 ring-1 ring-primary/20" 
                     : "bg-secondary/30 border-primary/5 hover:border-primary/20"
                 )}
               >
+                {member.position === 1 && (
+                  <motion.div 
+                    animate={{ 
+                      opacity: [0.1, 0.3, 0.1],
+                      scale: [1, 1.1, 1],
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                    className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 via-primary/10 to-yellow-500/10 pointer-events-none"
+                  />
+                )}
                 <div className="flex-shrink-0">
                   {getPositionIcon(member.position)}
                 </div>
@@ -86,7 +96,7 @@ export function RankingBoard({ members }: RankingBoardProps) {
                   <p className="font-bold truncate text-sm">{member.name}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-[10px] bg-secondary px-1.5 py-0.5 rounded text-muted-foreground font-bold">
-                      {member.sales} VENDAS
+                      R$ {member.salesAmount?.toLocaleString('pt-BR') || '0,00'}
                     </span>
                     {member.streak > 0 && (
                       <span className="text-[10px] text-red-500 font-black flex items-center gap-0.5">
@@ -99,6 +109,16 @@ export function RankingBoard({ members }: RankingBoardProps) {
                 <div className="text-right flex-shrink-0">
                   <p className="text-lg font-black text-primary">{member.goalPercentage}%</p>
                   <p className="text-[9px] text-muted-foreground uppercase font-bold">da meta</p>
+                </div>
+                <div className="absolute bottom-0 left-0 h-1 bg-primary/20 w-full">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${member.goalPercentage}%` }}
+                    className={cn(
+                      "h-full",
+                      member.goalPercentage >= 100 ? "bg-green-500" : "bg-primary"
+                    )}
+                  />
                 </div>
               </motion.div>
             ))}
