@@ -1,24 +1,21 @@
 import React from "react";
+import { Navigate, Outlet } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
+import { AppRole } from "@/services/authService";
 
 interface RoleGuardProps {
-  children: React.ReactNode;
-  allowedRoles: string[];
-  fallback?: React.ReactNode;
+  allowedRoles: AppRole[];
 }
 
-export function RoleGuard({ 
-  children, 
-  allowedRoles, 
-  fallback = null 
-}: RoleGuardProps) {
+export function RoleGuard({ allowedRoles }: RoleGuardProps) {
   const { role, loading } = useAuth();
 
   if (loading) return null;
 
-  if (role && allowedRoles.includes(role)) {
-    return <>{children}</>;
+  if (!role || !allowedRoles.includes(role)) {
+    console.log('[PERMISSION_DENIED] Insufficient role level', { role, required: allowedRoles });
+    return <Navigate to="/unauthorized" />;
   }
 
-  return <>{fallback}</>;
+  return <Outlet />;
 }
