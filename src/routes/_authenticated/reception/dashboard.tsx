@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
 import { CashRegisterCard } from "@/components/reception/CashRegisterCard";
 import { GoalsProgress } from "@/components/reception/GoalsProgress";
@@ -6,7 +6,7 @@ import { RankingBoard } from "@/components/reception/RankingBoard";
 import { ShiftTimeline, type Shift } from "@/components/reception/ShiftTimeline";
 import { DailySummary } from "@/components/reception/DailySummary";
 import { AdvancedCharts } from "@/components/reception/AdvancedCharts";
-import { Target, Users, LayoutDashboard, Calendar, Bell, User as UserIcon, Loader2, Award, Zap, LogOut } from "lucide-react";
+import { Target, Users, LayoutDashboard, Calendar, Bell, User as UserIcon, Loader2, Award, Zap, LogOut, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -125,8 +125,8 @@ function ReceptionGoalsDashboard() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50 pb-12 selection:bg-primary/30">
       {/* Premium Glass Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/60 backdrop-blur-xl transition-all">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/60 backdrop-blur-xl transition-all h-16 md:h-20">
+        <div className="container mx-auto px-4 h-full flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="p-2 bg-primary/20 rounded-lg border border-primary/30 shadow-[0_0_10px_rgba(179,114,45,0.3)]">
               <LayoutDashboard className="text-primary size-6" />
@@ -151,7 +151,7 @@ function ReceptionGoalsDashboard() {
             <div className="flex items-center gap-3 pl-6 border-l border-white/10">
               <div className="text-right hidden sm:block">
                 <p className="text-xs font-black">{receptionist.name}</p>
-                <p className="text-[10px] text-primary uppercase font-black italic tracking-widest">Recepcionista</p>
+                <p className="text-[10px] text-primary uppercase font-black italic tracking-widest">{role}</p>
               </div>
               <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-colors" onClick={() => signOut()}>
                 <LogOut className="size-5" />
@@ -165,6 +165,15 @@ function ReceptionGoalsDashboard() {
                 )}
               </div>
             </div>
+            {(role === 'admin' || role === 'manager') && (
+              <div className="flex items-center gap-2 px-6 border-x border-white/10 mx-6">
+                <Link to="/admin/dashboard">
+                  <Button variant="outline" size="sm" className="gap-2 border-primary/30 text-primary hover:bg-primary/10">
+                    <ShieldCheck className="size-4" /> Painel Admin
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -212,6 +221,7 @@ function ReceptionGoalsDashboard() {
                 salesCount={smartStats.vendasCount}
                 receptionistId={receptionist.id}
                 sessionId={currentSession?.id}
+                canViewAudit={role === 'admin' || role === 'manager'}
                 payments={{
                   pix: charts?.paymentMethods.find((p: any) => p.name === 'Pix')?.value || 0,
                   dinheiro: charts?.paymentMethods.find((p: any) => p.name === 'Dinheiro')?.value || 0,
