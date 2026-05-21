@@ -34,6 +34,7 @@ const CreateSchema = z.object({
   password: z.string().min(6).max(72),
   phone: z.string().trim().max(30).optional().nullable(),
   cpf: z.string().trim().max(20).optional().nullable(),
+  role_type: z.enum(["manager", "receptionist"]).default("receptionist"),
   role_title: z.string().trim().max(80).optional().nullable(),
   shift: z.string().trim().max(40).optional().nullable(),
   goal_value: z.number().min(0).max(10_000_000).default(0),
@@ -61,7 +62,7 @@ export const createReceptionist = createServerFn({ method: "POST" })
 
     await supabaseAdmin
       .from("user_roles")
-      .insert({ user_id: newUserId, role: "user" });
+      .insert({ user_id: newUserId, role: data.role_type });
 
     await (supabaseAdmin
       .from("users" as any)
@@ -99,6 +100,7 @@ const UpdateSchema = z.object({
   name: z.string().trim().min(1).max(120).optional(),
   phone: z.string().trim().max(30).nullable().optional(),
   cpf: z.string().trim().max(20).nullable().optional(),
+  role_type: z.enum(["manager", "receptionist"]).optional(),
   role_title: z.string().trim().max(80).nullable().optional(),
   shift: z.string().trim().max(40).nullable().optional(),
   goal_value: z.number().min(0).max(10_000_000).optional(),
@@ -113,10 +115,16 @@ export const updateReceptionist = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { logAudit } = await import("@/lib/audit.server");
     await assertAdmin(context.userId);
-    const { id, ...patch } = data;
+    const { id, role_type, ...patch } = data;
 
     const { data: before } = await supabaseAdmin
       .from("receptionists").select("*").eq("id", id).single();
+
+    if (role_type && before?.user_id) {
+      await supabaseAdmin
+        .from("user_roles")
+        .upsert({ user_id: before.user_id, role: role_type }, { onConflict: "user_id,role" });
+    }
 
     const updates = {
       ...patch,
