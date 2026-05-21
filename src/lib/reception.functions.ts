@@ -84,7 +84,6 @@ export const registerSale = createServerFn({ method: "POST" })
 
     if (error) throw error;
     
-    // Note: goal_progress is updated automatically by database trigger 'on_sale_inserted'
     return sale;
   });
 
@@ -136,6 +135,7 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
   .handler(async () => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    // Fetch receptionist data
     const { data: receptionist } = await supabaseAdmin
       .from("receptionists")
       .select("*")
@@ -145,76 +145,71 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       .maybeSingle();
 
     if (!receptionist) {
-      return {
-        receptionist: {
-          id: "",
-          name: "Recepção",
-          email: "",
-          avatar_url: "",
-          goal_value: 0,
-          active: true,
-          created_at: new Date().toISOString(),
-        },
-        currentSession: null,
-        dailyGoal: null,
-        goalProgress: null,
-        ranking: [],
-        smartStats: { remaining: 0, percentage: 0 },
-      };
+      return { receptionist: null, currentSession: null, dailyGoal: null, goalProgress: null, ranking: [], smartStats: { remaining: 0, percentage: 0 }, charts: null };
     }
 
-    // Get current open session
-    const { data: currentSession } = await supabaseAdmin
-      .from("cash_sessions")
-      .select(`
-        *,
-        receptionists (name)
-      `)
-      .eq("status", "open")
-      .maybeSingle();
+    // Get today's start and end for filtering
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
 
-    // Get goals
-    const { data: dailyGoal } = await supabaseAdmin
-      .from("daily_goals")
-      .select("*")
-      .eq("goal_date", new Date().toISOString().split('T')[0])
-      .maybeSingle();
+    // Concurrent data fetching
+    const [
+      { data: currentSession },
+      { data: dailyGoal },
+      { data: goalProgress },
+      { data: ranking },
+      { data: todaySales }
+    ] = await Promise.all([
+      supabaseAdmin.from("cash_sessions").select("*, receptionists (name)").eq("status", "open").maybeSingle(),
+      supabaseAdmin.from("daily_goals").select("*").eq("goal_date", today.toISOString().split('T')[0]).maybeSingle(),
+      supabaseAdmin.from("goal_progress").select("*").eq("receptionist_id", receptionist.id).maybeSingle(),
+      supabaseAdmin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists (name, avatar_url)").order("sold_amount", { ascending: false }).limit(10),
+      supabaseAdmin.from("sales").select("*").gte("created_at", today.toISOString()).lt("created_at", tomorrow.toISOString())
+    ]);
 
-    const { data: goalProgress } = await supabaseAdmin
-      .from("goal_progress")
-      .select("*")
-      .eq("receptionist_id", receptionist.id)
-      .single();
-
-    // Get ranking (top 5)
-    const { data: ranking } = await supabaseAdmin
-      .from("goal_progress")
-      .select(`
-        receptionist_id,
-        sold_amount,
-        goal_amount,
-        receptionists (name, avatar_url)
-      `)
-      .order("sold_amount", { ascending: false })
-      .limit(5);
-
-    // Calculate ranking positions and percentages
+    // Format ranking
     const formattedRanking = (ranking || []).map((item, index) => ({
       id: item.receptionist_id,
-      name: (item.receptionists as any).name,
-      avatar: (item.receptionists as any).avatar_url || "",
-      sales: item.sold_amount, // For MVP we use total amount as 'sales' metric or count
+      name: (item.receptionists as any)?.name || "N/A",
+      avatar: (item.receptionists as any)?.avatar_url || "",
+      salesAmount: Number(item.sold_amount),
       goalPercentage: Math.round((Number(item.sold_amount) / Number(item.goal_amount)) * 100),
-      streak: 0, // Placeholder
       position: index + 1
     }));
 
     // Calculate smart goal stats
-    // Note: In a real app we'd look at timestamps of recent sales to estimate velocity
     const target = Number(goalProgress?.goal_amount || 0);
     const current = Number(goalProgress?.sold_amount || 0);
     const remaining = Math.max(target - current, 0);
     const percentage = target > 0 ? Math.min(Math.round((current / target) * 100), 100) : 0;
+
+    // Advanced Stats & Charts
+    const sales = todaySales || [];
+    const totalSoldToday = sales.reduce((acc, s) => acc + Number(s.amount), 0);
+    const ticketMedio = sales.length > 0 ? totalSoldToday / sales.length : 0;
+
+    // Sales by hour
+    const salesByHour = Array.from({ length: 24 }, (_, i) => ({ hour: `${i}:00`, amount: 0, count: 0 }));
+    sales.forEach(s => {
+      const hour = new Date(s.created_at).getHours();
+      salesByHour[hour].amount += Number(s.amount);
+      salesByHour[hour].count += 1;
+    });
+
+    const mostLucrativeHour = [...salesByHour].sort((a, b) => b.amount - a.amount)[0]?.hour || "N/A";
+
+    // Sales by payment method
+    const paymentMethods = sales.reduce((acc: any, s) => {
+      acc[s.payment_method] = (acc[s.payment_method] || 0) + Number(s.amount);
+      return acc;
+    }, {});
+
+    const paymentChart = Object.keys(paymentMethods).map(key => ({
+      name: key.charAt(0).toUpperCase() + key.slice(1),
+      value: paymentMethods[key]
+    }));
 
     return {
       receptionist,
@@ -224,7 +219,15 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       ranking: formattedRanking,
       smartStats: {
         remaining,
-        percentage
+        percentage,
+        totalSoldToday,
+        vendasCount: sales.length,
+        ticketMedio,
+        mostLucrativeHour
+      },
+      charts: {
+        salesByHour: salesByHour.filter(h => h.count > 0 || today.getHours() >= parseInt(h.hour)),
+        paymentMethods: paymentChart
       }
     };
   });
