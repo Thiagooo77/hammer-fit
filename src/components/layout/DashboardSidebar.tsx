@@ -38,7 +38,7 @@ export function DashboardSidebar() {
     {
       title: "Vendas",
       icon: TrendingUp,
-      href: "/reception/dashboard",
+      href: isAdmin ? "/admin/sales" : "/reception/dashboard",
       roles: ["admin", "manager", "receptionist"],
     },
     {
