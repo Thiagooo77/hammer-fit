@@ -60,9 +60,6 @@ export function LoginForm() {
 
 
     try {
-      // Intentional auto-setup if special credentials are used and login fails
-      const isInitialSetup = (values.email === "admhammer@gmail.com" || values.email === "gerenciahammer@gmail.com") && values.password === "hammer123";
-
       const { data, error } = await withTimeout(
         supabase.auth.signInWithPassword({
           email: values.email,
@@ -73,22 +70,7 @@ export function LoginForm() {
       );
 
       if (error) {
-        if (isInitialSetup) {
-           toast.info("Iniciando configuração automática do Administrador Master...");
-           const { data: setupData, error: setupError } = await supabase.auth.signUp({
-              email: values.email,
-              password: values.password,
-              options: { data: { full_name: "Administrador Master" } }
-           });
-           
-           if (setupError) {
-              toast.error(`Falha no auto-setup: ${setupError.message}`);
-           } else {
-              toast.success("Conta criada! O sistema está processando suas permissões. Tente acessar novamente em instantes.");
-           }
-           return;
-        }
-        toast.error(error.message === "Invalid login credentials" ? "Credenciais inválidas" : error.message);
+        toast.error(error.message === "Invalid login credentials" ? "Credenciais inválidas" : "Erro ao realizar login");
         return;
       }
 
