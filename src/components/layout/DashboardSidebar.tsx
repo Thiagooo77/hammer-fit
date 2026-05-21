@@ -70,6 +70,7 @@ export function DashboardSidebar() {
       icon: FileText,
       href: "/admin/dashboard", // Placeholder for now
       roles: ["admin", "manager"],
+    },
   ], [isAdmin]);
 
   const filteredItems = useMemo(() => 
@@ -160,7 +161,7 @@ export function DashboardSidebar() {
             "w-full justify-start gap-3 text-slate-400 hover:text-red-400 hover:bg-red-400/10 transition-colors",
             !isOpen && "justify-center"
           )}
-          onClick={() => signOut()}
+          onClick={handleSignOut}
         >
           <LogOut className="size-4" />
           {isOpen && <span className="text-xs font-black uppercase italic">Sair</span>}
@@ -175,7 +176,7 @@ export function DashboardSidebar() {
         <ChevronRight className={cn("size-3 transition-transform", isOpen && "rotate-180")} />
       </button>
     </div>
-  );
+  ), [isOpen, filteredItems, location.pathname, user?.email, role, handleSignOut]);
 
   return (
     <>
