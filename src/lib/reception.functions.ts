@@ -59,8 +59,8 @@ export const openCashSession = createServerFn({ method: "POST" })
         receptionist_id: data.receptionist_id,
         opening_balance: data.opening_balance,
         status: "open",
-        device_info: meta.ua,
-        ip_address: meta.ip,
+        device_info: meta.ua as never,
+        ip_address: meta.ip as never,
       })
       .select()
       .single();
