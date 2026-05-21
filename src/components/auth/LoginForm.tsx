@@ -50,15 +50,22 @@ export function LoginForm() {
       toast.success("Login realizado com sucesso!");
       
       // Get role and redirect
-      const { data: roleData } = await supabase
+      const { data: roleData, error: roleError } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", data.user.id)
-        .single();
+        .maybeSingle();
+
+      if (roleError) {
+        console.error("Error fetching role:", roleError);
+        // Even if role fetch fails, we can try to redirect to a default dashboard
+        // or show an informative message.
+      }
 
       if (roleData?.role === "admin" || roleData?.role === "manager") {
         navigate({ to: "/admin/dashboard" });
       } else {
+        // Default to reception for regular users or if role not found
         navigate({ to: "/reception/dashboard" });
       }
     } catch (error) {

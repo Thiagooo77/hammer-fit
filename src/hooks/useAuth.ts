@@ -23,11 +23,15 @@ export function useAuth() {
       queryClient.invalidateQueries({ queryKey: ["userRole"] });
       queryClient.invalidateQueries({ queryKey: ["userProfile"] });
       if (event === "SIGNED_IN" && session?.user) {
-        recordClientAudit({ data: {
-          actionType: "login", module: "auth",
-          userId: session.user.id, userName: session.user.email,
-          description: `Login de ${session.user.email}`,
-        } }).catch(() => {});
+        recordClientAudit({
+          data: {
+            actionType: "login",
+            module: "auth",
+            userId: session.user.id,
+            userName: session.user.email,
+            description: `Login de ${session.user.email}`,
+          }
+        }).catch((err) => console.error("Login audit error:", err));
       }
       if (event === "SIGNED_OUT") {
         recordClientAudit({ data: {
