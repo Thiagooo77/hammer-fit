@@ -64,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
-        fetchUserData(session.user.id).finally(() => clearTimeout(stuckTimer));
+        fetchUserData(session.user.id, session).finally(() => clearTimeout(stuckTimer));
       } else {
         clearTimeout(stuckTimer);
         setLoading(false);
@@ -79,33 +79,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('[AUTH_STATE_CHANGE]', event);
       setSession(session);
       
-      if (event === "SIGNED_IN" && session?.user) {
-        console.log('[AUTH_LOGIN]', { email: session.user.email });
+      if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session?.user) {
+        console.log('[AUTH_ACTIVE_SESSION]', { email: session.user.email, event });
         setLoading(true);
         setTimeout(() => {
-          fetchUserData(session.user.id).catch(err => console.error('[AUTH_USER_DATA_ERROR]', err));
+          fetchUserData(session.user.id, session).catch(err => console.error('[AUTH_USER_DATA_ERROR]', err));
         }, 0);
         
-        // Use setImmediate or setTimeout to avoid blocking the main UI thread during login
-        setTimeout(() => {
-          recordClientAudit({
-            data: {
-              actionType: "login",
-              module: "auth",
-              userId: session.user.id,
-              userName: session.user.email,
-              description: `Login profissional realizado`,
-            }
-          }).catch(err => console.error('[AUDIT_ERROR]', err));
-        }, 0);
+        if (event === "SIGNED_IN") {
+          setTimeout(() => {
+            recordClientAudit({
+              data: {
+                actionType: "login",
+                module: "auth",
+                userId: session.user.id,
+                userName: session.user.email,
+                description: `Login profissional realizado`,
+              }
+            }).catch(err => console.error('[AUDIT_ERROR]', err));
+          }, 0);
+        }
         
       } else if (event === "SIGNED_OUT") {
         setRole(null);
         setProfile(null);
         queryClient.clear();
         setLoading(false);
-      } else if (event === "TOKEN_REFRESHED") {
-        console.log('[AUTH_TOKEN_REFRESHED]');
       }
     });
 
