@@ -14,6 +14,7 @@ import { Route as SetupRouteImport } from './routes/setup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReceptionDashboardRouteImport } from './routes/reception.dashboard'
+import { Route as AdminReceptionistsRouteImport } from './routes/admin.receptionists'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 
 const UnauthorizedRoute = UnauthorizedRouteImport.update({
@@ -41,6 +42,11 @@ const ReceptionDashboardRoute = ReceptionDashboardRouteImport.update({
   path: '/reception/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminReceptionistsRoute = AdminReceptionistsRouteImport.update({
+  id: '/admin/receptionists',
+  path: '/admin/receptionists',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/admin/dashboard',
   path: '/admin/dashboard',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/setup': typeof SetupRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/receptionists': typeof AdminReceptionistsRoute
   '/reception/dashboard': typeof ReceptionDashboardRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/setup': typeof SetupRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/receptionists': typeof AdminReceptionistsRoute
   '/reception/dashboard': typeof ReceptionDashboardRoute
 }
 export interface FileRoutesById {
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/setup': typeof SetupRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/receptionists': typeof AdminReceptionistsRoute
   '/reception/dashboard': typeof ReceptionDashboardRoute
 }
 export interface FileRouteTypes {
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/setup'
     | '/unauthorized'
     | '/admin/dashboard'
+    | '/admin/receptionists'
     | '/reception/dashboard'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/setup'
     | '/unauthorized'
     | '/admin/dashboard'
+    | '/admin/receptionists'
     | '/reception/dashboard'
   id:
     | '__root__'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/setup'
     | '/unauthorized'
     | '/admin/dashboard'
+    | '/admin/receptionists'
     | '/reception/dashboard'
   fileRoutesById: FileRoutesById
 }
@@ -105,6 +117,7 @@ export interface RootRouteChildren {
   SetupRoute: typeof SetupRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminReceptionistsRoute: typeof AdminReceptionistsRoute
   ReceptionDashboardRoute: typeof ReceptionDashboardRoute
 }
 
@@ -145,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReceptionDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/receptionists': {
+      id: '/admin/receptionists'
+      path: '/admin/receptionists'
+      fullPath: '/admin/receptionists'
+      preLoaderRoute: typeof AdminReceptionistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/dashboard': {
       id: '/admin/dashboard'
       path: '/admin/dashboard'
@@ -161,8 +181,19 @@ const rootRouteChildren: RootRouteChildren = {
   SetupRoute: SetupRoute,
   UnauthorizedRoute: UnauthorizedRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminReceptionistsRoute: AdminReceptionistsRoute,
   ReceptionDashboardRoute: ReceptionDashboardRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
