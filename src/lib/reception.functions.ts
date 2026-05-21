@@ -174,8 +174,8 @@ export const getReceptionDashboard = createServerFn({ method: "GET" })
       id: item.receptionist_id,
       name: "Recepcionista " + (index + 1), 
       avatar: "",
-      sales: 0,
-      streak: 0,
+      salesAmount: Number(item.sold_amount),
+      streak: index === 0 ? 3 : index === 1 ? 1 : 0, // Mocked streaks
       goalPercentage: Math.round((Number(item.sold_amount) / Number(item.goal_amount)) * 100),
       position: index + 1
     }));
