@@ -20,7 +20,7 @@ interface RankingBoardProps {
   members: RankingMember[];
 }
 
-export function RankingBoard({ members }: RankingBoardProps) {
+export const RankingBoard = React.memo(({ members }: RankingBoardProps) => {
   const sortedMembers = [...members].sort((a, b) => a.position - b.position);
 
   const getPositionIcon = (pos: number) => {
@@ -150,4 +150,4 @@ export function RankingBoard({ members }: RankingBoardProps) {
       </CardContent>
     </Card>
   );
-}
+});
