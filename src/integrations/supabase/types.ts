@@ -14,7 +14,211 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cash_sessions: {
+        Row: {
+          closed_at: string | null
+          closing_balance: number | null
+          created_at: string | null
+          difference: number | null
+          expected_balance: number | null
+          id: string
+          notes: string | null
+          opened_at: string
+          opening_balance: number
+          receptionist_id: string
+          status: Database["public"]["Enums"]["cash_session_status"]
+        }
+        Insert: {
+          closed_at?: string | null
+          closing_balance?: number | null
+          created_at?: string | null
+          difference?: number | null
+          expected_balance?: number | null
+          id?: string
+          notes?: string | null
+          opened_at?: string
+          opening_balance?: number
+          receptionist_id: string
+          status?: Database["public"]["Enums"]["cash_session_status"]
+        }
+        Update: {
+          closed_at?: string | null
+          closing_balance?: number | null
+          created_at?: string | null
+          difference?: number | null
+          expected_balance?: number | null
+          id?: string
+          notes?: string | null
+          opened_at?: string
+          opening_balance?: number
+          receptionist_id?: string
+          status?: Database["public"]["Enums"]["cash_session_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cash_sessions_receptionist_id_fkey"
+            columns: ["receptionist_id"]
+            isOneToOne: false
+            referencedRelation: "receptionists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_goals: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          goal_amount: number
+          goal_date: string
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          goal_amount: number
+          goal_date?: string
+          id?: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          goal_amount?: number
+          goal_date?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      goal_progress: {
+        Row: {
+          goal_amount: number
+          id: string
+          receptionist_id: string
+          remaining_amount: number | null
+          sold_amount: number
+          updated_at: string | null
+        }
+        Insert: {
+          goal_amount: number
+          id?: string
+          receptionist_id: string
+          remaining_amount?: number | null
+          sold_amount?: number
+          updated_at?: string | null
+        }
+        Update: {
+          goal_amount?: number
+          id?: string
+          receptionist_id?: string
+          remaining_amount?: number | null
+          sold_amount?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goal_progress_receptionist_id_fkey"
+            columns: ["receptionist_id"]
+            isOneToOne: true
+            referencedRelation: "receptionists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      receptionists: {
+        Row: {
+          active: boolean | null
+          avatar_url: string | null
+          created_at: string | null
+          email: string
+          goal_value: number | null
+          id: string
+          name: string
+        }
+        Insert: {
+          active?: boolean | null
+          avatar_url?: string | null
+          created_at?: string | null
+          email: string
+          goal_value?: number | null
+          id?: string
+          name: string
+        }
+        Update: {
+          active?: boolean | null
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string
+          goal_value?: number | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      sales: {
+        Row: {
+          amount: number
+          cash_session_id: string
+          client_name: string | null
+          created_at: string | null
+          id: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          receptionist_id: string
+          service_name: string
+        }
+        Insert: {
+          amount: number
+          cash_session_id: string
+          client_name?: string | null
+          created_at?: string | null
+          id?: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          receptionist_id: string
+          service_name: string
+        }
+        Update: {
+          amount?: number
+          cash_session_id?: string
+          client_name?: string | null
+          created_at?: string | null
+          id?: string
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          receptionist_id?: string
+          service_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_cash_session_id_fkey"
+            columns: ["cash_session_id"]
+            isOneToOne: false
+            referencedRelation: "cash_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_receptionist_id_fkey"
+            columns: ["receptionist_id"]
+            isOneToOne: false
+            referencedRelation: "receptionists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -27,9 +231,19 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "moderator" | "user"
+      cash_session_status: "open" | "pending_review" | "closed"
       hammer_role: "admin" | "employee"
+      payment_method: "pix" | "dinheiro" | "cartao" | "convenio" | "outros"
       user_role: "admin" | "professor" | "aluno"
     }
     CompositeTypes: {
@@ -158,7 +372,10 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "moderator", "user"],
+      cash_session_status: ["open", "pending_review", "closed"],
       hammer_role: ["admin", "employee"],
+      payment_method: ["pix", "dinheiro", "cartao", "convenio", "outros"],
       user_role: ["admin", "professor", "aluno"],
     },
   },
