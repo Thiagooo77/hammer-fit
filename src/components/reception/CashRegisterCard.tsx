@@ -168,7 +168,11 @@ export const CashRegisterCard = React.memo(({
           </div>
 
           <div className="grid grid-cols-1 gap-2 pt-2">
-            {status === "Fechado" ? (
+            {!receptionistId ? (
+              <div className="text-center py-2 text-xs text-muted-foreground italic">
+                Operação de caixa indisponível para esta conta. Use uma conta de recepcionista para abrir/fechar caixa.
+              </div>
+            ) : status === "Fechado" ? (
               <Button 
                 className="w-full gap-2 font-bold" 
                 variant="default"
