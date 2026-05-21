@@ -110,6 +110,16 @@ export function RankingBoard({ members }: RankingBoardProps) {
                   <p className="text-lg font-black text-primary">{member.goalPercentage}%</p>
                   <p className="text-[9px] text-muted-foreground uppercase font-bold">da meta</p>
                 </div>
+                <div className="absolute bottom-0 left-0 h-1 bg-primary/20 w-full">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${member.goalPercentage}%` }}
+                    className={cn(
+                      "h-full",
+                      member.goalPercentage >= 100 ? "bg-green-500" : "bg-primary"
+                    )}
+                  />
+                </div>
               </motion.div>
             ))}
           </AnimatePresence>
