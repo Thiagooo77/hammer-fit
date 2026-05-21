@@ -331,11 +331,18 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
 
   // ---------- reception ----------
   "reception.openCash": async ({ user, data, meta }) => {
-    const { data: existing } = await admin.from("cash_sessions").select("id").eq("status", "open").maybeSingle();
-    if (existing) throw new Error("Já existe um caixa aberto. Feche o anterior antes de abrir um novo.");
+    if (!data?.receptionist_id) throw new Error("Recepcionista não identificado.");
+    const { data: existing } = await admin
+      .from("cash_sessions")
+      .select("id")
+      .eq("status", "open")
+      .eq("receptionist_id", data.receptionist_id)
+      .maybeSingle();
+    if (existing) throw new Error("Você já possui um caixa aberto. Feche o anterior antes de abrir um novo.");
     const { data: session, error } = await admin.from("cash_sessions").insert({
-      receptionist_id: data.receptionist_id, opening_balance: data.opening_balance, status: "open",
-      device_info: meta.ua as never, ip_address: meta.ip as never,
+      receptionist_id: data.receptionist_id,
+      opening_balance: Number(data.opening_balance) || 0,
+      status: "open",
     }).select().single();
     if (error) throw new Error(error.message);
     await logAudit({ userId: user.id, actionType: "cash_open", module: "cash", description: `Abertura de caixa (R$ ${data.opening_balance})`, newData: session, ip: meta.ip, ua: meta.ua });
@@ -352,7 +359,7 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
     const { data: sale, error } = await admin.from("sales").insert({
       cash_session_id: data.cash_session_id, receptionist_id: data.receptionist_id,
       service_name: data.service_name, client_name: data.client_name,
-      payment_method: data.payment_method, amount: data.amount, notes: data.notes as never,
+      payment_method: data.payment_method, amount: Number(data.amount) || 0,
     }).select().single();
     if (error) throw new Error(error.message);
     await logAudit({ userId: user.id, actionType: "sale_create", module: "sales", description: `Venda R$ ${data.amount} (${data.payment_method}) — ${data.service_name}`, newData: sale, ip: meta.ip, ua: meta.ua });
@@ -394,7 +401,7 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
       { data: currentSession }, { data: dailyGoal }, { data: goalProgress },
       { data: ranking }, { data: todaySales }, { data: todaysSessions },
     ] = await Promise.all([
-      admin.from("cash_sessions").select("id, status, opened_at, receptionists (name, avatar_url)").eq("status", "open").maybeSingle(),
+      admin.from("cash_sessions").select("id, status, opened_at, receptionists (name, avatar_url)").eq("receptionist_id", receptionist.id).in("status", ["open", "pending_review"]).order("opened_at", { ascending: false }).limit(1).maybeSingle(),
       admin.from("goals" as any).select("goal_amount").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle() as any,
       admin.from("goal_progress").select("goal_amount, sold_amount").eq("receptionist_id", receptionist.id).maybeSingle(),
       admin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists(name, avatar_url)").order("sold_amount", { ascending: false }).limit(10),
