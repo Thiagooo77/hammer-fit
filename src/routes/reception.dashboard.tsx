@@ -5,9 +5,12 @@ import { GoalsProgress } from "@/components/reception/GoalsProgress";
 import { RankingBoard, type RankingMember } from "@/components/reception/RankingBoard";
 import { ShiftTimeline, type Shift } from "@/components/reception/ShiftTimeline";
 import { DailySummary } from "@/components/reception/DailySummary";
-import { Target, Users, LayoutDashboard, Calendar, Bell, User as UserIcon } from "lucide-react";
+import { Target, Users, LayoutDashboard, Calendar, Bell, User as UserIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getReceptionDashboard } from "@/lib/reception.functions";
 
 export const Route = createFileRoute("/reception/dashboard")({
   component: ReceptionGoalsDashboard,
