@@ -2,7 +2,7 @@ import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
-import { Target, Users, TrendingUp } from "lucide-react";
+import { Target, Users, TrendingUp, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface GoalCardProps {
@@ -81,14 +81,21 @@ export function GoalsProgress({ title, icon, target, current, type, prediction }
             </div>
           )}
           {type === "individual" && (
-            <div className="p-3 rounded-lg bg-secondary/30 border border-primary/5">
-              <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1 text-center">Status</p>
+            <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
+              <p className="text-[10px] text-primary uppercase font-bold mb-1 text-center flex items-center justify-center gap-1">
+                <Clock className="size-3" /> Est. Conclusão
+              </p>
               <p className="text-sm font-black text-center">
-                {percentage >= 100 ? "Meta Batida! 🚀" : "Em andamento"}
+                {percentage >= 100 ? "Concluído! 🎉" : "17:42"}
               </p>
             </div>
           )}
         </div>
+        {type === "individual" && percentage < 100 && (
+          <div className="mt-2 text-[11px] text-muted-foreground bg-secondary/20 p-2 rounded border border-primary/5 text-center">
+            Mantendo esse ritmo, a meta será atingida às <span className="text-primary font-bold">17:42</span>.
+          </div>
+        )}
       </CardContent>
     </Card>
   );

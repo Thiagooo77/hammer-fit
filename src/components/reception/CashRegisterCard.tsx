@@ -2,7 +2,7 @@ import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Wallet, Plus, Lock, Search, CreditCard, Banknote, Landmark, HandCoins } from "lucide-react";
+import { Wallet, Plus, Lock, Search, CreditCard, Banknote, Landmark, HandCoins, AlertCircle } from "lucide-react";
 
 export interface CashRegisterCardProps {
   status: "Aberto" | "Em análise" | "Fechado";
@@ -77,20 +77,29 @@ export function CashRegisterCard({
         </div>
 
         <div className="grid grid-cols-1 gap-2 pt-2">
-          <Button className="w-full gap-2 font-bold" variant="default">
-            <Plus className="size-4" />
-            Adicionar Venda
-          </Button>
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" className="gap-2 border-primary/20 hover:bg-primary/10">
-              <Lock className="size-4" />
-              Solicitar Fechamento
+          {status === "Fechado" ? (
+            <Button className="w-full gap-2 font-bold" variant="default">
+              <Plus className="size-4" />
+              Abrir Novo Caixa
             </Button>
-            <Button variant="outline" className="gap-2 border-primary/20 hover:bg-primary/10">
-              <Search className="size-4" />
-              Ver Auditoria
-            </Button>
-          </div>
+          ) : (
+            <>
+              <Button className="w-full gap-2 font-bold" variant="default">
+                <Plus className="size-4" />
+                Adicionar Venda
+              </Button>
+              <div className="grid grid-cols-2 gap-2">
+                <Button variant="outline" className="gap-2 border-primary/20 hover:bg-primary/10">
+                  <Lock className="size-4" />
+                  Solicitar Fechamento
+                </Button>
+                <Button variant="outline" className="gap-2 border-primary/20 hover:bg-primary/10">
+                  <Search className="size-4" />
+                  Ver Auditoria
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </CardContent>
     </Card>
