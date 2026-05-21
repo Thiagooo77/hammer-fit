@@ -83,11 +83,17 @@ function ReceptionGoalsDashboard() {
   const smartStats = data?.smartStats || { remaining: 0, percentage: 0, totalSoldToday: 0, vendasCount: 0, ticketMedio: 0, mostLucrativeHour: "N/A" };
   const charts = data?.charts;
 
-  const mockShifts: Shift[] = [
-    { id: "s1", type: "Manhã", receptionist: "Ana Silva", time: "06:00 - 12:00", status: "encerrado" },
-    { id: "s2", type: "Tarde", receptionist: receptionist.name, time: "12:00 - 18:00", status: "ativo" },
-    { id: "s3", type: "Noite", receptionist: "Pendente", time: "18:00 - 22:00", status: "aguardando fechamento" },
-  ];
+  const mockShifts: Shift[] = (data?.todaysSessions || []).map((s: any) => ({
+    id: s.id,
+    type: new Date(s.opened_at).getHours() < 12 ? "Manhã" : new Date(s.opened_at).getHours() < 18 ? "Tarde" : "Noite",
+    receptionist: s.receptionists?.name || "Desconhecido",
+    time: `${new Date(s.opened_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} - ${s.closed_at ? new Date(s.closed_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'Ativo'}`,
+    status: s.status === 'open' ? 'ativo' : s.status === 'pending_review' ? 'aguardando fechamento' : 'encerrado'
+  }));
+
+  if (mockShifts.length === 0) {
+    mockShifts.push({ id: "empty", type: "Manhã", receptionist: "Nenhum turno iniciado", time: "--:--", status: "encerrado" });
+  }
 
   const clinicTarget = dailyGoal ? Number(dailyGoal.goal_amount) : 10000;
   const clinicCurrent = smartStats.totalSoldToday || 4250.00;
@@ -115,7 +121,9 @@ function ReceptionGoalsDashboard() {
           <div className="flex items-center gap-6">
             <div className="hidden md:flex flex-col items-end">
               <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Turno Ativo</span>
-              <span className="text-sm font-black text-primary">TARDE (12:00 - 18:00)</span>
+              <span className="text-sm font-black text-primary">
+                {currentSession ? (new Date(currentSession.opened_at).getHours() < 12 ? "MANHÃ" : new Date(currentSession.opened_at).getHours() < 18 ? "TARDE" : "NOITE") : "NENHUM"}
+              </span>
             </div>
             
             <div className="flex items-center gap-3 pl-6 border-l border-primary/10">
@@ -178,17 +186,19 @@ function ReceptionGoalsDashboard() {
           <div className="lg:col-span-8 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <CashRegisterCard 
-                status={currentSession ? "Aberto" : "Fechado"}
+                status={currentSession ? (currentSession.status === 'open' ? "Aberto" : "Em análise") : "Fechado"}
                 startTime={currentSession ? new Date(currentSession.opened_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : "--:--"}
                 responsible={currentSession ? (currentSession.receptionists as any)?.name || "N/A" : "Nenhum"}
                 totalSales={smartStats.totalSoldToday}
                 salesCount={smartStats.vendasCount}
+                receptionistId={receptionist.id}
+                sessionId={currentSession?.id}
                 payments={{
-                  pix: 0,
-                  dinheiro: 0,
-                  cartao: 0,
-                  convenio: 0,
-                  outros: 0
+                  pix: charts?.paymentMethods.find((p: any) => p.name === 'Pix')?.value || 0,
+                  dinheiro: charts?.paymentMethods.find((p: any) => p.name === 'Dinheiro')?.value || 0,
+                  cartao: charts?.paymentMethods.find((p: any) => p.name === 'Cartao')?.value || 0,
+                  convenio: charts?.paymentMethods.find((p: any) => p.name === 'Convenio')?.value || 0,
+                  outros: charts?.paymentMethods.find((p: any) => p.name === 'Outros')?.value || 0
                 }}
               />
               <GoalsProgress 
@@ -249,7 +259,12 @@ function ReceptionGoalsDashboard() {
               </div>
             </motion.div>
 
-            <DailySummary />
+            <DailySummary 
+              totalSold={smartStats.totalSoldToday}
+              salesCount={smartStats.vendasCount}
+              ticketMedio={smartStats.ticketMedio}
+              bestHour={smartStats.mostLucrativeHour}
+            />
           </div>
         </div>
       </main>
