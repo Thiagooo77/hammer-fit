@@ -9,14 +9,13 @@ export async function callApi<TResult = unknown>(action: string, data?: unknown)
   if (error) {
     // Supabase wraps non-2xx as FunctionsHttpError; surface inner message when possible.
     let msg = error.message || "Erro na chamada do servidor";
-    try {
-      // @ts-expect-error context is sometimes present on the error
-      const ctx = error.context;
-      if (ctx && typeof ctx.json === "function") {
+    const ctx = (error as any).context;
+    if (ctx && typeof ctx.json === "function") {
+      try {
         const j = await ctx.json();
         if (j?.error) msg = j.error;
-      }
-    } catch { /* noop */ }
+      } catch { /* noop */ }
+    }
     throw new Error(msg);
   }
   if (result && typeof result === "object" && "error" in (result as any) && (result as any).error) {
