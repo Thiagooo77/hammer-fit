@@ -56,14 +56,8 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
 
-    // Safety net: if login hangs > 10s, clear stale storage and reset
-    const stuckTimeout = setTimeout(() => {
-      console.warn('[LOGIN_STUCK] Clearing stale session storage');
-      clearSupabaseStorage();
-      supabase.auth.signOut().catch(() => {});
-      setIsLoading(false);
-      toast.error("Conexão demorou demais. Sessão local limpa, tente novamente.");
-    }, 10000);
+    // Removed destructive stuck timeout
+
 
     try {
       // Intentional auto-setup if special credentials are used and login fails
@@ -112,20 +106,20 @@ export function LoginForm() {
 
       const finalRole = roleData?.role || (values.email === 'admhammer@gmail.com' ? 'admin' : null);
 
-      // Small delay to let AuthProvider handle the event
+      // Delay to let Supabase settle the session in storage before reload
       setTimeout(() => {
         if (finalRole === "admin" || finalRole === "manager") {
           window.location.href = "/admin/dashboard";
         } else {
           window.location.href = "/reception/dashboard";
         }
-      }, 100);
+      }, 500);
     } catch (error) {
       clearSupabaseStorage();
       supabase.auth.signOut().catch(() => {});
       toast.error(error instanceof Error && error.message.includes("Tempo") ? "Login travou. Sessão limpa, tente novamente." : "Erro ao realizar login");
     } finally {
-      clearTimeout(stuckTimeout);
+      // clearTimeout(stuckTimeout); // Removed
       setIsLoading(false);
     }
   }

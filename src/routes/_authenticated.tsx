@@ -25,10 +25,18 @@ export const Route = createFileRoute("/_authenticated")({
       };
     }
 
-    const { data: { session } } = await supabase.auth.getSession();
+    let { data: { session } } = await supabase.auth.getSession();
     
+    // If no session, wait a brief moment and retry once (handles storage race conditions)
+    if (!session && typeof window !== "undefined") {
+      console.log('[AUTH_GUARD] No session found, retrying in 500ms...');
+      await new Promise(resolve => setTimeout(resolve, 500));
+      const { data: { session: retriedSession } } = await supabase.auth.getSession();
+      session = retriedSession;
+    }
+
     if (!session) {
-      console.log('[HAMMER_FIT_AUDIT] No session found, redirecting');
+      console.warn('[AUTH_GUARD] Redirecting to login: No session found after retry');
       throw redirect({
         to: "/login",
         search: {
