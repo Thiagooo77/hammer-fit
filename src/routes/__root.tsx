@@ -1,6 +1,7 @@
 import { Outlet, ScrollRestoration, createRootRouteWithContext, HeadContent, Scripts } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as React from "react";
+import { Toaster } from "sonner";
 import "../styles.css";
 
 interface RouterContext {
@@ -24,8 +25,10 @@ function RootComponent() {
     <RootDocument>
       <QueryClientProvider client={queryClient}>
         <Outlet />
+        <Toaster position="top-right" richColors />
       </QueryClientProvider>
     </RootDocument>
+
   );
 }
 

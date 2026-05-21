@@ -1,5 +1,22 @@
-import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/")({
-  component: () => <Navigate to="/reception/dashboard" />,
+  component: Index,
 });
+
+function Index() {
+  const { isAuthenticated, role, loading } = useAuth();
+
+  if (loading) return null;
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  if (role === "admin" || role === "manager") {
+    return <Navigate to="/admin/dashboard" />;
+  }
+
+  return <Navigate to="/reception/dashboard" />;
+}

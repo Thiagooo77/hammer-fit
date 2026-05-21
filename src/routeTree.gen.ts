@@ -9,9 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
+import { Route as SetupRouteImport } from './routes/setup'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReceptionDashboardRouteImport } from './routes/reception.dashboard'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 
+const UnauthorizedRoute = UnauthorizedRouteImport.update({
+  id: '/unauthorized',
+  path: '/unauthorized',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetupRoute = SetupRouteImport.update({
+  id: '/setup',
+  path: '/setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -22,35 +41,96 @@ const ReceptionDashboardRoute = ReceptionDashboardRouteImport.update({
   path: '/reception/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/setup': typeof SetupRoute
+  '/unauthorized': typeof UnauthorizedRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/reception/dashboard': typeof ReceptionDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/setup': typeof SetupRoute
+  '/unauthorized': typeof UnauthorizedRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/reception/dashboard': typeof ReceptionDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/setup': typeof SetupRoute
+  '/unauthorized': typeof UnauthorizedRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/reception/dashboard': typeof ReceptionDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/reception/dashboard'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/setup'
+    | '/unauthorized'
+    | '/admin/dashboard'
+    | '/reception/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/reception/dashboard'
-  id: '__root__' | '/' | '/reception/dashboard'
+  to:
+    | '/'
+    | '/login'
+    | '/setup'
+    | '/unauthorized'
+    | '/admin/dashboard'
+    | '/reception/dashboard'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/setup'
+    | '/unauthorized'
+    | '/admin/dashboard'
+    | '/reception/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
+  SetupRoute: typeof SetupRoute
+  UnauthorizedRoute: typeof UnauthorizedRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
   ReceptionDashboardRoute: typeof ReceptionDashboardRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unauthorized': {
+      id: '/unauthorized'
+      path: '/unauthorized'
+      fullPath: '/unauthorized'
+      preLoaderRoute: typeof UnauthorizedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/setup': {
+      id: '/setup'
+      path: '/setup'
+      fullPath: '/setup'
+      preLoaderRoute: typeof SetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,11 +145,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReceptionDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
+  SetupRoute: SetupRoute,
+  UnauthorizedRoute: UnauthorizedRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
   ReceptionDashboardRoute: ReceptionDashboardRoute,
 }
 export const routeTree = rootRouteImport
