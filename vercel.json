@@ -1,13 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": null,
   "buildCommand": "vite build",
-  "outputDirectory": ".vercel/output",
   "installCommand": "bun install",
-  "build": {
-    "env": {
-      "VITE_SUPABASE_URL": "@vite_supabase_url",
-      "VITE_SUPABASE_PUBLISHABLE_KEY": "@vite_supabase_publishable_key"
-    }
-  }
+  "framework": null
 }
