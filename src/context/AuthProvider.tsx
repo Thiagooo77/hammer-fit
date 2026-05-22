@@ -118,8 +118,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }).catch(error => {
       console.error('[AUTH_INITIAL_SESSION_ERROR]', error);
+      // Stale refresh token — wipe local auth so the login screen renders cleanly.
+      clearLocalAuthState();
       clearTimeout(stuckTimer);
-      setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
