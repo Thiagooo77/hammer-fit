@@ -196,7 +196,7 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
   // ---------- admin sales ----------
   "admin.listSales": async ({ user }) => {
     await assertAdmin(user.id, user.email);
-    const { data, error } = await admin.from("sales").select("*, receptionists (name, avatar_url), cash_sessions (status)").order("created_at", { ascending: false });
+    const { data, error } = await admin.from("sales").select("*, receptionists (name, avatar_url), cash_sessions (status)").is("hidden_at", null).order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return { sales: data || [] };
   },
