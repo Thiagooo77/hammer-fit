@@ -13,6 +13,7 @@ import AdminReceptionists from "@/pages/routes/AdminReceptionists";
 import AdminAudit from "@/pages/routes/AdminAudit";
 import AdminGoals from "@/pages/routes/AdminGoals";
 import AdminReports from "@/pages/routes/AdminReports";
+import AdminCashApprovals from "@/pages/routes/AdminCashApprovals";
 
 import ReceptionDashboard from "@/pages/routes/ReceptionDashboard";
 import ReceptionTasks from "@/pages/routes/ReceptionTasks";
