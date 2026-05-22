@@ -15,8 +15,10 @@ interface GoalCardProps {
 }
 
 export const GoalsProgress = React.memo(({ title, icon, target, current, type, prediction }: GoalCardProps) => {
-  const percentage = Math.min(Math.round((current / target) * 100), 100);
-  const remaining = Math.max(target - current, 0);
+  const safeTarget = Number.isFinite(target) && target > 0 ? target : 0;
+  const safeCurrent = Number.isFinite(current) && current > 0 ? current : 0;
+  const percentage = safeTarget > 0 ? Math.min(Math.round((safeCurrent / safeTarget) * 100), 100) : 0;
+  const remaining = Math.max(safeTarget - safeCurrent, 0);
 
   const getBarColor = React.useCallback((pct: number) => {
     if (pct >= 80) return "bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)]";
@@ -50,7 +52,7 @@ export const GoalsProgress = React.memo(({ title, icon, target, current, type, p
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Progresso</span>
             <span className="font-bold">
-              R$ {current.toLocaleString('pt-BR')} / R$ {target.toLocaleString('pt-BR')}
+              R$ {safeCurrent.toLocaleString('pt-BR')} / R$ {safeTarget.toLocaleString('pt-BR')}
             </span>
           </div>
           <div className="h-4 w-full bg-secondary rounded-full overflow-hidden border border-primary/10">

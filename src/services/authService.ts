@@ -15,14 +15,14 @@ export const authService = {
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
-      .single();
+      .limit(1)
+      .maybeSingle();
 
     if (error) {
-      if (error.code === "PGRST116") return null; // No role found
       throw error;
     }
 
-    return data.role;
+    return data?.role ?? null;
   },
 
   async getProfile(userId: string) {
