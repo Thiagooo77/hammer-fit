@@ -33,6 +33,8 @@ export default function AdminReceptionists() {
   const createMut = useMutation({ mutationFn: (form: any) => create({ data: form }), onSuccess: () => { toast.success("Criado"); setCreating(false); invalidate(); }, onError: (e: any) => toast.error(e.message) });
   const updateMut = useMutation({ mutationFn: (form: any) => update({ data: form }), onSuccess: () => { toast.success("Atualizado"); setEditing(null); invalidate(); }, onError: (e: any) => toast.error(e.message) });
   const resetMut = useMutation({ mutationFn: (form: any) => reset({ data: form }), onSuccess: () => { toast.success("Senha resetada"); setResetting(null); }, onError: (e: any) => toast.error(e.message) });
+  const deleteMut = useMutation({ mutationFn: (id: string) => del({ data: { id } }), onSuccess: () => { toast.success("Cadastro excluído"); invalidate(); }, onError: (e: any) => toast.error(e.message) });
+
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50">
