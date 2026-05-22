@@ -27,6 +27,7 @@ export default function ReceptionDashboard() {
     if (!user) return;
     const ch = supabase.channel("reception_updates")
       .on("postgres_changes", { event: "*", schema: "public", table: "sales" }, () => refetch())
+      .on("postgres_changes", { event: "*", schema: "public", table: "goals" }, () => refetch())
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [user, refetch]);
@@ -85,8 +86,7 @@ export default function ReceptionDashboard() {
                   outros: data?.currentSessionStats?.payments?.outros || 0,
                 }}
               />
-              <GoalsProgress title="Sua Meta" icon={<Target className="size-5" />} target={goalProgress ? Number(goalProgress.goal_amount) : 0} current={goalProgress ? Number(goalProgress.sold_amount) : 0} type="individual" />
-              <GoalsProgress title="Meta Academia" icon={<Users className="size-5" />} target={gymTarget} current={gymCurrent} type="general" />
+              <GoalsProgress title="Meta Geral da Academia" icon={<Users className="size-5" />} target={gymTarget} current={gymCurrent} type="general" />
             </div>
           </div>
           <div className="lg:col-span-4 space-y-6">

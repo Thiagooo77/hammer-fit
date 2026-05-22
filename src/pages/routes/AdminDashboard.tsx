@@ -27,7 +27,10 @@ export default function AdminDashboard() {
 
   React.useEffect(() => {
     if (!user || (role !== "admin" && role !== "manager")) return;
-    const ch = supabase.channel("admin_updates").on("postgres_changes", { event: "*", schema: "public", table: "sales" }, () => refetch()).subscribe();
+    const ch = supabase.channel("admin_updates")
+      .on("postgres_changes", { event: "*", schema: "public", table: "sales" }, () => refetch())
+      .on("postgres_changes", { event: "*", schema: "public", table: "goals" }, () => refetch())
+      .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [user, role, refetch]);
 
