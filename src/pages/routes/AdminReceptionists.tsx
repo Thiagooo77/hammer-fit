@@ -4,20 +4,22 @@ import { useAuth } from "@/hooks/useAuth";
 import { useServerFn } from "@/lib/useServerFn";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { listReceptionists, createReceptionist, updateReceptionist, resetReceptionistPassword } from "@/lib/admin-receptionists.functions";
+import { listReceptionists, createReceptionist, updateReceptionist, resetReceptionistPassword, deleteReceptionist } from "@/lib/admin-receptionists.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Users, Plus, KeyRound, Loader2, Pencil } from "lucide-react";
+import { ArrowLeft, Users, Plus, KeyRound, Loader2, Pencil, Trash2 } from "lucide-react";
 
 export default function AdminReceptionists() {
   const list = useServerFn(listReceptionists);
   const create = useServerFn(createReceptionist);
   const update = useServerFn(updateReceptionist);
   const reset = useServerFn(resetReceptionistPassword);
+  const del = useServerFn(deleteReceptionist);
+
   const qc = useQueryClient();
   const [editing, setEditing] = useState<any>(null);
   const [creating, setCreating] = useState(false);
@@ -31,6 +33,8 @@ export default function AdminReceptionists() {
   const createMut = useMutation({ mutationFn: (form: any) => create({ data: form }), onSuccess: () => { toast.success("Criado"); setCreating(false); invalidate(); }, onError: (e: any) => toast.error(e.message) });
   const updateMut = useMutation({ mutationFn: (form: any) => update({ data: form }), onSuccess: () => { toast.success("Atualizado"); setEditing(null); invalidate(); }, onError: (e: any) => toast.error(e.message) });
   const resetMut = useMutation({ mutationFn: (form: any) => reset({ data: form }), onSuccess: () => { toast.success("Senha resetada"); setResetting(null); }, onError: (e: any) => toast.error(e.message) });
+  const deleteMut = useMutation({ mutationFn: (id: string) => del({ data: { id } }), onSuccess: () => { toast.success("Cadastro excluído"); invalidate(); }, onError: (e: any) => toast.error(e.message) });
+
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50">
@@ -60,6 +64,16 @@ export default function AdminReceptionists() {
                   </div>
                   <Button variant="ghost" size="icon" onClick={() => { setEditing(r); setCreating(false); }}><Pencil className="h-4 w-4" /></Button>
                   <Button variant="ghost" size="icon" onClick={() => setResetting(r)}><KeyRound className="h-4 w-4" /></Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Excluir cadastro"
+                    disabled={deleteMut.isPending || r.email === "admhammer@gmail.com"}
+                    onClick={() => { if (confirm(`Excluir o cadastro de ${r.name}? Esta ação é permanente.`)) deleteMut.mutate(r.id); }}
+                  >
+                    {deleteMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4 text-red-400" />}
+                  </Button>
+
                 </div>
               ))
             }

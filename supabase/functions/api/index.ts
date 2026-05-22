@@ -300,6 +300,26 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
     await logAudit({ userId: user.id, actionType: "password_reset", module: "users", description: `Resetou senha de ${rec.name}`, ip: meta.ip, ua: meta.ua });
     return { ok: true };
   },
+  "admin.deleteReceptionist": async ({ user, data, meta }) => {
+    await assertAdmin(user.id, user.email);
+    const { data: rec, error } = await admin.from("receptionists").select("*").eq("id", data.id).single();
+    if (error) throw new Error(error.message);
+    if (rec.email === "admhammer@gmail.com") throw new Error("Não é possível excluir o administrador principal.");
+    // Remove dependent records first
+    await admin.from("sales").delete().eq("receptionist_id", rec.id);
+    await admin.from("cash_sessions").delete().eq("receptionist_id", rec.id);
+    await admin.from("goal_progress").delete().eq("receptionist_id", rec.id);
+    await admin.from("receptionists").delete().eq("id", rec.id);
+    if (rec.user_id) {
+      await admin.from("user_roles").delete().eq("user_id", rec.user_id);
+      await admin.from("users" as any).delete().eq("id", rec.user_id);
+      try { await admin.auth.admin.deleteUser(rec.user_id); } catch (_) { /* ignore */ }
+    }
+    await logAudit({ userId: user.id, actionType: "receptionist_delete", module: "users", description: `Excluiu ${rec.name}`, oldData: rec, ip: meta.ip, ua: meta.ua });
+    return { ok: true };
+  },
+
+
 
   // ---------- checklists ----------
   "checklists.list": async () => {
