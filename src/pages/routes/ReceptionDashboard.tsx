@@ -108,6 +108,10 @@ export default function ReceptionDashboard() {
           <TabsContent value="resumo">
             <DailySummary totalSold={smartStats.totalSoldToday} salesCount={smartStats.vendasCount} ticketMedio={smartStats.ticketMedio} bestHour={smartStats.mostLucrativeHour} />
           </TabsContent>
+
+          <TabsContent value="config">
+            <SettingsPanel receptionist={receptionist} onUpdated={refetch} />
+          </TabsContent>
         </Tabs>
       </main>
     </div>
