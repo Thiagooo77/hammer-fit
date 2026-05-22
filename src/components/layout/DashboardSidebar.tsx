@@ -35,6 +35,7 @@ export function DashboardSidebar() {
       return [
         { title: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard", roles: ["admin", "manager"] },
         { title: "Vendas", icon: TrendingUp, href: "/admin/sales", roles: ["admin", "manager"] },
+        { title: "Aprovar Caixas", icon: Wallet, href: "/admin/cash-approvals", roles: ["admin", "manager"] },
         { title: "Recepção", icon: Building2, href: "/reception/dashboard", roles: ["admin", "manager"] },
         { title: "Checklists", icon: CheckSquare, href: "/reception/tasks", roles: ["admin", "manager"] },
         { title: "Colaboradores", icon: Users, href: "/admin/receptionists", roles: ["admin", "manager"] },
