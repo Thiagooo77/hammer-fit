@@ -512,21 +512,33 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
     }
     const [
       { data: currentSession }, { data: dailyGoal }, { data: goalProgress },
-      { data: ranking }, { data: todaySales }, { data: todaysSessions },
+      { data: openSessions }, { data: todaySales }, { data: todaysSessions },
     ] = await Promise.all([
       admin.from("cash_sessions").select("id, status, opened_at, receptionists (name, avatar_url)").eq("receptionist_id", receptionist.id).in("status", ["open", "pending_review"]).order("opened_at", { ascending: false }).limit(1).maybeSingle(),
       admin.from("goals" as any).select("goal_amount").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle() as any,
       admin.from("goal_progress").select("goal_amount, sold_amount").eq("receptionist_id", receptionist.id).maybeSingle(),
-      admin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists(name, avatar_url)").order("sold_amount", { ascending: false }).limit(10),
+      admin.from("cash_sessions").select("id, receptionist_id, receptionists(name, avatar_url, goal_value)").in("status", ["open", "pending_review"]),
       admin.from("sales").select("amount, payment_method, created_at").is("hidden_at", null).gte("created_at", todayStart.toISOString()).lt("created_at", tomorrowStart.toISOString()),
       admin.from("cash_sessions").select("id, status, opened_at, closed_at, receptionists(name)").gte("opened_at", todayStart.toISOString()).order("opened_at", { ascending: true }),
     ]);
-    const formattedRanking = (ranking || []).map((item: any, i: number) => ({
-      id: item.receptionist_id, name: item.receptionists?.name || "Desconhecido",
-      avatar: item.receptionists?.avatar_url || "", salesAmount: Number(item.sold_amount),
-      streak: 0, goalPercentage: Math.round((Number(item.sold_amount) / Math.max(Number(item.goal_amount), 1)) * 100),
-      position: i + 1,
-    }));
+    // Ranking by CURRENT open session sales — resets when a receptionist closes their cash
+    const openSessionIds = (openSessions || []).map((s: any) => s.id);
+    const sessionSoldMap: Record<string, number> = {};
+    if (openSessionIds.length) {
+      const { data: rs } = await admin.from("sales").select("cash_session_id, amount").in("cash_session_id", openSessionIds).is("hidden_at", null);
+      (rs || []).forEach((s: any) => { sessionSoldMap[s.cash_session_id] = (sessionSoldMap[s.cash_session_id] || 0) + Number(s.amount); });
+    }
+    const formattedRanking = (openSessions || []).map((s: any) => {
+      const sold = sessionSoldMap[s.id] || 0;
+      const goal = Number(s.receptionists?.goal_value || 0);
+      return {
+        id: s.receptionist_id, name: s.receptionists?.name || "Desconhecido",
+        avatar: s.receptionists?.avatar_url || "", salesAmount: sold, streak: 0,
+        goalPercentage: goal > 0 ? Math.round((sold / goal) * 100) : 0,
+        _sold: sold,
+      };
+    }).sort((a: any, b: any) => b._sold - a._sold).map((r: any, i: number) => ({ ...r, position: i + 1 }));
+
     const target = Number(goalProgress?.goal_amount || 0);
     const current = Number(goalProgress?.sold_amount || 0);
     const remaining = Math.max(target - current, 0);
