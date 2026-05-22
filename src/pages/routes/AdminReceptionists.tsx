@@ -110,7 +110,7 @@ function CreateForm({ onSubmit, pending }: { onSubmit: (form: any) => void; pend
           </select>
         </div>
       <div><Label>Nome</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
-      <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /></div>
+      <div><Label>E-mail</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /></div>
       <div><Label>Senha</Label><Input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required minLength={6} /></div>
       <p className="text-xs text-muted-foreground italic">A meta geral é definida pelo admin em "Metas".</p>
       <Button type="submit" disabled={pending} className="transition-all duration-200">{pending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Criar</Button>

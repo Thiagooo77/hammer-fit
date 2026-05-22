@@ -43,7 +43,7 @@ export const RankingBoard = React.memo(({ members }: RankingBoardProps) => {
         </CardTitle>
         <div className="flex items-center gap-2 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
           <div className="size-1.5 bg-green-500 rounded-full animate-pulse" />
-          <span className="text-[10px] font-black text-green-400 uppercase tracking-tighter">Live</span>
+          <span className="text-[10px] font-black text-green-400 uppercase tracking-tighter">Ao Vivo</span>
         </div>
       </CardHeader>
       <CardContent className="pt-2">

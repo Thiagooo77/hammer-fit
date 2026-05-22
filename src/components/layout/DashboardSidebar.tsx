@@ -33,7 +33,7 @@ export function DashboardSidebar() {
   const menuItems = useMemo(() => {
     if (isAdmin) {
       return [
-        { title: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard", roles: ["admin", "manager"] },
+        { title: "Painel", icon: LayoutDashboard, href: "/admin/dashboard", roles: ["admin", "manager"] },
         { title: "Vendas", icon: TrendingUp, href: "/admin/sales", roles: ["admin", "manager"] },
         { title: "Aprovar Caixas", icon: Wallet, href: "/admin/cash-approvals", roles: ["admin", "manager"] },
         { title: "Recepção", icon: Building2, href: "/reception/dashboard", roles: ["admin", "manager"] },
