@@ -133,7 +133,7 @@ function TaskDialog({ isOpen, onClose, recs, onSubmit, initialData }: any) {
           <div><Label>Turno</Label>
             <Select value={form.shift} onValueChange={(v) => setForm({ ...form, shift: v as any })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>{["morning", "afternoon", "night", "general"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+              <SelectContent>{[{v:"morning",l:"Manhã"},{v:"afternoon",l:"Tarde"},{v:"night",l:"Noite"},{v:"general",l:"Geral"}].map((s) => <SelectItem key={s.v} value={s.v}>{s.l}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div><Label>Responsável</Label>
