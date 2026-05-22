@@ -196,7 +196,7 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
   // ---------- admin sales ----------
   "admin.listSales": async ({ user }) => {
     await assertAdmin(user.id, user.email);
-    const { data, error } = await admin.from("sales").select("*, receptionists (name, avatar_url), cash_sessions (status)").order("created_at", { ascending: false });
+    const { data, error } = await admin.from("sales").select("*, receptionists (name, avatar_url), cash_sessions (status)").is("hidden_at", null).order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return { sales: data || [] };
   },
@@ -229,9 +229,15 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
   "admin.deleteSale": async ({ user, data, meta }) => {
     await assertAdmin(user.id, user.email);
     const { data: before } = await admin.from("sales").select("*").eq("id", data.id).single();
-    const { error } = await admin.from("sales").delete().eq("id", data.id);
+    // Soft delete: keep the record so the receptionist's history/totals are preserved,
+    // but mark it hidden so it disappears from listings.
+    const { error } = await admin.from("sales").update({
+      hidden_at: new Date().toISOString(),
+      hidden_by: user.id,
+      hidden_reason: data.reason || null,
+    } as any).eq("id", data.id);
     if (error) throw new Error(error.message);
-    await logAudit({ userId: user.id, actionType: "sale_delete", module: "sales", description: `Admin excluiu venda ${data.id} (R$ ${before?.amount})`, oldData: before, ip: meta.ip, ua: meta.ua });
+    await logAudit({ userId: user.id, actionType: "sale_delete", module: "sales", description: `Admin ocultou venda ${data.id} (R$ ${before?.amount})`, oldData: before, ip: meta.ip, ua: meta.ua });
     return { success: true };
   },
   "admin.listReceptionistsBasic": async ({ user }) => {
