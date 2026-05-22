@@ -61,6 +61,7 @@ export default function AdminDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <Link to="/reception/dashboard"><Button variant="outline" size="sm" className="hidden sm:flex gap-2 border-primary/30 text-primary"><LayoutDashboard className="size-4" /> Recepção</Button></Link>
+            <Link to="/admin/settings"><Button variant="ghost" size="icon" title="Configurações"><Settings className="h-5 w-5" /></Button></Link>
             <Button variant="ghost" size="icon" onClick={() => signOut()}><LogOut className="h-5 w-5" /></Button>
           </div>
         </div>
