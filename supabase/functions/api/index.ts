@@ -550,7 +550,7 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
     // Sales of the CURRENT open/pending session only — used to reset the cash card on close
     let sessionSales: any[] = [];
     if (currentSession?.id) {
-      const { data: ss } = await admin.from("sales").select("amount, payment_method").eq("cash_session_id", currentSession.id);
+      const { data: ss } = await admin.from("sales").select("amount, payment_method").eq("cash_session_id", currentSession.id).is("hidden_at", null);
       sessionSales = ss || [];
     }
     const sessionTotal = sessionSales.reduce((a, s) => a + Number(s.amount), 0);
