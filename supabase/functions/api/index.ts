@@ -147,8 +147,8 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
       { data: todaySales }, { data: weekSales }, { data: ranking },
       { data: activeReceptionists }, { data: dailyGoal }, { data: sessions },
     ] = await Promise.all([
-      admin.from("sales").select("amount, created_at").gte("created_at", todayStart.toISOString()),
-      admin.from("sales").select("amount, created_at").gte("created_at", weekStart.toISOString()),
+      admin.from("sales").select("amount, created_at").is("hidden_at", null).gte("created_at", todayStart.toISOString()),
+      admin.from("sales").select("amount, created_at").is("hidden_at", null).gte("created_at", weekStart.toISOString()),
       admin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists(name, avatar_url)").order("sold_amount", { ascending: false }),
       admin.from("receptionists").select("id").eq("active", true),
       admin.from("goals" as any).select("goal_amount").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle() as any,
@@ -239,17 +239,25 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
   "admin.deleteSale": async ({ user, data, meta }) => {
     await assertAdmin(user.id, user.email);
     const { data: before } = await admin.from("sales").select("*").eq("id", data.id).single();
-    // Soft delete: keep the record so the receptionist's history/totals are preserved,
-    // but mark it hidden so it disappears from listings.
     const { error } = await admin.from("sales").update({
       hidden_at: new Date().toISOString(),
       hidden_by: user.id,
       hidden_reason: data.reason || null,
     } as any).eq("id", data.id);
     if (error) throw new Error(error.message);
+    // Decrement goal_progress so receptionist totals reflect the removal
+    if (before?.receptionist_id && before?.amount) {
+      const { data: gp } = await admin.from("goal_progress").select("sold_amount").eq("receptionist_id", before.receptionist_id).maybeSingle();
+      if (gp) {
+        await admin.from("goal_progress").update({
+          sold_amount: Math.max(Number(gp.sold_amount) - Number(before.amount), 0),
+        }).eq("receptionist_id", before.receptionist_id);
+      }
+    }
     await logAudit({ userId: user.id, actionType: "sale_delete", module: "sales", description: `Admin ocultou venda ${data.id} (R$ ${before?.amount})`, oldData: before, ip: meta.ip, ua: meta.ua });
     return { success: true };
   },
+
   "admin.listReceptionistsBasic": async ({ user }) => {
     await assertAdmin(user.id, user.email);
     const { data, error } = await admin.from("receptionists").select("id, name").eq("active", true).order("name");
@@ -510,7 +518,7 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
       admin.from("goals" as any).select("goal_amount").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle() as any,
       admin.from("goal_progress").select("goal_amount, sold_amount").eq("receptionist_id", receptionist.id).maybeSingle(),
       admin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists(name, avatar_url)").order("sold_amount", { ascending: false }).limit(10),
-      admin.from("sales").select("amount, payment_method, created_at").gte("created_at", todayStart.toISOString()).lt("created_at", tomorrowStart.toISOString()),
+      admin.from("sales").select("amount, payment_method, created_at").is("hidden_at", null).gte("created_at", todayStart.toISOString()).lt("created_at", tomorrowStart.toISOString()),
       admin.from("cash_sessions").select("id, status, opened_at, closed_at, receptionists(name)").gte("opened_at", todayStart.toISOString()).order("opened_at", { ascending: true }),
     ]);
     const formattedRanking = (ranking || []).map((item: any, i: number) => ({
@@ -542,7 +550,7 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
     // Sales of the CURRENT open/pending session only — used to reset the cash card on close
     let sessionSales: any[] = [];
     if (currentSession?.id) {
-      const { data: ss } = await admin.from("sales").select("amount, payment_method").eq("cash_session_id", currentSession.id);
+      const { data: ss } = await admin.from("sales").select("amount, payment_method").eq("cash_session_id", currentSession.id).is("hidden_at", null);
       sessionSales = ss || [];
     }
     const sessionTotal = sessionSales.reduce((a, s) => a + Number(s.amount), 0);
