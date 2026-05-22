@@ -176,9 +176,10 @@ export const CashRegisterCard = React.memo(({
               <Button 
                 className="w-full gap-2 font-bold" 
                 variant="default"
-                onClick={() => setOpenDialogOpen(true)}
+                onClick={() => openMutation.mutate()}
+                disabled={openMutation.isPending}
               >
-                <Plus className="size-4" />
+                {openMutation.isPending ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
                 Abrir Novo Caixa
               </Button>
             ) : (
@@ -216,42 +217,6 @@ export const CashRegisterCard = React.memo(({
           </div>
         </CardContent>
       </Card>
-
-      {/* Dialog Abertura */}
-      <Dialog open={openDialogOpen} onOpenChange={setOpenDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="uppercase font-black italic italic tracking-tight">Abrir Novo Caixa</DialogTitle>
-            <DialogDescription>
-              Informe o saldo inicial em dinheiro para começar o turno.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="opening_balance">Saldo Inicial (R$)</Label>
-              <Input
-                id="opening_balance"
-                type="number"
-                step="0.01"
-                value={openBalance}
-                onChange={(e) => setOpenBalance(e.target.value)}
-                autoFocus
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button 
-              type="button" 
-              className="w-full uppercase font-black italic" 
-              onClick={() => openMutation.mutate()}
-              disabled={openMutation.isPending}
-            >
-              {openMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Confirmar Abertura
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Dialog Fechamento */}
       <Dialog open={closeDialogOpen} onOpenChange={setCloseDialogOpen}>
