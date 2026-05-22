@@ -80,9 +80,9 @@ export default function AdminReceptionists() {
 }
 
 function CreateForm({ onSubmit, pending }: { onSubmit: (form: any) => void; pending: boolean }) {
-  const [form, setForm] = useState({ name: "", email: "", password: "", phone: "", cpf: "", role_type: "receptionist", role_title: "", shift: "", status: "active", avatar_url: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", cpf: "", role_type: "receptionist", role_title: "", shift: "", status: "active", avatar_url: "" });
   return (
-    <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); onSubmit({ ...form, goal_value: 0, phone: form.phone || null, cpf: form.cpf || null, role_title: form.role_title || (form.role_type === "manager" ? "Gerente" : "Recepcionista"), shift: form.shift || null, avatar_url: form.avatar_url || null }); }}>
+    <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); onSubmit({ ...form, goal_value: 0, phone: null, cpf: form.cpf || null, role_title: form.role_title || (form.role_type === "manager" ? "Gerente" : "Recepcionista"), shift: form.shift || null, avatar_url: form.avatar_url || null }); }}>
         <div>
           <Label>Função</Label>
           <select
@@ -98,7 +98,6 @@ function CreateForm({ onSubmit, pending }: { onSubmit: (form: any) => void; pend
       <div><Label>Nome</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
       <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /></div>
       <div><Label>Senha</Label><Input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required minLength={6} /></div>
-      <div><Label>Telefone</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
       <p className="text-xs text-muted-foreground italic">A meta geral é definida pelo admin em "Metas".</p>
       <Button type="submit" disabled={pending} className="transition-all duration-200">{pending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Criar</Button>
     </form>
