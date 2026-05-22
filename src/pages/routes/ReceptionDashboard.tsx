@@ -74,6 +74,7 @@ export default function ReceptionDashboard() {
             <TabsTrigger value="metas" className="flex-1 md:flex-none"><Users className="size-4" /> Metas</TabsTrigger>
             <TabsTrigger value="ranking" className="flex-1 md:flex-none"><Trophy className="size-4" /> Ranking</TabsTrigger>
             <TabsTrigger value="resumo" className="flex-1 md:flex-none"><BarChart3 className="size-4" /> Resumo</TabsTrigger>
+            <TabsTrigger value="config" className="flex-1 md:flex-none"><Settings className="size-4" /> Configurações</TabsTrigger>
           </TabsList>
 
           <TabsContent value="caixa">
