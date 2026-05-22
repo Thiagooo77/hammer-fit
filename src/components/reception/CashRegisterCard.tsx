@@ -176,9 +176,10 @@ export const CashRegisterCard = React.memo(({
               <Button 
                 className="w-full gap-2 font-bold" 
                 variant="default"
-                onClick={() => setOpenDialogOpen(true)}
+                onClick={() => openMutation.mutate()}
+                disabled={openMutation.isPending}
               >
-                <Plus className="size-4" />
+                {openMutation.isPending ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
                 Abrir Novo Caixa
               </Button>
             ) : (
