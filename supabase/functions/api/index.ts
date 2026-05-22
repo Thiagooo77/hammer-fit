@@ -318,6 +318,75 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
     await logAudit({ userId: user.id, actionType: "receptionist_delete", module: "users", description: `Excluiu ${rec.name}`, oldData: rec, ip: meta.ip, ua: meta.ua });
     return { ok: true };
   },
+  "admin.listPendingCashSessions": async ({ user }) => {
+    await assertAdmin(user.id, user.email);
+    const { data, error } = await admin
+      .from("cash_sessions")
+      .select("*, receptionists(id, name, email, avatar_url)")
+      .eq("status", "pending_review")
+      .order("closed_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    const ids = (data || []).map((s: any) => s.id);
+    let salesBySession: Record<string, any[]> = {};
+    if (ids.length) {
+      const { data: sales } = await admin.from("sales").select("*").in("cash_session_id", ids);
+      for (const s of sales || []) {
+        (salesBySession[s.cash_session_id] ||= []).push(s);
+      }
+    }
+    return {
+      sessions: (data || []).map((s: any) => ({
+        ...s,
+        sales: salesBySession[s.id] || [],
+        sales_count: (salesBySession[s.id] || []).length,
+        sales_total: (salesBySession[s.id] || []).reduce((a, x) => a + Number(x.amount), 0),
+      })),
+    };
+  },
+  "admin.approveCashSession": async ({ user, data, meta }) => {
+    await assertAdmin(user.id, user.email);
+    const { data: session } = await admin.from("cash_sessions").select("*, receptionists(name)").eq("id", data.session_id).single();
+    if (!session) throw new Error("Sessão não encontrada");
+    if (session.status !== "pending_review") throw new Error("Sessão não está em análise.");
+    const newNotes = [session.notes, data.admin_notes ? `[ADM] ${data.admin_notes}` : null].filter(Boolean).join("\n");
+    const { data: updated, error } = await admin.from("cash_sessions").update({
+      status: "closed",
+      notes: newNotes,
+    }).eq("id", data.session_id).select().single();
+    if (error) throw new Error(error.message);
+    await logAudit({
+      userId: user.id,
+      actionType: "cash_close_approve",
+      module: "cash",
+      description: `Aprovou fechamento de ${session.receptionists?.name || "recepcionista"} (dif R$ ${Number(session.difference || 0).toFixed(2)})`,
+      oldData: session, newData: updated, ip: meta.ip, ua: meta.ua,
+    });
+    return { session: updated };
+  },
+  "admin.reopenCashSession": async ({ user, data, meta }) => {
+    await assertAdmin(user.id, user.email);
+    const { data: session } = await admin.from("cash_sessions").select("*, receptionists(name)").eq("id", data.session_id).single();
+    if (!session) throw new Error("Sessão não encontrada");
+    if (session.status !== "pending_review") throw new Error("Sessão não está em análise.");
+    const newNotes = [session.notes, data.admin_notes ? `[ADM-REABERTO] ${data.admin_notes}` : null].filter(Boolean).join("\n");
+    const { data: updated, error } = await admin.from("cash_sessions").update({
+      status: "open",
+      closed_at: null,
+      closing_balance: null,
+      difference: null,
+      expected_balance: null,
+      notes: newNotes,
+    }).eq("id", data.session_id).select().single();
+    if (error) throw new Error(error.message);
+    await logAudit({
+      userId: user.id,
+      actionType: "cash_close_reopen",
+      module: "cash",
+      description: `Reabriu caixa de ${session.receptionists?.name || "recepcionista"}`,
+      oldData: session, newData: updated, ip: meta.ip, ua: meta.ua,
+    });
+    return { session: updated };
+  },
 
 
 
