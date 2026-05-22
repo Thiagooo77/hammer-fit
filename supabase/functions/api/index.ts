@@ -34,8 +34,18 @@ async function getUser(req: Request) {
     global: { headers: { Authorization: `Bearer ${token}` } },
     auth: { persistSession: false, autoRefreshToken: false },
   });
+  // Try modern signing-keys verification first, then fall back to getUser.
+  try {
+    const { data, error } = await (userClient.auth as any).getClaims(token);
+    if (!error && data?.claims?.sub) {
+      return { id: data.claims.sub as string, email: (data.claims.email as string) ?? null, client: userClient };
+    }
+  } catch (_) { /* fall through */ }
   const { data, error } = await userClient.auth.getUser(token);
-  if (error || !data.user) return null;
+  if (error || !data.user) {
+    console.error("[AUTH_FAIL]", error?.message);
+    return null;
+  }
   return { id: data.user.id, email: data.user.email ?? null, client: userClient };
 }
 
