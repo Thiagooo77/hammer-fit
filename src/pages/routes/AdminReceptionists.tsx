@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Users, Plus, KeyRound, Loader2, Pencil } from "lucide-react";
+import { ArrowLeft, Users, Plus, KeyRound, Loader2, Pencil, Trash2 } from "lucide-react";
 
 export default function AdminReceptionists() {
   const list = useServerFn(listReceptionists);
