@@ -13,7 +13,8 @@ import {
   Menu,
   X,
   CheckSquare,
-  Building2
+  Building2,
+  Wallet
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
