@@ -526,6 +526,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      update_my_avatar: { Args: { p_url: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "manager" | "receptionist"

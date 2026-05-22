@@ -4,7 +4,8 @@ import { CashRegisterCard } from "@/components/reception/CashRegisterCard";
 import { GoalsProgress } from "@/components/reception/GoalsProgress";
 import { RankingBoard } from "@/components/reception/RankingBoard";
 import { DailySummary } from "@/components/reception/DailySummary";
-import { Users, LayoutDashboard, Loader2, LogOut, ShieldCheck, Wallet, Trophy, BarChart3 } from "lucide-react";
+import { Users, LayoutDashboard, Loader2, LogOut, ShieldCheck, Wallet, Trophy, BarChart3, Settings } from "lucide-react";
+import { SettingsPanel } from "@/components/reception/SettingsPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -73,6 +74,7 @@ export default function ReceptionDashboard() {
             <TabsTrigger value="metas" className="flex-1 md:flex-none"><Users className="size-4" /> Metas</TabsTrigger>
             <TabsTrigger value="ranking" className="flex-1 md:flex-none"><Trophy className="size-4" /> Ranking</TabsTrigger>
             <TabsTrigger value="resumo" className="flex-1 md:flex-none"><BarChart3 className="size-4" /> Resumo</TabsTrigger>
+            <TabsTrigger value="config" className="flex-1 md:flex-none"><Settings className="size-4" /> Configurações</TabsTrigger>
           </TabsList>
 
           <TabsContent value="caixa">
@@ -105,6 +107,10 @@ export default function ReceptionDashboard() {
 
           <TabsContent value="resumo">
             <DailySummary totalSold={smartStats.totalSoldToday} salesCount={smartStats.vendasCount} ticketMedio={smartStats.ticketMedio} bestHour={smartStats.mostLucrativeHour} />
+          </TabsContent>
+
+          <TabsContent value="config">
+            <SettingsPanel receptionist={receptionist} onUpdated={refetch} />
           </TabsContent>
         </Tabs>
       </main>
