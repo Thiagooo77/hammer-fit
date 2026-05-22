@@ -239,17 +239,25 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
   "admin.deleteSale": async ({ user, data, meta }) => {
     await assertAdmin(user.id, user.email);
     const { data: before } = await admin.from("sales").select("*").eq("id", data.id).single();
-    // Soft delete: keep the record so the receptionist's history/totals are preserved,
-    // but mark it hidden so it disappears from listings.
     const { error } = await admin.from("sales").update({
       hidden_at: new Date().toISOString(),
       hidden_by: user.id,
       hidden_reason: data.reason || null,
     } as any).eq("id", data.id);
     if (error) throw new Error(error.message);
+    // Decrement goal_progress so receptionist totals reflect the removal
+    if (before?.receptionist_id && before?.amount) {
+      const { data: gp } = await admin.from("goal_progress").select("sold_amount").eq("receptionist_id", before.receptionist_id).maybeSingle();
+      if (gp) {
+        await admin.from("goal_progress").update({
+          sold_amount: Math.max(Number(gp.sold_amount) - Number(before.amount), 0),
+        }).eq("receptionist_id", before.receptionist_id);
+      }
+    }
     await logAudit({ userId: user.id, actionType: "sale_delete", module: "sales", description: `Admin ocultou venda ${data.id} (R$ ${before?.amount})`, oldData: before, ip: meta.ip, ua: meta.ua });
     return { success: true };
   },
+
   "admin.listReceptionistsBasic": async ({ user }) => {
     await assertAdmin(user.id, user.email);
     const { data, error } = await admin.from("receptionists").select("id, name").eq("active", true).order("name");
