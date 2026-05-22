@@ -60,6 +60,7 @@ export default function App() {
           <Route path="/admin/audit" element={<AdminAudit />} />
           <Route path="/admin/goals" element={<AdminGoals />} />
           <Route path="/admin/reports" element={<AdminReports />} />
+          <Route path="/admin/cash-approvals" element={<AdminCashApprovals />} />
         </Route>
 
         <Route path="/reception/dashboard" element={<ReceptionDashboard />} />
