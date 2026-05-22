@@ -64,6 +64,16 @@ export default function AdminReceptionists() {
                   </div>
                   <Button variant="ghost" size="icon" onClick={() => { setEditing(r); setCreating(false); }}><Pencil className="h-4 w-4" /></Button>
                   <Button variant="ghost" size="icon" onClick={() => setResetting(r)}><KeyRound className="h-4 w-4" /></Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Excluir cadastro"
+                    disabled={deleteMut.isPending || r.email === "admhammer@gmail.com"}
+                    onClick={() => { if (confirm(`Excluir o cadastro de ${r.name}? Esta ação é permanente.`)) deleteMut.mutate(r.id); }}
+                  >
+                    {deleteMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4 text-red-400" />}
+                  </Button>
+
                 </div>
               ))
             }
