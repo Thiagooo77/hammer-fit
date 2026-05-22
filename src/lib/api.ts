@@ -3,11 +3,22 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export async function callApi<TResult = unknown>(action: string, data?: unknown): Promise<TResult> {
+  // Guard: never invoke the edge function without an authenticated session.
+  // Otherwise stale/expired refresh tokens cause an unhandled 401 that the
+  // runtime error reporter surfaces as a blank screen.
+  const { data: sessionData } = await supabase.auth.getSession();
+  const token = sessionData?.session?.access_token;
+  if (!token) {
+    const err: any = new Error("Sessão expirada. Faça login novamente.");
+    err.code = "NO_SESSION";
+    throw err;
+  }
+
   const { data: result, error } = await supabase.functions.invoke("api", {
     body: { action, data },
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (error) {
-    // Supabase wraps non-2xx as FunctionsHttpError; surface inner message when possible.
     let msg = error.message || "Erro na chamada do servidor";
     const ctx = (error as any).context;
     if (ctx && typeof ctx.json === "function") {
