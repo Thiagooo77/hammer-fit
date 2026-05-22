@@ -189,7 +189,7 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
     const dailyGoalAmount = Number((dailyGoal as any)?.goal_amount || 0);
     return {
       kpis: {
-        revenueToday: totalRevenueToday, revenueWeek: totalRevenueWeek,
+        revenueToday: totalRevenueToday, revenueWeek: totalRevenueWeek, revenueMonth: totalRevenueMonth,
         receptionistsCount: activeReceptionists?.length || 0,
         dailyGoalStatus: dailyGoalAmount > 0 ? Math.round((totalRevenueToday / dailyGoalAmount) * 100) : 0,
         dailyGoalAmount, ticketMedio, vendasCount: salesCountToday,
