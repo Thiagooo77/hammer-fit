@@ -70,7 +70,7 @@ export default function AdminDashboard() {
           <StatCard title="Receita Hoje" value={`R$ ${kpis.revenueToday.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`} icon={<DollarSign />} />
           <StatCard title="Vendas" value={`${kpis.vendasCount}`} icon={<LayoutDashboard />} />
           <StatCard title="Meta do Dia" value={`${kpis.dailyGoalStatus}%`} icon={<Target />} />
-          <StatCard title="Sessões Ativas" value={`${kpis.receptionistsCount}`} icon={<Users />} />
+          <StatCard title="Venda Total Mês" value={`R$ ${Number(kpis.revenueMonth || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`} icon={<TrendingUp />} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 space-y-8">
