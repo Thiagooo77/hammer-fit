@@ -21,7 +21,12 @@ export default function LoginPage() {
               Sistema de Gestão de Alta Performance
             </CardDescription>
           </CardHeader>
-          <CardContent className="px-8 pb-10"><LoginForm /></CardContent>
+          <CardContent className="px-8 pb-10 space-y-6">
+            <LoginForm />
+            <p className="text-center text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+              Contas são criadas exclusivamente pelo administrador.
+            </p>
+          </CardContent>
         </Card>
       </motion.div>
     </div>
