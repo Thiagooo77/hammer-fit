@@ -258,6 +258,42 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
     return { success: true };
   },
 
+  // ---------- admin general goals (academy-wide) ----------
+  "admin.listGoals": async ({ user }) => {
+    await assertAdmin(user.id, user.email);
+    const { data, error } = await admin.from("goals" as any).select("*").order("goal_date", { ascending: false }).limit(60);
+    if (error) throw new Error(error.message);
+    return { goals: data || [] };
+  },
+  "admin.upsertGoal": async ({ user, data, meta }) => {
+    await assertAdmin(user.id, user.email);
+    const goal_date = data?.goal_date || new Date().toISOString().substring(0, 10);
+    const goal_amount = Number(data?.goal_amount);
+    if (!goal_amount || goal_amount <= 0) throw new Error("Valor da meta inválido");
+    const { data: existing } = await admin.from("goals" as any).select("*").eq("goal_date", goal_date).maybeSingle();
+    let saved: any;
+    if (existing) {
+      const { data: updated, error } = await admin.from("goals" as any).update({ goal_amount }).eq("id", (existing as any).id).select().single();
+      if (error) throw new Error(error.message);
+      saved = updated;
+      await logAudit({ userId: user.id, actionType: "goal_update", module: "goals", description: `Meta geral ${goal_date} alterada para R$ ${goal_amount}`, oldData: existing, newData: saved, ip: meta.ip, ua: meta.ua });
+    } else {
+      const { data: created, error } = await admin.from("goals" as any).insert({ goal_amount, goal_date, created_by: user.id }).select().single();
+      if (error) throw new Error(error.message);
+      saved = created;
+      await logAudit({ userId: user.id, actionType: "goal_create", module: "goals", description: `Meta geral criada ${goal_date}: R$ ${goal_amount}`, newData: saved, ip: meta.ip, ua: meta.ua });
+    }
+    return { goal: saved };
+  },
+  "admin.deleteGoal": async ({ user, data, meta }) => {
+    await assertAdmin(user.id, user.email);
+    const { data: before } = await admin.from("goals" as any).select("*").eq("id", data.id).maybeSingle();
+    const { error } = await admin.from("goals" as any).delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await logAudit({ userId: user.id, actionType: "goal_delete", module: "goals", description: `Meta geral excluída`, oldData: before, ip: meta.ip, ua: meta.ua });
+    return { success: true };
+  },
+
   "admin.listReceptionistsBasic": async ({ user }) => {
     await assertAdmin(user.id, user.email);
     const { data, error } = await admin.from("receptionists").select("id, name").eq("active", true).order("name");
