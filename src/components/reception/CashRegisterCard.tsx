@@ -117,65 +117,88 @@ export const CashRegisterCard = React.memo(({
     onError: (e: any) => toast.error(e.message),
   });
 
-  const statusColors = {
-    "Aberto": "bg-green-500/20 text-green-500 border-green-500/50",
-    "Em análise": "bg-yellow-500/20 text-yellow-500 border-yellow-500/50",
-    "Fechado": "bg-red-500/20 text-red-500 border-red-500/50",
-  };
+  const statusStyles = {
+    "Aberto": { dot: "bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.8)]", chip: "bg-green-500/15 text-green-400 border-green-500/40", label: "AO VIVO" },
+    "Em análise": { dot: "bg-yellow-500 shadow-[0_0_12px_rgba(234,179,8,0.8)]", chip: "bg-yellow-500/15 text-yellow-400 border-yellow-500/40", label: "ANÁLISE" },
+    "Fechado": { dot: "bg-red-500/80", chip: "bg-red-500/15 text-red-400 border-red-500/40", label: "FECHADO" },
+  } as const;
+  const s = statusStyles[status];
 
   return (
     <>
-      <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-lg font-bold flex items-center gap-2">
-            <Wallet className="size-5 text-primary" />
+      <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-card/80 via-card/60 to-background backdrop-blur-xl shadow-[0_8px_40px_-12px_rgba(179,114,45,0.35)]">
+        {/* Decorative glow */}
+        <div className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-primary/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 -left-16 size-48 rounded-full bg-primary/10 blur-3xl" />
+
+        <CardHeader className="relative flex flex-row items-center justify-between pb-3 border-b border-primary/10">
+          <CardTitle className="text-base font-black uppercase italic tracking-tight flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-primary/15 border border-primary/30">
+              <Wallet className="size-4 text-primary" />
+            </div>
             Caixa Atual
           </CardTitle>
-          <Badge variant="outline" className={statusColors[status]}>
-            {status}
+          <Badge variant="outline" className={`gap-1.5 font-black text-[10px] tracking-widest ${s.chip}`}>
+            <span className={`size-1.5 rounded-full ${s.dot} ${status === "Aberto" ? "animate-pulse" : ""}`} />
+            {s.label}
           </Badge>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-muted-foreground">Abertura</p>
-              <p className="font-medium">{startTime}</p>
+
+        <CardContent className="relative space-y-5 pt-5">
+          {/* Meta row */}
+          <div className="grid grid-cols-2 gap-3 text-xs">
+            <div className="p-2.5 rounded-lg bg-secondary/40 border border-primary/5">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-0.5">Abertura</p>
+              <p className="font-black tabular-nums">{startTime}</p>
             </div>
-            <div>
-              <p className="text-muted-foreground">Responsável</p>
-              <p className="font-medium truncate max-w-[120px]" title={responsible}>{responsible}</p>
+            <div className="p-2.5 rounded-lg bg-secondary/40 border border-primary/5">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-0.5">Responsável</p>
+              <p className="font-black truncate" title={responsible}>{responsible}</p>
             </div>
           </div>
 
-          <div className="py-4 border-y border-primary/10">
-            <div className="flex justify-between items-end mb-1">
-              <p className="text-muted-foreground text-sm">Total Vendido</p>
-              <p className="text-2xl font-black text-primary">
-                R$ {totalSales.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </p>
+          {/* Hero total */}
+          <div className="relative p-5 rounded-2xl bg-gradient-to-br from-primary/15 via-primary/5 to-transparent border border-primary/25 overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(179,114,45,0.18),transparent_60%)]" />
+            <div className="relative">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-primary/80 font-black mb-1">Total Vendido</p>
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span className="text-xs font-black text-primary/70">R$</span>
+                <span className="text-4xl md:text-5xl font-black italic tracking-tighter text-primary leading-none tabular-nums">
+                  {totalSales.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="size-1 rounded-full bg-primary/60" />
+                <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">
+                  {salesCount} {salesCount === 1 ? "venda" : "vendas"} registradas
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground text-right">
-              {salesCount} vendas realizadas
-            </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 py-2">
-            <PaymentItem icon={<Landmark className="size-3" />} label="PIX" value={payments.pix} />
-            <PaymentItem icon={<Banknote className="size-3" />} label="Dinheiro" value={payments.dinheiro} />
-            <PaymentItem icon={<CreditCard className="size-3" />} label="Cartão" value={payments.cartao} />
-            <PaymentItem icon={<HandCoins className="size-3" />} label="Convênio" value={payments.convenio} />
-            <PaymentItem icon={<Plus className="size-3" />} label="Outros" value={payments.outros} />
+          {/* Payment breakdown */}
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-black mb-2">Por Pagamento</p>
+            <div className="grid grid-cols-5 gap-1.5">
+              <PaymentItem icon={<Landmark className="size-3.5" />} label="PIX" value={payments.pix} accent="emerald" />
+              <PaymentItem icon={<Banknote className="size-3.5" />} label="Dinheiro" value={payments.dinheiro} accent="green" />
+              <PaymentItem icon={<CreditCard className="size-3.5" />} label="Cartão" value={payments.cartao} accent="blue" />
+              <PaymentItem icon={<HandCoins className="size-3.5" />} label="Convênio" value={payments.convenio} accent="violet" />
+              <PaymentItem icon={<Plus className="size-3.5" />} label="Outros" value={payments.outros} accent="amber" />
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-2 pt-2">
+          {/* Actions */}
+          <div className="grid grid-cols-1 gap-2 pt-1">
             {!receptionistId ? (
-              <div className="text-center py-2 text-xs text-muted-foreground italic">
-                Operação de caixa indisponível para esta conta. Use uma conta de recepcionista para abrir/fechar caixa.
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-xs text-yellow-200">
+                <AlertCircle className="size-4 shrink-0 mt-0.5" />
+                <span>Operação de caixa indisponível. Use uma conta de recepcionista para abrir/fechar caixa.</span>
               </div>
             ) : status === "Fechado" ? (
-              <Button 
-                className="w-full gap-2 font-bold" 
-                variant="default"
+              <Button
+                className="w-full gap-2 h-12 font-black uppercase italic tracking-wide bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/30"
                 onClick={() => openMutation.mutate()}
                 disabled={openMutation.isPending}
               >
@@ -184,9 +207,8 @@ export const CashRegisterCard = React.memo(({
               </Button>
             ) : (
               <>
-                <Button 
-                  className="w-full gap-2 font-bold" 
-                  variant="default"
+                <Button
+                  className="w-full gap-2 h-12 font-black uppercase italic tracking-wide bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/30"
                   onClick={() => setSaleDialogOpen(true)}
                   disabled={status === "Em análise"}
                 >
@@ -194,29 +216,32 @@ export const CashRegisterCard = React.memo(({
                   Adicionar Venda
                 </Button>
                 <div className="grid grid-cols-2 gap-2">
-                  <Button 
-                    variant="outline" 
-                    className="gap-2 border-primary/20 hover:bg-primary/10"
+                  <Button
+                    variant="outline"
+                    className="h-10 gap-2 border-primary/20 hover:bg-primary/10 font-bold"
                     onClick={() => setCloseDialogOpen(true)}
                     disabled={status === "Em análise"}
                   >
                     <Lock className="size-4" />
-                    Encerrar Caixa
+                    Encerrar
                   </Button>
                   {canViewAudit ? (
                     <Link to="/admin/audit" className="flex-1">
-                      <Button variant="outline" className="w-full gap-2 border-primary/20 hover:bg-primary/10">
+                      <Button variant="outline" className="w-full h-10 gap-2 border-primary/20 hover:bg-primary/10 font-bold">
                         <Search className="size-4" />
                         Auditoria
                       </Button>
                     </Link>
-                  ) : null}
+                  ) : (
+                    <div className="h-10 rounded-md border border-dashed border-primary/10" />
+                  )}
                 </div>
               </>
             )}
           </div>
         </CardContent>
       </Card>
+
 
       {/* Dialog Fechamento */}
       <Dialog open={closeDialogOpen} onOpenChange={setCloseDialogOpen}>
@@ -327,12 +352,24 @@ export const CashRegisterCard = React.memo(({
   );
 });
 
-function PaymentItem({ icon, label, value }: { icon: React.ReactNode, label: string, value: number }) {
+const ACCENTS: Record<string, string> = {
+  emerald: "from-emerald-500/20 to-emerald-500/5 border-emerald-500/30 text-emerald-300",
+  green: "from-green-500/20 to-green-500/5 border-green-500/30 text-green-300",
+  blue: "from-blue-500/20 to-blue-500/5 border-blue-500/30 text-blue-300",
+  violet: "from-violet-500/20 to-violet-500/5 border-violet-500/30 text-violet-300",
+  amber: "from-amber-500/20 to-amber-500/5 border-amber-500/30 text-amber-300",
+};
+
+function PaymentItem({ icon, label, value, accent = "amber" }: { icon: React.ReactNode, label: string, value: number, accent?: string }) {
+  const cls = ACCENTS[accent] || ACCENTS.amber;
+  const active = value > 0;
   return (
-    <div className="flex flex-col items-center p-2 rounded-lg bg-secondary/50 border border-primary/5">
-      <div className="text-primary mb-1">{icon}</div>
-      <p className="text-[10px] text-muted-foreground uppercase font-bold">{label}</p>
-      <p className="text-xs font-bold">R$ {value.toFixed(0)}</p>
+    <div className={`flex flex-col items-center gap-1 p-2 rounded-xl bg-gradient-to-b border transition-all ${active ? cls : "from-secondary/40 to-secondary/10 border-white/5 text-muted-foreground opacity-60"}`}>
+      <div>{icon}</div>
+      <p className="text-[9px] uppercase font-black tracking-wider leading-none">{label}</p>
+      <p className="text-[11px] font-black tabular-nums leading-none">
+        {value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value.toFixed(0)}
+      </p>
     </div>
   );
 }
