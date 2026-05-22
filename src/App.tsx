@@ -14,6 +14,7 @@ import AdminReceptionists from "@/pages/routes/AdminReceptionists";
 import AdminGoals from "@/pages/routes/AdminGoals";
 import AdminReports from "@/pages/routes/AdminReports";
 import AdminCashApprovals from "@/pages/routes/AdminCashApprovals";
+import AdminSettings from "@/pages/routes/AdminSettings";
 
 import ReceptionDashboard from "@/pages/routes/ReceptionDashboard";
 import ReceptionTasks from "@/pages/routes/ReceptionTasks";
@@ -61,6 +62,7 @@ export default function App() {
           <Route path="/admin/goals" element={<AdminGoals />} />
           <Route path="/admin/reports" element={<AdminReports />} />
           <Route path="/admin/cash-approvals" element={<AdminCashApprovals />} />
+          <Route path="/admin/settings" element={<AdminSettings />} />
         </Route>
 
         <Route path="/reception/dashboard" element={<ReceptionDashboard />} />
