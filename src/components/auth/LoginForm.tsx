@@ -55,6 +55,7 @@ export function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
+    console.log('[LoginForm:submit]', { email: values.email });
 
     // Removed destructive stuck timeout
 
@@ -81,12 +82,16 @@ export function LoginForm() {
           .from("user_roles")
           .select("role")
           .eq("user_id", data.user.id)
+          .limit(1)
           .maybeSingle(),
         3000,
         "Tempo de permissões excedido"
-      ).catch(() => ({ data: null }));
+      ).catch((error) => {
+        console.error('[LoginForm:role_lookup_error]', error);
+        return { data: null };
+      });
 
-      const finalRole = roleData?.role || (values.email === 'admhammer@gmail.com' ? 'admin' : null);
+      const finalRole = roleData?.role || (values.email === 'admhammer@gmail.com' ? 'admin' : 'receptionist');
 
       // Delay to let Supabase settle the session in storage before reload
       setTimeout(() => {
