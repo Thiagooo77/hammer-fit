@@ -9,3 +9,6 @@ export const updateReceptionist = makeFn<any, { receptionist: any }>("admin.upda
 export const resetReceptionistPassword = makeFn<{ id: string; password: string }, { ok: true }>(
   "admin.resetReceptionistPassword",
 );
+
+export const deleteReceptionist = makeFn<{ id: string }, { ok: true }>("admin.deleteReceptionist");
+
