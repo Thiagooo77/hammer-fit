@@ -143,17 +143,20 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
     await assertAdmin(user.id, user.email);
     const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
     const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - 7); weekStart.setHours(0, 0, 0, 0);
+    const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
     const [
-      { data: todaySales }, { data: weekSales }, { data: ranking },
+      { data: todaySales }, { data: weekSales }, { data: monthSales }, { data: ranking },
       { data: activeReceptionists }, { data: dailyGoal }, { data: sessions },
     ] = await Promise.all([
       admin.from("sales").select("amount, created_at").is("hidden_at", null).gte("created_at", todayStart.toISOString()),
       admin.from("sales").select("amount, created_at").is("hidden_at", null).gte("created_at", weekStart.toISOString()),
+      admin.from("sales").select("amount").is("hidden_at", null).gte("created_at", monthStart.toISOString()),
       admin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists(name, avatar_url)").order("sold_amount", { ascending: false }),
       admin.from("receptionists").select("id").eq("active", true),
       admin.from("goals" as any).select("goal_amount").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle() as any,
       admin.from("cash_sessions").select("id").gte("opened_at", todayStart.toISOString()),
     ]);
+    const totalRevenueMonth = (monthSales || []).reduce((a: number, s: any) => a + Number(s.amount), 0);
     const totalRevenueToday = (todaySales || []).reduce((a: number, s: any) => a + Number(s.amount), 0);
     const totalRevenueWeek = (weekSales || []).reduce((a: number, s: any) => a + Number(s.amount), 0);
     const salesCountToday = todaySales?.length || 0;
