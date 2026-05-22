@@ -18,6 +18,8 @@ export default function AdminReceptionists() {
   const create = useServerFn(createReceptionist);
   const update = useServerFn(updateReceptionist);
   const reset = useServerFn(resetReceptionistPassword);
+  const del = useServerFn(deleteReceptionist);
+
   const qc = useQueryClient();
   const [editing, setEditing] = useState<any>(null);
   const [creating, setCreating] = useState(false);
