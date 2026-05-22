@@ -225,17 +225,8 @@ export const CashRegisterCard = React.memo(({
                     <Lock className="size-4" />
                     Encerrar
                   </Button>
-                  {canViewAudit ? (
-                    <Link to="/admin/audit" className="flex-1">
-                      <Button variant="outline" className="w-full h-10 gap-2 border-primary/20 hover:bg-primary/10 font-bold">
-                        <Search className="size-4" />
-                        Auditoria
-                      </Button>
-                    </Link>
-                  ) : (
-                    <div className="h-10 rounded-md border border-dashed border-primary/10" />
-                  )}
                 </div>
+
               </>
             )}
           </div>
