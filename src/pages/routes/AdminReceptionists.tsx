@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useServerFn } from "@/lib/useServerFn";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { listReceptionists, createReceptionist, updateReceptionist, resetReceptionistPassword } from "@/lib/admin-receptionists.functions";
+import { listReceptionists, createReceptionist, updateReceptionist, resetReceptionistPassword, deleteReceptionist } from "@/lib/admin-receptionists.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
