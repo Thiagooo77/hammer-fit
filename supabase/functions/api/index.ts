@@ -518,7 +518,7 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
       admin.from("goals" as any).select("goal_amount").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle() as any,
       admin.from("goal_progress").select("goal_amount, sold_amount").eq("receptionist_id", receptionist.id).maybeSingle(),
       admin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists(name, avatar_url)").order("sold_amount", { ascending: false }).limit(10),
-      admin.from("sales").select("amount, payment_method, created_at").gte("created_at", todayStart.toISOString()).lt("created_at", tomorrowStart.toISOString()),
+      admin.from("sales").select("amount, payment_method, created_at").is("hidden_at", null).gte("created_at", todayStart.toISOString()).lt("created_at", tomorrowStart.toISOString()),
       admin.from("cash_sessions").select("id, status, opened_at, closed_at, receptionists(name)").gte("opened_at", todayStart.toISOString()).order("opened_at", { ascending: true }),
     ]);
     const formattedRanking = (ranking || []).map((item: any, i: number) => ({
