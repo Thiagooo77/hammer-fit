@@ -28,9 +28,9 @@ function AuthenticatedLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-950 w-full max-w-full overflow-x-hidden">
+    <div className="flex min-h-screen bg-slate-950 w-full">
       <DashboardSidebar />
-      <main className="flex-1 min-w-0 w-full max-w-full overflow-x-hidden">
+      <main className="flex-1 min-w-0 overflow-x-hidden">
         <Outlet />
       </main>
     </div>
