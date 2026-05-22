@@ -72,17 +72,17 @@ export default function ReceptionDashboard() {
                 status={currentSession ? (currentSession.status === "open" ? "Aberto" : "Em análise") : "Fechado"}
                 startTime={currentSession ? new Date(currentSession.opened_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--"}
                 responsible={currentSession ? (currentSession.receptionists as any)?.name || "N/A" : "Nenhum"}
-                totalSales={smartStats.totalSoldToday}
-                salesCount={smartStats.vendasCount}
+                totalSales={data?.currentSessionStats?.total || 0}
+                salesCount={data?.currentSessionStats?.count || 0}
                 receptionistId={receptionist.id}
                 sessionId={currentSession?.id}
                 canViewAudit={role === "admin" || role === "manager"}
                 payments={{
-                  pix: charts?.paymentMethods.find((p: any) => p.name === "Pix")?.value || 0,
-                  dinheiro: charts?.paymentMethods.find((p: any) => p.name === "Dinheiro")?.value || 0,
-                  cartao: charts?.paymentMethods.find((p: any) => p.name === "Cartao")?.value || 0,
-                  convenio: charts?.paymentMethods.find((p: any) => p.name === "Convenio")?.value || 0,
-                  outros: charts?.paymentMethods.find((p: any) => p.name === "Outros")?.value || 0,
+                  pix: data?.currentSessionStats?.payments?.pix || 0,
+                  dinheiro: data?.currentSessionStats?.payments?.dinheiro || 0,
+                  cartao: data?.currentSessionStats?.payments?.cartao || 0,
+                  convenio: data?.currentSessionStats?.payments?.convenio || 0,
+                  outros: data?.currentSessionStats?.payments?.outros || 0,
                 }}
               />
               <GoalsProgress title="Sua Meta" icon={<Target className="size-5" />} target={goalProgress ? Number(goalProgress.goal_amount) : 0} current={goalProgress ? Number(goalProgress.sold_amount) : 0} type="individual" />

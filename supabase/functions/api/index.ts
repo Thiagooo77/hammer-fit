@@ -522,12 +522,35 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
     const paymentChart = Object.keys(paymentMethods).map((k) => ({ name: k.charAt(0).toUpperCase() + k.slice(1), value: paymentMethods[k] }));
     const currentHour = new Date().getHours();
     const filteredCharts = salesByHour.filter((_, i) => salesByHour[i].count > 0 || currentHour >= i);
+
+    // Sales of the CURRENT open/pending session only — used to reset the cash card on close
+    let sessionSales: any[] = [];
+    if (currentSession?.id) {
+      const { data: ss } = await admin.from("sales").select("amount, payment_method").eq("cash_session_id", currentSession.id);
+      sessionSales = ss || [];
+    }
+    const sessionTotal = sessionSales.reduce((a, s) => a + Number(s.amount), 0);
+    const sessionPayments = sessionSales.reduce((acc: any, s: any) => {
+      acc[s.payment_method] = (acc[s.payment_method] || 0) + Number(s.amount); return acc;
+    }, {});
+
     return {
       receptionist, currentSession, dailyGoal, goalProgress,
       ranking: formattedRanking,
       smartStats: { remaining, percentage, totalSoldToday, vendasCount: sales.length, ticketMedio, mostLucrativeHour },
       charts: { salesByHour: filteredCharts, paymentMethods: paymentChart },
       todaysSessions: todaysSessions || [],
+      currentSessionStats: {
+        total: sessionTotal,
+        count: sessionSales.length,
+        payments: {
+          pix: sessionPayments.pix || 0,
+          dinheiro: sessionPayments.dinheiro || 0,
+          cartao: sessionPayments.cartao || 0,
+          convenio: sessionPayments.convenio || 0,
+          outros: sessionPayments.outros || 0,
+        },
+      },
     };
   },
 };
