@@ -41,7 +41,7 @@ export function DashboardSidebar() {
         { title: "Colaboradores", icon: Users, href: "/admin/receptionists", roles: ["admin", "manager"] },
         { title: "Metas", icon: Target, href: "/admin/goals", roles: ["admin", "manager"] },
         { title: "Relatórios", icon: FileText, href: "/admin/reports", roles: ["admin", "manager"] },
-        { title: "Log de Auditoria", icon: ShieldCheck, href: "/admin/audit", roles: ["admin", "manager"] },
+        
       ];
     }
     // Receptionist menu — sem duplicações

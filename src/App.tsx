@@ -10,7 +10,7 @@ import { UnauthorizedPage } from "@/pages/Unauthorized";
 import AdminDashboard from "@/pages/routes/AdminDashboard";
 import AdminSales from "@/pages/routes/AdminSales";
 import AdminReceptionists from "@/pages/routes/AdminReceptionists";
-import AdminAudit from "@/pages/routes/AdminAudit";
+
 import AdminGoals from "@/pages/routes/AdminGoals";
 import AdminReports from "@/pages/routes/AdminReports";
 import AdminCashApprovals from "@/pages/routes/AdminCashApprovals";
@@ -57,7 +57,7 @@ export default function App() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/sales" element={<AdminSales />} />
           <Route path="/admin/receptionists" element={<AdminReceptionists />} />
-          <Route path="/admin/audit" element={<AdminAudit />} />
+          
           <Route path="/admin/goals" element={<AdminGoals />} />
           <Route path="/admin/reports" element={<AdminReports />} />
           <Route path="/admin/cash-approvals" element={<AdminCashApprovals />} />
