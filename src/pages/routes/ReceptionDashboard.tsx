@@ -4,9 +4,10 @@ import { CashRegisterCard } from "@/components/reception/CashRegisterCard";
 import { GoalsProgress } from "@/components/reception/GoalsProgress";
 import { RankingBoard } from "@/components/reception/RankingBoard";
 import { DailySummary } from "@/components/reception/DailySummary";
-import { Target, Users, LayoutDashboard, Calendar, User as UserIcon, Loader2, LogOut, ShieldCheck } from "lucide-react";
+import { Users, LayoutDashboard, Loader2, LogOut, ShieldCheck, Wallet, Trophy, BarChart3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@/lib/useServerFn";
@@ -66,34 +67,46 @@ export default function ReceptionDashboard() {
           <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic">BOAS VINDAS, {receptionist.name.split(" ")[0]}!</h2>
           <p className="text-slate-400 mt-2">Status: <span className="font-black text-primary uppercase">{currentSession ? "Turno Ativo" : "Aguardando"}</span></p>
         </motion.div>
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-8 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <CashRegisterCard
-                status={currentSession ? (currentSession.status === "open" ? "Aberto" : "Em análise") : "Fechado"}
-                startTime={currentSession ? new Date(currentSession.opened_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--"}
-                responsible={currentSession ? (currentSession.receptionists as any)?.name || "N/A" : "Nenhum"}
-                totalSales={data?.currentSessionStats?.total || 0}
-                salesCount={data?.currentSessionStats?.count || 0}
-                receptionistId={receptionist.id}
-                sessionId={currentSession?.id}
-                canViewAudit={role === "admin" || role === "manager"}
-                payments={{
-                  pix: data?.currentSessionStats?.payments?.pix || 0,
-                  dinheiro: data?.currentSessionStats?.payments?.dinheiro || 0,
-                  cartao: data?.currentSessionStats?.payments?.cartao || 0,
-                  convenio: data?.currentSessionStats?.payments?.convenio || 0,
-                  outros: data?.currentSessionStats?.payments?.outros || 0,
-                }}
-              />
-              <GoalsProgress title="Meta Geral da Academia" icon={<Users className="size-5" />} target={gymTarget} current={gymCurrent} type="general" />
-            </div>
-          </div>
-          <div className="lg:col-span-4 space-y-6">
+        <Tabs defaultValue="caixa" className="w-full">
+          <TabsList className="w-full md:w-auto flex flex-wrap h-auto">
+            <TabsTrigger value="caixa" className="flex-1 md:flex-none"><Wallet className="size-4" /> Caixa</TabsTrigger>
+            <TabsTrigger value="metas" className="flex-1 md:flex-none"><Users className="size-4" /> Metas</TabsTrigger>
+            <TabsTrigger value="ranking" className="flex-1 md:flex-none"><Trophy className="size-4" /> Ranking</TabsTrigger>
+            <TabsTrigger value="resumo" className="flex-1 md:flex-none"><BarChart3 className="size-4" /> Resumo</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="caixa">
+            <CashRegisterCard
+              status={currentSession ? (currentSession.status === "open" ? "Aberto" : "Em análise") : "Fechado"}
+              startTime={currentSession ? new Date(currentSession.opened_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--"}
+              responsible={currentSession ? (currentSession.receptionists as any)?.name || "N/A" : "Nenhum"}
+              totalSales={data?.currentSessionStats?.total || 0}
+              salesCount={data?.currentSessionStats?.count || 0}
+              receptionistId={receptionist.id}
+              sessionId={currentSession?.id}
+              canViewAudit={role === "admin" || role === "manager"}
+              payments={{
+                pix: data?.currentSessionStats?.payments?.pix || 0,
+                dinheiro: data?.currentSessionStats?.payments?.dinheiro || 0,
+                cartao: data?.currentSessionStats?.payments?.cartao || 0,
+                convenio: data?.currentSessionStats?.payments?.convenio || 0,
+                outros: data?.currentSessionStats?.payments?.outros || 0,
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="metas">
+            <GoalsProgress title="Meta Geral da Academia" icon={<Users className="size-5" />} target={gymTarget} current={gymCurrent} type="general" />
+          </TabsContent>
+
+          <TabsContent value="ranking">
             <RankingBoard members={ranking} />
+          </TabsContent>
+
+          <TabsContent value="resumo">
             <DailySummary totalSold={smartStats.totalSoldToday} salesCount={smartStats.vendasCount} ticketMedio={smartStats.ticketMedio} bestHour={smartStats.mostLucrativeHour} />
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
