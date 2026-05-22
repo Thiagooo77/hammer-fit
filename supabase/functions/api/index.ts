@@ -147,8 +147,8 @@ const handlers: Record<string, (ctx: { req: Request; user: any; data: any; meta:
       { data: todaySales }, { data: weekSales }, { data: ranking },
       { data: activeReceptionists }, { data: dailyGoal }, { data: sessions },
     ] = await Promise.all([
-      admin.from("sales").select("amount, created_at").gte("created_at", todayStart.toISOString()),
-      admin.from("sales").select("amount, created_at").gte("created_at", weekStart.toISOString()),
+      admin.from("sales").select("amount, created_at").is("hidden_at", null).gte("created_at", todayStart.toISOString()),
+      admin.from("sales").select("amount, created_at").is("hidden_at", null).gte("created_at", weekStart.toISOString()),
       admin.from("goal_progress").select("receptionist_id, sold_amount, goal_amount, receptionists(name, avatar_url)").order("sold_amount", { ascending: false }),
       admin.from("receptionists").select("id").eq("active", true),
       admin.from("goals" as any).select("goal_amount").eq("goal_date", todayStart.toISOString().substring(0, 10)).maybeSingle() as any,
