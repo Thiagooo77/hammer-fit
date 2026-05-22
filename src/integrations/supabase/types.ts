@@ -344,6 +344,9 @@ export type Database = {
           cash_session_id: string
           client_name: string | null
           created_at: string | null
+          hidden_at: string | null
+          hidden_by: string | null
+          hidden_reason: string | null
           id: string
           payment_method: Database["public"]["Enums"]["payment_method"]
           receptionist_id: string
@@ -354,6 +357,9 @@ export type Database = {
           cash_session_id: string
           client_name?: string | null
           created_at?: string | null
+          hidden_at?: string | null
+          hidden_by?: string | null
+          hidden_reason?: string | null
           id?: string
           payment_method: Database["public"]["Enums"]["payment_method"]
           receptionist_id: string
@@ -364,6 +370,9 @@ export type Database = {
           cash_session_id?: string
           client_name?: string | null
           created_at?: string | null
+          hidden_at?: string | null
+          hidden_by?: string | null
+          hidden_reason?: string | null
           id?: string
           payment_method?: Database["public"]["Enums"]["payment_method"]
           receptionist_id?: string
