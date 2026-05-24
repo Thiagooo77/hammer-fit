@@ -1,75 +1,23 @@
-import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-
-import LoginPage from "@/pages/routes/Login";
-import IndexPage from "@/pages/routes/Index";
-import TVDashboard from "@/pages/routes/TVDashboard";
-import { UnauthorizedPage } from "@/pages/Unauthorized";
-
-import AdminDashboard from "@/pages/routes/AdminDashboard";
-import AdminSales from "@/pages/routes/AdminSales";
-import AdminReceptionists from "@/pages/routes/AdminReceptionists";
-
-import AdminGoals from "@/pages/routes/AdminGoals";
-import AdminReports from "@/pages/routes/AdminReports";
-import AdminCashApprovals from "@/pages/routes/AdminCashApprovals";
-import AdminSettings from "@/pages/routes/AdminSettings";
-
-import ReceptionDashboard from "@/pages/routes/ReceptionDashboard";
-import ReceptionTasks from "@/pages/routes/ReceptionTasks";
-
-function AuthenticatedLayout() {
-  const { isAuthenticated, loading } = useAuth();
-  const location = useLocation();
-
-  if (loading) return <div className="min-h-screen bg-slate-950" />;
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
-  }
-
-  return (
-    <div className="flex min-h-screen bg-slate-950 w-full">
-      <DashboardSidebar />
-      <main className="flex-1 min-w-0 overflow-x-hidden">
-        <Outlet />
-      </main>
-    </div>
-  );
-}
-
-function AdminGate() {
-  const { role, loading } = useAuth();
-  if (loading) return <div className="min-h-screen bg-slate-950" />;
-  if (role !== "admin" && role !== "manager") return <Navigate to="/unauthorized" replace />;
-  return <Outlet />;
-}
+import { Wrench } from "lucide-react";
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<IndexPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/unauthorized" element={<UnauthorizedPage />} />
-      <Route path="/tv-dashboard" element={<TVDashboard />} />
-
-      <Route element={<AuthenticatedLayout />}>
-        <Route element={<AdminGate />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/sales" element={<AdminSales />} />
-          <Route path="/admin/receptionists" element={<AdminReceptionists />} />
-          
-          <Route path="/admin/goals" element={<AdminGoals />} />
-          <Route path="/admin/reports" element={<AdminReports />} />
-          <Route path="/admin/cash-approvals" element={<AdminCashApprovals />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
-        </Route>
-
-        <Route path="/reception/dashboard" element={<ReceptionDashboard />} />
-        <Route path="/reception/tasks" element={<ReceptionTasks />} />
-      </Route>
-
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <div className="min-h-screen w-full bg-slate-950 text-slate-50 flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-md text-center space-y-6 p-6 sm:p-10 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl">
+        <div className="mx-auto size-16 sm:size-20 rounded-2xl bg-primary/15 border border-primary/30 flex items-center justify-center">
+          <Wrench className="size-8 sm:size-10 text-primary" />
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-black uppercase italic tracking-tight">
+          Sistema <span className="text-primary">Desativado</span>
+        </h1>
+        <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
+          O sistema está temporariamente fora do ar para manutenção.
+          Por favor, tente novamente mais tarde.
+        </p>
+        <div className="pt-2 text-xs text-slate-500 uppercase tracking-widest font-bold">
+          Hammer FIT
+        </div>
+      </div>
+    </div>
   );
 }
