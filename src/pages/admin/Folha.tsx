@@ -330,6 +330,63 @@ export default function Folha() {
           </div>
         </div>
       )}
+
+      {closeOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true">
+          <div className="bg-card w-full max-w-lg rounded-lg border border-border shadow-xl max-h-[90dvh] flex flex-col">
+            <div className="p-6 border-b border-border">
+              <h2 className="text-lg font-semibold">Fechar período</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                {defaultCycle().start_date} → {defaultCycle().end_date}
+              </p>
+            </div>
+            <div className="p-6 space-y-4 overflow-y-auto">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setMode("all")}
+                  className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium transition ${mode === "all" ? "border-primary bg-primary/10 text-primary" : "border-border hover:bg-secondary"}`}
+                >
+                  Todos os funcionários
+                </button>
+                <button
+                  onClick={() => setMode("some")}
+                  className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium transition ${mode === "some" ? "border-primary bg-primary/10 text-primary" : "border-border hover:bg-secondary"}`}
+                >
+                  Selecionar funcionários
+                </button>
+              </div>
+              {mode === "some" && (
+                <div className="rounded-md border border-border max-h-72 overflow-y-auto divide-y divide-border">
+                  {employees.length === 0 && <p className="p-4 text-sm text-muted-foreground">Nenhum funcionário ativo.</p>}
+                  {employees.map((e) => {
+                    const checked = pickedIds.includes(e.id);
+                    return (
+                      <label key={e.id} className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-secondary/50">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => setPickedIds((p) => checked ? p.filter((x) => x !== e.id) : [...p, e.id])}
+                          className="h-4 w-4"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{e.nome_completo ?? e.email}</p>
+                          <p className="text-xs text-muted-foreground truncate">{e.cargo ?? e.email}</p>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            <div className="p-6 pt-0 flex justify-end gap-2">
+              <button onClick={() => setCloseOpen(false)} className="rounded-md border border-border px-4 py-2 text-sm hover:bg-secondary">Cancelar</button>
+              <button onClick={confirmClose} disabled={busy} className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:opacity-90 disabled:opacity-60">
+                <Plus className="w-4 h-4" /> Fechar período
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
