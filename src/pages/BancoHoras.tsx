@@ -41,7 +41,17 @@ export default function BancoHoras() {
     }
   }, [isAdmin]);
 
-  const saldo = items.reduce((acc, e) => acc + (e.kind === "devedora" ? -Number(e.hours) : Number(e.hours)), 0);
+  const totalExtras = items.filter((e) => e.kind === "extra").reduce((a, e) => a + Number(e.hours), 0);
+  const totalDevedoras = items.filter((e) => e.kind === "devedora").reduce((a, e) => a + Number(e.hours), 0);
+  const saldo = totalExtras - totalDevedoras + items.filter((e) => e.kind === "ajuste").reduce((a, e) => a + Number(e.hours), 0);
+  const fmt = (h: number) => {
+    const sign = h < 0 ? "-" : "+";
+    const abs = Math.abs(h);
+    const hh = Math.floor(abs);
+    const mm = Math.round((abs - hh) * 60);
+    return `${sign}${hh}h ${String(mm).padStart(2, "0")}min`;
+  };
+  console.log("[BancoHoras] cálculo realizado", { saldo, totalExtras, totalDevedoras });
 
   const submit = async (ev: React.FormEvent) => {
     ev.preventDefault();
@@ -75,20 +85,34 @@ export default function BancoHoras() {
       <header className="flex items-center justify-between gap-4 mb-6 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Banco de Horas</h1>
-          <p className="text-muted-foreground text-sm mt-1">Separado da folha. Apenas registro e acompanhamento.</p>
+          <p className="text-muted-foreground text-sm mt-1">
+            {isAdmin
+              ? "Cálculo automático após a saída do expediente. Apenas administradores podem ajustar."
+              : "Cálculo automático. Acompanhe seu saldo — não é possível lançar horas manualmente."}
+          </p>
         </div>
         {isAdmin && (
           <button onClick={() => setOpen(true)} className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:opacity-90 min-h-11">
-            <Plus className="w-4 h-4" /> Novo lançamento
+            <Plus className="w-4 h-4" /> Ajuste manual
           </button>
         )}
       </header>
 
-      <div className="rounded-lg border border-border bg-card p-5 mb-6 max-w-xs">
-        <p className="text-xs uppercase tracking-wide text-muted-foreground">Saldo atual</p>
-        <p className={`text-3xl font-bold tabular-nums mt-1 ${saldo < 0 ? "text-destructive" : "text-primary"}`}>
-          {saldo > 0 ? "+" : ""}{saldo.toFixed(2)}h
-        </p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div className="rounded-lg border border-border bg-card p-5">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Saldo atual</p>
+          <p className={`text-3xl font-bold tabular-nums mt-1 ${saldo < 0 ? "text-destructive" : "text-primary"}`}>
+            {fmt(saldo)}
+          </p>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-5">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Horas extras</p>
+          <p className="text-2xl font-semibold tabular-nums mt-1 text-primary">+{totalExtras.toFixed(2)}h</p>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-5">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Horas devedoras</p>
+          <p className="text-2xl font-semibold tabular-nums mt-1 text-destructive">-{totalDevedoras.toFixed(2)}h</p>
+        </div>
       </div>
 
       {loading && <p className="text-sm text-muted-foreground">Carregando...</p>}
