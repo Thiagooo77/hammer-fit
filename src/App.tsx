@@ -43,7 +43,7 @@ export default function App() {
           <Route path="/admin/logs" element={<Admin><Logs /></Admin>} />
         </Route>
 
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<ProtectedRoute><RootRedirect /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AuthProvider>
