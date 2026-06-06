@@ -34,7 +34,7 @@ export default function AppShell() {
       <aside className="w-64 border-r border-border bg-card flex flex-col shrink-0">
         <div className="px-6 py-5 border-b border-border">
           <h1 className="font-bold text-lg tracking-tight">
-            Hammer<span className="text-primary">Ponto</span>
+            Gestão<span className="text-primary"> de Ponto</span>
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
             {isAdmin ? "Master Admin" : "Colaborador"}
