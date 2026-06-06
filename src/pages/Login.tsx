@@ -173,7 +173,7 @@ export default function Login() {
                 <div className="flex items-center gap-3 mb-7">
                   <LogoMark size="lg" />
                   <div>
-                    <h2 className="text-lg font-semibold tracking-tight">HammerPonto</h2>
+                    <h2 className="text-lg font-semibold tracking-tight">Gestão de Ponto</h2>
                     <p className="text-[11px] text-muted-foreground">Acesso corporativo</p>
                   </div>
                 </div>
