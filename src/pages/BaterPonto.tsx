@@ -201,8 +201,15 @@ export default function BaterPonto() {
       <header className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight">Bater Ponto</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          O registro exige autorização de localização. Confirme os dados antes de salvar.
+          O registro exige autorização de localização e que você esteja na empresa.
         </p>
+        <div className="mt-3 rounded-md border border-border bg-card px-4 py-3 text-xs text-muted-foreground flex items-start gap-2">
+          <MapPin className="w-4 h-4 mt-0.5 text-primary shrink-0" />
+          <span>
+            <span className="font-medium text-foreground">Endereço autorizado:</span> {OFFICE.address}
+            <span className="block mt-0.5">Raio permitido: {OFFICE.radiusMeters}m.</span>
+          </span>
+        </div>
       </header>
 
       <section className="grid sm:grid-cols-3 gap-4 mb-8">
