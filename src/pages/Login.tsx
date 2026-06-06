@@ -121,7 +121,7 @@ export default function Login() {
           <div className="flex items-center gap-2.5">
             <LogoMark />
             <span className="font-bold tracking-tight text-sm sm:text-base">
-              Hammer<span className="text-primary">Ponto</span>
+              Gestão<span className="text-primary"> de Ponto</span>
             </span>
           </div>
           <div className="hidden sm:inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-muted-foreground backdrop-blur">
