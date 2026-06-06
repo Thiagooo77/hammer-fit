@@ -48,7 +48,7 @@ export default function Login() {
         />
         <div className="absolute inset-0 bg-gradient-to-tr from-primary/80 via-primary/40 to-transparent" />
         <div className="relative text-primary-foreground max-w-md">
-          <h1 className="text-4xl font-bold tracking-tight mb-3">HammerPonto</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-3">Gestão de Ponto</h1>
           <p className="text-primary-foreground/90">
             Controle de ponto online com geolocalização, gestão de colaboradores e folha de pagamento.
           </p>
@@ -60,7 +60,7 @@ export default function Login() {
           <div className="mb-8">
             <h2 className="text-2xl font-bold tracking-tight">Entrar</h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Acesse o painel HammerPonto
+              Acesse o painel Gestão de Ponto
             </p>
           </div>
 
