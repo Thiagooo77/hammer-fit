@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import L from "leaflet";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -9,6 +9,20 @@ L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
+
+const OFFICE = {
+  address: "R. José Barros Magaldi, 539 - Jardim São João, São Paulo - SP, 05815-010",
+  lat: -23.6680859,
+  lng: -46.7378753,
+  radiusMeters: 200,
+};
+
+const officeIcon = L.divIcon({
+  className: "",
+  html: `<div style="background:hsl(var(--primary));border:2px solid white;border-radius:50%;width:18px;height:18px;box-shadow:0 0 0 2px hsl(var(--primary))"></div>`,
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
 });
 
 interface PunchPoint {
@@ -45,9 +59,7 @@ export default function MapaCorporativo() {
     return () => { supabase.removeChannel(ch); };
   }, []);
 
-  const center: [number, number] = points.length > 0
-    ? [points[0].latitude, points[0].longitude]
-    : [-15.78, -47.93]; // Brasília fallback
+  const center: [number, number] = [OFFICE.lat, OFFICE.lng];
 
   return (
     <div className="p-6 md:p-8 max-w-7xl">
@@ -56,14 +68,31 @@ export default function MapaCorporativo() {
         <p className="text-muted-foreground text-sm mt-1">
           {loading ? "Carregando registros..." : `${points.length} pontos batidos hoje (tempo real).`}
         </p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Endereço autorizado: {OFFICE.address} — raio {OFFICE.radiusMeters}m.
+        </p>
       </header>
 
       <div className="rounded-lg border border-border overflow-hidden" style={{ height: "70dvh" }}>
-        <MapContainer center={center} zoom={points.length > 0 ? 13 : 4} style={{ height: "100%", width: "100%" }}>
+        <MapContainer center={center} zoom={16} style={{ height: "100%", width: "100%" }}>
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          <Circle
+            center={[OFFICE.lat, OFFICE.lng]}
+            radius={OFFICE.radiusMeters}
+            pathOptions={{ color: "hsl(var(--primary))", fillColor: "hsl(var(--primary))", fillOpacity: 0.12, weight: 2 }}
+          />
+          <Marker position={[OFFICE.lat, OFFICE.lng]} icon={officeIcon}>
+            <Popup>
+              <div className="text-xs">
+                <p className="font-semibold">Empresa (ponto autorizado)</p>
+                <p>{OFFICE.address}</p>
+                <p className="text-gray-500">Raio permitido: {OFFICE.radiusMeters}m</p>
+              </div>
+            </Popup>
+          </Marker>
           {points.map((p) => (
             <Marker key={p.id} position={[p.latitude, p.longitude]}>
               <Popup>
