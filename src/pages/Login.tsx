@@ -60,7 +60,7 @@ export default function Login() {
           <div className="mb-8">
             <h2 className="text-2xl font-bold tracking-tight">Entrar</h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Acesse o painel HammerPonto
+              Acesse o painel Gestão de Ponto
             </p>
           </div>
 
