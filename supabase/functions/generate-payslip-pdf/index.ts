@@ -47,59 +47,113 @@ Deno.serve(async (req) => {
     const brl = (n: number) =>
       new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(n ?? 0));
     const date = (s: string) => new Date(s).toLocaleDateString("pt-BR");
+    const fmtCnpj = (v?: string | null) => {
+      if (!v) return "—";
+      const d = String(v).replace(/\D/g, "").padStart(14, "0").slice(-14);
+      return `${d.slice(0,2)}.${d.slice(2,5)}.${d.slice(5,8)}/${d.slice(8,12)}-${d.slice(12,14)}`;
+    };
 
-    // Header
-    page.drawRectangle({ x: 0, y: 780, width: 595, height: 62, color: rgb(0.13,0.18,0.28) });
-    draw(settings?.company_name ?? ps.companies?.name ?? "Empresa", 40, 810, 18, bold, rgb(1,1,1));
-    draw("HOLERITE / RECIBO DE PAGAMENTO", 40, 790, 9, font, rgb(0.85,0.88,0.95));
-    draw(`Período: ${date(ps.payroll_cycles.start_date)} a ${date(ps.payroll_cycles.end_date)}`, 360, 810, 9, font, rgb(1,1,1));
+    // Colors
+    const navy = rgb(0.08, 0.13, 0.24);
+    const navySoft = rgb(0.85, 0.88, 0.95);
+    const line = rgb(0.82, 0.84, 0.88);
+    const muted = rgb(0.42, 0.45, 0.52);
+    const sectionBg = rgb(0.96, 0.97, 0.99);
+    const totalBg = rgb(0.93, 0.96, 0.99);
 
-    // Employee
+    const companyName = settings?.company_name ?? ps.companies?.name ?? "Empresa";
+    const cnpj = fmtCnpj(settings?.cnpj);
+    const endereco = settings?.endereco ?? "";
+    const contato = [settings?.telefone, settings?.email].filter(Boolean).join("  ·  ");
+
+    // === HEADER ===
+    page.drawRectangle({ x: 0, y: 762, width: 595, height: 80, color: navy });
+    draw(companyName, 40, 812, 18, bold, rgb(1,1,1));
+    draw("HOLERITE / RECIBO DE PAGAMENTO", 40, 792, 9, font, navySoft);
+    if (cnpj !== "—") draw(`CNPJ: ${cnpj}`, 40, 776, 8, font, navySoft);
+    draw(`Período de Referência`, 555 - 120, 812, 8, font, navySoft);
+    draw(`${date(ps.payroll_cycles.start_date)} a ${date(ps.payroll_cycles.end_date)}`, 555 - bold.widthOfTextAtSize(`${date(ps.payroll_cycles.start_date)} a ${date(ps.payroll_cycles.end_date)}`, 11), 794, 11, bold, rgb(1,1,1));
+    if (endereco) draw(endereco.slice(0,70), 555 - font.widthOfTextAtSize(endereco.slice(0,70), 7), 776, 7, font, navySoft);
+
+    // === EMPLOYEE CARD ===
     let y = 740;
-    draw("FUNCIONÁRIO", 40, y, 9, bold); y -= 14;
-    draw(`Nome: ${ps.profiles?.nome_completo ?? "—"}`, 40, y); y -= 12;
-    draw(`CPF: ${ps.profiles?.cpf ?? "—"}`, 40, y);
-    draw(`Cargo: ${ps.profiles?.cargo ?? "—"}`, 300, y); y -= 18;
+    page.drawRectangle({ x: 40, y: y - 78, width: 515, height: 78, color: sectionBg, borderColor: line, borderWidth: 0.5 });
+    draw("DADOS DO FUNCIONÁRIO", 52, y - 16, 8, bold, muted);
+    draw("Nome", 52, y - 34, 7, font, muted);
+    draw(ps.profiles?.nome_completo ?? "—", 52, y - 48, 10, bold);
+    draw("Cargo", 52, y - 62, 7, font, muted);
+    draw(ps.profiles?.cargo ?? "—", 52, y - 74, 9);
 
-    // Body table
-    draw("DESCRIÇÃO", 40, y, 9, bold);
-    draw("PROVENTOS", 360, y, 9, bold);
-    draw("DESCONTOS", 470, y, 9, bold);
-    y -= 6;
-    page.drawLine({ start: { x: 40, y }, end: { x: 555, y }, thickness: 0.5, color: rgb(0.6,0.6,0.6) });
-    y -= 14;
+    draw("E-mail", 310, y - 34, 7, font, muted);
+    draw(ps.profiles?.email ?? "—", 310, y - 48, 9);
+    draw("CPF", 310, y - 62, 7, font, muted);
+    draw(ps.profiles?.cpf ?? "—", 310, y - 74, 9);
 
-    const rows: [string, number, number][] = [
-      ["Salário Base", Number(ps.base_salary), 0],
-      ["Horas Extras", Number(ps.extra_hours_value), 0],
-      ["Bonificações", Number(ps.bonuses), 0],
-      ["Descontos", 0, Number(ps.discounts)],
+    y -= 100;
+
+    // === EARNINGS / DEDUCTIONS TABLE ===
+    page.drawRectangle({ x: 40, y: y - 18, width: 515, height: 22, color: navy });
+    draw("CÓD.", 52, y - 12, 8, bold, rgb(1,1,1));
+    draw("DESCRIÇÃO", 100, y - 12, 8, bold, rgb(1,1,1));
+    draw("REFERÊNCIA", 320, y - 12, 8, bold, rgb(1,1,1));
+    draw("PROVENTOS", 405, y - 12, 8, bold, rgb(1,1,1));
+    draw("DESCONTOS", 490, y - 12, 8, bold, rgb(1,1,1));
+    y -= 26;
+
+    const rows: { code: string; label: string; ref: string; prov: number; desc: number }[] = [
+      { code: "001", label: "Salário Base", ref: "30 dias", prov: Number(ps.base_salary), desc: 0 },
+      { code: "002", label: "Horas Extras", ref: `${Number(ps.extra_hours ?? 0)} h`, prov: Number(ps.extra_hours_value), desc: 0 },
+      { code: "003", label: "Bonificações / Adicionais", ref: "—", prov: Number(ps.bonuses), desc: 0 },
+      { code: "101", label: "Descontos / Faltas", ref: "—", prov: 0, desc: Number(ps.discounts) },
     ];
-    for (const [label, prov, desc] of rows) {
-      draw(label, 40, y);
-      if (prov) draw(brl(prov), 360, y);
-      if (desc) draw(brl(desc), 470, y);
-      y -= 14;
-    }
 
-    y -= 6;
-    page.drawLine({ start: { x: 40, y }, end: { x: 555, y }, thickness: 0.5, color: rgb(0.6,0.6,0.6) });
+    let totalProv = 0, totalDesc = 0;
+    rows.forEach((r, i) => {
+      if (i % 2 === 0) page.drawRectangle({ x: 40, y: y - 6, width: 515, height: 18, color: sectionBg });
+      draw(r.code, 52, y, 9);
+      draw(r.label, 100, y, 9);
+      draw(r.ref, 320, y, 9, font, muted);
+      if (r.prov) { const t = brl(r.prov); draw(t, 470 - font.widthOfTextAtSize(t, 9), y, 9); totalProv += r.prov; }
+      if (r.desc) { const t = brl(r.desc); draw(t, 555 - font.widthOfTextAtSize(t, 9), y, 9); totalDesc += r.desc; }
+      y -= 18;
+    });
+
+    // Totals row
+    y -= 4;
+    page.drawLine({ start: { x: 40, y }, end: { x: 555, y }, thickness: 0.5, color: line });
     y -= 16;
-    draw("LÍQUIDO A RECEBER", 40, y, 11, bold);
-    draw(brl(Number(ps.final_salary)), 470, y, 11, bold);
+    draw("TOTAL DE PROVENTOS", 100, y, 9, bold);
+    const tp = brl(totalProv);
+    draw(tp, 470 - bold.widthOfTextAtSize(tp, 9), y, 9, bold);
+    draw("TOTAL DE DESCONTOS", 320, y - 16, 9, bold);
+    const td = brl(totalDesc);
+    draw(td, 555 - bold.widthOfTextAtSize(td, 9), y - 16, 9, bold);
+    y -= 36;
+
+    // Net pay highlight
+    page.drawRectangle({ x: 40, y: y - 22, width: 515, height: 30, color: totalBg, borderColor: navy, borderWidth: 1 });
+    draw("LÍQUIDO A RECEBER", 52, y - 8, 11, bold, navy);
+    const net = brl(Number(ps.final_salary));
+    draw(net, 545 - bold.widthOfTextAtSize(net, 14), y - 10, 14, bold, navy);
+    y -= 40;
 
     if (ps.notes) {
-      y -= 40;
-      draw("Observações:", 40, y, 9, bold); y -= 12;
+      y -= 6;
+      draw("OBSERVAÇÕES", 40, y, 8, bold, muted); y -= 14;
       draw(String(ps.notes).slice(0, 400), 40, y, 9);
     }
 
     // Footer signatures
-    page.drawLine({ start: { x: 60, y: 100 }, end: { x: 240, y: 100 }, thickness: 0.5 });
-    draw("Assinatura Empresa", 100, 86, 8);
-    page.drawLine({ start: { x: 340, y: 100 }, end: { x: 520, y: 100 }, thickness: 0.5 });
-    draw("Assinatura Funcionário", 370, 86, 8);
-    draw(`Gerado em ${new Date().toLocaleString("pt-BR")}`, 40, 50, 7, font, rgb(0.5,0.5,0.5));
+    page.drawLine({ start: { x: 60, y: 110 }, end: { x: 260, y: 110 }, thickness: 0.5, color: line });
+    draw("Assinatura da Empresa", 110, 96, 8, font, muted);
+    page.drawLine({ start: { x: 335, y: 110 }, end: { x: 535, y: 110 }, thickness: 0.5, color: line });
+    draw("Assinatura do Funcionário", 380, 96, 8, font, muted);
+
+    page.drawLine({ start: { x: 40, y: 60 }, end: { x: 555, y: 60 }, thickness: 0.5, color: line });
+    draw(`${companyName}${cnpj !== "—" ? `  ·  CNPJ ${cnpj}` : ""}`, 40, 46, 7, font, muted);
+    const gen = `Documento gerado em ${new Date().toLocaleString("pt-BR")}`;
+    draw(gen, 555 - font.widthOfTextAtSize(gen, 7), 46, 7, font, muted);
+
 
     const bytes = await pdf.save();
     const path = `${ps.company_id}/${ps.id}.pdf`;
