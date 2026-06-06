@@ -4,6 +4,7 @@ import { PDFDocument, StandardFonts, rgb } from "npm:pdf-lib@1.17.1";
 import { z } from "npm:zod@3";
 
 const Body = z.object({ payslip_id: z.string().uuid() });
+const PAYSLIPS_BUCKET = "payslips";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -102,7 +103,10 @@ Deno.serve(async (req) => {
 
     const bytes = await pdf.save();
     const path = `${ps.company_id}/${ps.id}.pdf`;
-    const { error: upErr } = await admin.storage.from("payslips")
+    const bucketErr = await ensurePayslipsBucket(admin);
+    if (bucketErr) return j({ error: "bucket_setup_failed", message: bucketErr }, 500);
+
+    const { error: upErr } = await admin.storage.from(PAYSLIPS_BUCKET)
       .upload(path, bytes, { contentType: "application/pdf", upsert: true });
     if (upErr) return j({ error: "upload_failed", message: upErr.message }, 500);
 
@@ -121,4 +125,19 @@ Deno.serve(async (req) => {
 
 function j(b: unknown, s = 200) {
   return new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+}
+
+async function ensurePayslipsBucket(admin: ReturnType<typeof createClient>) {
+  const { data: buckets, error: listErr } = await admin.storage.listBuckets();
+  if (listErr) return listErr.message;
+
+  if (buckets?.some((bucket) => bucket.name === PAYSLIPS_BUCKET)) return null;
+
+  const { error: createErr } = await admin.storage.createBucket(PAYSLIPS_BUCKET, {
+    public: false,
+    fileSizeLimit: 10 * 1024 * 1024,
+    allowedMimeTypes: ["application/pdf"],
+  });
+
+  return createErr?.message ?? null;
 }
