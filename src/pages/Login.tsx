@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Clock, MapPin, ShieldCheck, Lock, Smartphone, MoreVertical, Share, Plus } from "lucide-react";
+import { Clock, MapPin, ShieldCheck, Lock, Smartphone, MoreVertical, Share, Plus, Monitor, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 
@@ -11,6 +11,39 @@ export default function Login() {
   const [submitting, setSubmitting] = useState(false);
   const { user, loading, isAdmin, role } = useAuth();
   const navigate = useNavigate();
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const isDesktop = typeof window !== "undefined" && window.matchMedia?.("(min-width: 1024px)").matches;
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    };
+    const installedHandler = () => {
+      setIsInstalled(true);
+      setInstallPrompt(null);
+      toast.success("App instalado com sucesso!");
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    window.addEventListener("appinstalled", installedHandler);
+    if (window.matchMedia?.("(display-mode: standalone)").matches) setIsInstalled(true);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handler);
+      window.removeEventListener("appinstalled", installedHandler);
+    };
+  }, []);
+
+  const handleInstall = async () => {
+    if (!installPrompt) {
+      toast.info("Use o menu do navegador (Chrome/Edge) → 'Instalar Gestão de Ponto'.");
+      return;
+    }
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === "accepted") toast.success("Instalando o app...");
+    setInstallPrompt(null);
+  };
 
   useEffect(() => {
     if (!loading && user && role !== null) {
