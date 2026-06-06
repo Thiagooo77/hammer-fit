@@ -11,6 +11,20 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
+const OFFICE = {
+  address: "R. José Barros Magaldi, 539 - Jardim São João, São Paulo - SP, 05815-010",
+  lat: -23.6680859,
+  lng: -46.7378753,
+  radiusMeters: 200,
+};
+
+const officeIcon = L.divIcon({
+  className: "",
+  html: `<div style="background:hsl(var(--primary));border:2px solid white;border-radius:50%;width:18px;height:18px;box-shadow:0 0 0 2px hsl(var(--primary))"></div>`,
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
+});
+
 interface PunchPoint {
   id: string;
   latitude: number;
