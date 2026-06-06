@@ -7,7 +7,6 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -20,59 +19,38 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  --color-gold: var(--gold);
-  --color-sky: var(--sky);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
 }
 
 :root {
-  --radius: 0.75rem;
-  --background: oklch(0.99 0.01 130);
-  --foreground: oklch(0.25 0.04 160);
+  --radius: 0.625rem;
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.18 0.01 250);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.25 0.04 160);
-  --primary: oklch(0.55 0.14 150);            /* verde nutricionista */
+  --card-foreground: oklch(0.18 0.01 250);
+  --primary: oklch(0.45 0.16 255);          /* azul profissional */
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.95 0.04 150);
-  --secondary-foreground: oklch(0.35 0.1 150);
-  --muted: oklch(0.96 0.01 150);
-  --muted-foreground: oklch(0.5 0.03 160);
-  --accent: oklch(0.9 0.06 220);               /* azul claro */
-  --accent-foreground: oklch(0.3 0.1 230);
-  --gold: oklch(0.85 0.15 90);                 /* dourado */
-  --sky: oklch(0.85 0.08 220);
-  --border: oklch(0.9 0.02 150);
-  --input: oklch(0.95 0.02 150);
-  --ring: oklch(0.55 0.14 150);
+  --secondary: oklch(0.96 0.005 250);
+  --secondary-foreground: oklch(0.25 0.02 250);
+  --muted: oklch(0.96 0.005 250);
+  --muted-foreground: oklch(0.5 0.01 250);
+  --accent: oklch(0.94 0.01 250);
+  --accent-foreground: oklch(0.25 0.02 250);
+  --border: oklch(0.92 0.005 250);
+  --input: oklch(0.92 0.005 250);
+  --ring: oklch(0.45 0.16 255);
 }
 
 @layer base {
   * { border-color: var(--color-border); }
-  html { scrollbar-gutter: stable; scroll-behavior: smooth; }
+  html { scrollbar-gutter: stable; }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     min-height: 100dvh;
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  }
-
-  .glass {
-    background: color-mix(in oklch, white 65%, transparent);
-    backdrop-filter: blur(14px) saturate(140%);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
-    border: 1px solid color-mix(in oklch, white 50%, transparent);
-    box-shadow: 0 10px 40px -10px oklch(0.55 0.14 150 / 0.25);
-  }
-
-  .fade-up {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity .8s ease, transform .8s ease;
-  }
-  .fade-up.in {
-    opacity: 1;
-    transform: translateY(0);
+    -webkit-font-smoothing: antialiased;
   }
 }
