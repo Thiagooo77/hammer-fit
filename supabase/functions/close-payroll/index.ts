@@ -5,6 +5,7 @@ import { z } from "npm:zod@3";
 const Body = z.object({
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  user_ids: z.array(z.string().uuid()).optional(),
 });
 
 Deno.serve(async (req) => {
