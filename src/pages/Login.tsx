@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Clock, MapPin, ShieldCheck, Lock } from "lucide-react";
+import { Clock, MapPin, ShieldCheck, Lock, Smartphone, MoreVertical, Share, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 
@@ -121,7 +121,7 @@ export default function Login() {
           <div className="flex items-center gap-2.5">
             <LogoMark />
             <span className="font-bold tracking-tight text-sm sm:text-base">
-              Hammer<span className="text-primary">Ponto</span>
+              Gestão<span className="text-primary"> de Ponto</span>
             </span>
           </div>
           <div className="hidden sm:inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-muted-foreground backdrop-blur">
@@ -173,7 +173,7 @@ export default function Login() {
                 <div className="flex items-center gap-3 mb-7">
                   <LogoMark size="lg" />
                   <div>
-                    <h2 className="text-lg font-semibold tracking-tight">HammerPonto</h2>
+                    <h2 className="text-lg font-semibold tracking-tight">Gestão de Ponto</h2>
                     <p className="text-[11px] text-muted-foreground">Acesso corporativo</p>
                   </div>
                 </div>
@@ -228,10 +228,44 @@ export default function Login() {
                   </button>
                 </form>
 
-                <div className="mt-6 pt-5 border-t border-white/10">
+                <div className="mt-6 pt-5 border-t border-white/10 space-y-4">
                   <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
                     Não possui conta? Solicite acesso ao administrador da sua empresa.
                   </p>
+
+                  <details className="group rounded-lg border border-white/10 bg-white/[0.03] open:bg-white/[0.05] transition-all duration-300">
+                    <summary className="cursor-pointer list-none flex items-center justify-between gap-2 px-3.5 py-2.5 text-xs font-medium select-none">
+                      <span className="inline-flex items-center gap-2">
+                        <Smartphone className="w-3.5 h-3.5 text-primary" />
+                        Instalar app no celular
+                      </span>
+                      <span className="text-muted-foreground transition-transform duration-300 group-open:rotate-180">▾</span>
+                    </summary>
+                    <div className="px-3.5 pb-3.5 pt-1 space-y-3 text-[11px] text-muted-foreground">
+                      <div>
+                        <p className="font-semibold text-foreground mb-1 flex items-center gap-1.5">
+                          <span className="inline-flex size-5 items-center justify-center rounded-md bg-primary/15 text-primary text-[10px] font-bold">A</span>
+                          Android (Chrome)
+                        </p>
+                        <ol className="list-decimal pl-5 space-y-0.5">
+                          <li>Toque no menu <MoreVertical className="inline w-3 h-3" /> no canto superior direito.</li>
+                          <li>Selecione <strong className="text-foreground">"Instalar app"</strong> ou <strong className="text-foreground">"Adicionar à tela inicial"</strong>.</li>
+                          <li>Confirme em <strong className="text-foreground">Instalar</strong>.</li>
+                        </ol>
+                      </div>
+                      <div className="border-t border-white/10 pt-3">
+                        <p className="font-semibold text-foreground mb-1 flex items-center gap-1.5">
+                          <span className="inline-flex size-5 items-center justify-center rounded-md bg-primary/15 text-primary text-[10px] font-bold">i</span>
+                          iPhone / iPad (Safari)
+                        </p>
+                        <ol className="list-decimal pl-5 space-y-0.5">
+                          <li>Toque em <Share className="inline w-3 h-3" /> <strong className="text-foreground">Compartilhar</strong>.</li>
+                          <li>Escolha <Plus className="inline w-3 h-3" /> <strong className="text-foreground">"Adicionar à Tela de Início"</strong>.</li>
+                          <li>Toque em <strong className="text-foreground">Adicionar</strong>.</li>
+                        </ol>
+                      </div>
+                    </div>
+                  </details>
                 </div>
               </div>
             </div>
@@ -239,7 +273,7 @@ export default function Login() {
         </main>
 
         <footer className="px-5 sm:px-8 pb-6 flex flex-wrap items-center justify-between gap-3 text-[11px] text-muted-foreground">
-          <span>© {new Date().getFullYear()} HammerPonto. Todos os direitos reservados.</span>
+          <span>© {new Date().getFullYear()} Gestão de Ponto. Todos os direitos reservados.</span>
           <span className="inline-flex items-center gap-1.5">
             <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
             Sistemas operando normalmente
