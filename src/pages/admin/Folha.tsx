@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Plus, FileDown, Save, Eye } from "lucide-react";
+import { Plus, FileDown, Save, Eye, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Cycle {
@@ -76,6 +76,24 @@ export default function Folha() {
     loadCycles();
   };
 
+  const deleteCycle = async (c: Cycle) => {
+    if (!confirm(`Excluir o período de ${new Date(c.start_date).toLocaleDateString("pt-BR")} a ${new Date(c.end_date).toLocaleDateString("pt-BR")}?\n\nTodos os holerites e PDFs deste período serão removidos. Esta ação não pode ser desfeita.`)) return;
+    setBusy(true);
+    // Remove PDFs do storage
+    const { data: ps } = await supabase.from("payslips").select("pdf_url").eq("cycle_id", c.id);
+    const paths = (ps ?? []).map((p: any) => p.pdf_url).filter(Boolean);
+    if (paths.length) await supabase.storage.from("payslips").remove(paths);
+    // Remove holerites e ciclo
+    const { error: e1 } = await supabase.from("payslips").delete().eq("cycle_id", c.id);
+    if (e1) { setBusy(false); return toast.error(e1.message); }
+    const { error: e2 } = await supabase.from("payroll_cycles").delete().eq("id", c.id);
+    setBusy(false);
+    if (e2) return toast.error(e2.message);
+    toast.success("Período excluído");
+    if (selected?.id === c.id) { setSelected(null); setPayslips([]); }
+    loadCycles();
+  };
+
   const saveEdit = async () => {
     if (!editing) return;
     const final = Number(editing.base_salary) + Number(editing.extra_hours_value) + Number(editing.bonuses) - Number(editing.discounts);
@@ -147,15 +165,25 @@ export default function Folha() {
           <ul className="space-y-2">
             {cycles.map((c) => (
               <li key={c.id}>
-                <button
-                  onClick={() => setSelected(c)}
-                  className={`w-full text-left rounded-md border px-3 py-2 text-sm transition ${
+                <div
+                  className={`group flex items-stretch rounded-md border transition ${
                     selected?.id === c.id ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-secondary"
                   }`}
                 >
-                  <p className="font-medium">{new Date(c.start_date).toLocaleDateString("pt-BR")} → {new Date(c.end_date).toLocaleDateString("pt-BR")}</p>
-                  <p className="text-xs text-muted-foreground capitalize">{c.status}</p>
-                </button>
+                  <button onClick={() => setSelected(c)} className="flex-1 text-left px-3 py-2 text-sm">
+                    <p className="font-medium">{new Date(c.start_date).toLocaleDateString("pt-BR")} → {new Date(c.end_date).toLocaleDateString("pt-BR")}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{c.status}</p>
+                  </button>
+                  <button
+                    onClick={() => deleteCycle(c)}
+                    disabled={busy}
+                    aria-label="Excluir período"
+                    title="Excluir período e holerites"
+                    className="px-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-r-md transition disabled:opacity-40"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
