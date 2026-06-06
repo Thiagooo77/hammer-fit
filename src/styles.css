@@ -25,29 +25,39 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(0.99 0 0);
-  --foreground: oklch(0.18 0.01 250);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.01 250);
-  --primary: oklch(0.45 0.16 255);          /* azul profissional */
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0.005 250);
-  --secondary-foreground: oklch(0.25 0.02 250);
-  --muted: oklch(0.96 0.005 250);
-  --muted-foreground: oklch(0.5 0.01 250);
-  --accent: oklch(0.94 0.01 250);
-  --accent-foreground: oklch(0.25 0.02 250);
-  --border: oklch(0.92 0.005 250);
-  --input: oklch(0.92 0.005 250);
-  --ring: oklch(0.45 0.16 255);
+  --radius: 0.75rem;
+  /* Modo escuro premium */
+  --background: oklch(0.16 0.01 260);
+  --foreground: oklch(0.97 0.005 250);
+  --card: oklch(0.21 0.012 260);
+  --card-foreground: oklch(0.97 0.005 250);
+  --primary: oklch(0.7 0.18 260);
+  --primary-foreground: oklch(0.12 0.01 260);
+  --secondary: oklch(0.26 0.012 260);
+  --secondary-foreground: oklch(0.97 0.005 250);
+  --muted: oklch(0.24 0.01 260);
+  --muted-foreground: oklch(0.68 0.01 260);
+  --accent: oklch(0.3 0.04 260);
+  --accent-foreground: oklch(0.97 0.005 250);
+  --border: oklch(0.28 0.012 260);
+  --input: oklch(0.28 0.012 260);
+  --ring: oklch(0.7 0.18 260);
+
+  --gradient-primary: linear-gradient(135deg, oklch(0.7 0.18 260), oklch(0.62 0.2 290));
+  --gradient-surface: linear-gradient(180deg, oklch(0.22 0.012 260), oklch(0.18 0.01 260));
+  --shadow-elegant: 0 10px 40px -12px oklch(0.55 0.2 260 / 0.45);
+  --shadow-card: 0 1px 0 0 oklch(1 0 0 / 0.04) inset, 0 8px 24px -12px oklch(0 0 0 / 0.5);
 }
 
 @layer base {
   * { border-color: var(--color-border); }
-  html { scrollbar-gutter: stable; }
+  html { scrollbar-gutter: stable; color-scheme: dark; }
   body {
     background-color: var(--color-background);
+    background-image:
+      radial-gradient(1200px 600px at 0% -10%, oklch(0.7 0.18 260 / 0.08), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, oklch(0.62 0.2 290 / 0.06), transparent 60%);
+    background-attachment: fixed;
     color: var(--color-foreground);
     min-height: 100dvh;
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
