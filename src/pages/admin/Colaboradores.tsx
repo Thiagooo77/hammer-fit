@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Plus, RefreshCw, UserCheck, UserX } from "lucide-react";
+import { Pencil, Plus, RefreshCw, UserCheck, UserX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Employee {
@@ -36,6 +36,7 @@ export default function Colaboradores() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
 
@@ -67,35 +68,90 @@ export default function Colaboradores() {
     load();
   };
 
+  const openCreate = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setOpen(true);
+  };
+
+  const openEdit = (e: Employee) => {
+    setEditingId(e.id);
+    setForm({
+      ...emptyForm,
+      email: e.email,
+      nome_completo: e.nome_completo ?? "",
+      telefone: e.telefone ?? "",
+      cargo: e.cargo ?? "",
+      departamento: e.departamento ?? "",
+      salario: e.salario != null ? String(e.salario) : "",
+      horario_entrada: e.horario_entrada?.slice(0, 5) ?? "08:00",
+      horario_saida: e.horario_saida?.slice(0, 5) ?? "17:00",
+      data_admissao: e.data_admissao ?? new Date().toISOString().slice(0, 10),
+    });
+    setOpen(true);
+  };
+
   const submit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     setSaving(true);
     try {
-      const payload = {
-        ...form,
-        salario: form.salario ? Number(form.salario) : null,
-        cpf: form.cpf || null,
-        telefone: form.telefone || null,
-        cargo: form.cargo || null,
-        departamento: form.departamento || null,
-        data_admissao: form.data_admissao || null,
-      };
-      const { data, error: err } = await supabase.functions.invoke("create-employee", { body: payload });
-      if (err || (data as any)?.error) {
-        const msg = (data as any)?.message ?? err?.message ?? "Erro ao criar";
-        throw new Error(msg);
+      if (editingId) {
+        const { error: err } = await supabase
+          .from("profiles")
+          .update({
+            nome_completo: form.nome_completo || null,
+            telefone: form.telefone || null,
+            cargo: form.cargo || null,
+            departamento: form.departamento || null,
+            salario: form.salario ? Number(form.salario) : null,
+            horario_entrada: form.horario_entrada || null,
+            horario_saida: form.horario_saida || null,
+            data_admissao: form.data_admissao || null,
+          })
+          .eq("id", editingId);
+        if (err) throw err;
+        toast.success("Colaborador atualizado");
+      } else {
+        const payload = {
+          ...form,
+          salario: form.salario ? Number(form.salario) : null,
+          cpf: form.cpf || null,
+          telefone: form.telefone || null,
+          cargo: form.cargo || null,
+          departamento: form.departamento || null,
+          data_admissao: form.data_admissao || null,
+        };
+        const { data, error: err } = await supabase.functions.invoke("create-employee", { body: payload });
+        if (err || (data as any)?.error) {
+          const msg = (data as any)?.message ?? err?.message ?? "Erro ao criar";
+          throw new Error(msg);
+        }
+        toast.success("Colaborador criado com sucesso");
       }
-      toast.success("Colaborador criado com sucesso");
-      console.log("[HammerPonto] employee.created", { email: form.email });
       setOpen(false);
+      setEditingId(null);
       setForm(emptyForm);
       load();
     } catch (e: any) {
-      toast.error(e.message ?? "Falha ao criar colaborador");
+      toast.error(e.message ?? "Falha ao salvar colaborador");
     } finally {
       setSaving(false);
     }
   };
+
+  const fields: any[] = [
+    { k: "nome_completo", label: "Nome completo *", type: "text", required: true },
+    { k: "email", label: "E-mail *", type: "email", required: true, disabledOnEdit: true },
+    ...(!editingId ? [{ k: "cpf", label: "CPF", type: "text" }] : []),
+    { k: "telefone", label: "Telefone", type: "text" },
+    { k: "cargo", label: "Cargo", type: "text" },
+    { k: "departamento", label: "Departamento", type: "text" },
+    { k: "salario", label: "Salário (R$)", type: "number", step: "0.01" },
+    { k: "data_admissao", label: "Data de admissão", type: "date" },
+    { k: "horario_entrada", label: "Horário entrada", type: "time" },
+    { k: "horario_saida", label: "Horário saída", type: "time" },
+    ...(!editingId ? [{ k: "temp_password", label: "Senha temporária *", type: "text", required: true, minLength: 8, fullWidth: true }] : []),
+  ];
 
   return (
     <div className="p-6 md:p-8 max-w-6xl">
@@ -113,7 +169,7 @@ export default function Colaboradores() {
             <RefreshCw className="w-4 h-4" /> Atualizar
           </button>
           <button
-            onClick={() => setOpen(true)}
+            onClick={openCreate}
             className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:opacity-90 transition min-h-11"
           >
             <Plus className="w-4 h-4" /> Novo colaborador
@@ -165,14 +221,23 @@ export default function Colaboradores() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button
-                      onClick={() => toggleActive(e)}
-                      aria-label={e.ativo ? "Inativar colaborador" : "Ativar colaborador"}
-                      className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs hover:bg-secondary transition"
-                    >
-                      {e.ativo ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
-                      {e.ativo ? "Inativar" : "Ativar"}
-                    </button>
+                    <div className="inline-flex gap-2">
+                      <button
+                        onClick={() => openEdit(e)}
+                        aria-label="Editar colaborador"
+                        className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs hover:bg-secondary transition"
+                      >
+                        <Pencil className="w-3.5 h-3.5" /> Editar
+                      </button>
+                      <button
+                        onClick={() => toggleActive(e)}
+                        aria-label={e.ativo ? "Inativar colaborador" : "Ativar colaborador"}
+                        className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs hover:bg-secondary transition"
+                      >
+                        {e.ativo ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
+                        {e.ativo ? "Inativar" : "Ativar"}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -186,7 +251,7 @@ export default function Colaboradores() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
           role="dialog"
           aria-modal="true"
-          aria-labelledby="new-emp-title"
+          aria-labelledby="emp-title"
           onClick={() => !saving && setOpen(false)}
         >
           <div
@@ -194,24 +259,18 @@ export default function Colaboradores() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 border-b border-border">
-              <h2 id="new-emp-title" className="text-lg font-semibold">Novo colaborador</h2>
-              <p className="text-xs text-muted-foreground mt-1">A senha temporária deverá ser trocada no primeiro acesso.</p>
+              <h2 id="emp-title" className="text-lg font-semibold">
+                {editingId ? "Editar colaborador" : "Novo colaborador"}
+              </h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                {editingId
+                  ? "Atualize as informações cadastrais do colaborador."
+                  : "A senha temporária deverá ser trocada no primeiro acesso."}
+              </p>
             </div>
             <form onSubmit={submit} className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                { k: "nome_completo", label: "Nome completo *", type: "text", required: true },
-                { k: "email", label: "E-mail *", type: "email", required: true },
-                { k: "cpf", label: "CPF", type: "text" },
-                { k: "telefone", label: "Telefone", type: "text" },
-                { k: "cargo", label: "Cargo", type: "text" },
-                { k: "departamento", label: "Departamento", type: "text" },
-                { k: "salario", label: "Salário (R$)", type: "number", step: "0.01" },
-                { k: "data_admissao", label: "Data de admissão", type: "date" },
-                { k: "horario_entrada", label: "Horário entrada", type: "time" },
-                { k: "horario_saida", label: "Horário saída", type: "time" },
-                { k: "temp_password", label: "Senha temporária *", type: "text", required: true, minLength: 8 },
-              ].map((f: any) => (
-                <div key={f.k} className={f.k === "temp_password" ? "md:col-span-2" : ""}>
+              {fields.map((f) => (
+                <div key={f.k} className={f.fullWidth ? "md:col-span-2" : ""}>
                   <label htmlFor={f.k} className="text-sm font-medium">{f.label}</label>
                   <input
                     id={f.k}
@@ -219,9 +278,10 @@ export default function Colaboradores() {
                     step={f.step}
                     required={f.required}
                     minLength={f.minLength}
+                    disabled={!!editingId && f.disabledOnEdit}
                     value={(form as any)[f.k]}
-                    onChange={(e) => setForm({ ...form, [f.k]: e.target.value })}
-                    className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    onChange={(ev) => setForm({ ...form, [f.k]: ev.target.value })}
+                    className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
                   />
                 </div>
               ))}
@@ -239,7 +299,7 @@ export default function Colaboradores() {
                   disabled={saving}
                   className="rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:opacity-90 transition disabled:opacity-60"
                 >
-                  {saving ? "Salvando..." : "Criar colaborador"}
+                  {saving ? "Salvando..." : editingId ? "Salvar alterações" : "Criar colaborador"}
                 </button>
               </div>
             </form>
