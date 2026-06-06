@@ -237,7 +237,9 @@ export default function Login() {
             <div className="relative group">
               {/* Glow ring */}
               <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-primary/40 via-primary/10 to-transparent opacity-60 blur-md transition-all duration-300 group-hover:opacity-80" />
-              <div className="relative rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-7 sm:p-8 shadow-[0_30px_80px_-20px_oklch(0_0_0/0.6)]">
+              <div className="relative rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-7 sm:p-8 shadow-[0_30px_80px_-20px_oklch(0_0_0/0.6)] overflow-hidden">
+                {/* Reflexo animado em loop (glass shine) */}
+                <div aria-hidden className="login-shine" />
                 {/* Brilho sutil no topo */}
                 <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
