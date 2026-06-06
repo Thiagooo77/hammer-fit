@@ -126,7 +126,6 @@ export default function AdminPanel() {
   const cards = useMemo(() => stats ? [
     { label: "Funcionários", value: stats.total, icon: Users },
     { label: "Presentes hoje", value: stats.presentes, icon: UserCheck },
-    { label: "Ausentes", value: stats.ausentes, icon: UserX },
     { label: "Atrasados", value: stats.atrasados, icon: ClockIcon },
     { label: "Horas trabalhadas", value: fmtH(stats.horas), icon: TrendingUp },
   ] : [], [stats]);
