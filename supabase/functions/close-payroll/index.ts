@@ -36,12 +36,24 @@ Deno.serve(async (req) => {
       .select().single();
     if (cycleErr) return json({ error: "cycle_failed", message: cycleErr.message }, 400);
 
+    // Sempre inclui o admin que está fechando a folha
+    const targetIds = parsed.data.user_ids && parsed.data.user_ids.length > 0
+      ? Array.from(new Set([...parsed.data.user_ids, u.user.id]))
+      : null;
+
     let q = admin.from("profiles").select("id,salario").eq("company_id", prof.company_id).eq("ativo", true);
-    if (parsed.data.user_ids && parsed.data.user_ids.length > 0) q = q.in("id", parsed.data.user_ids);
+    if (targetIds) q = q.in("id", targetIds);
     const { data: employees } = await q;
 
-    if (employees && employees.length > 0) {
-      const rows = employees.map((e: any) => ({
+    // Garante a linha do admin mesmo se filtrado por algum motivo
+    const list: Array<{ id: string; salario: number | null }> = (employees as any) ?? [];
+    if (!list.find((e) => e.id === u.user.id)) {
+      const { data: me } = await admin.from("profiles").select("id,salario").eq("id", u.user.id).maybeSingle();
+      if (me) list.push(me as any);
+    }
+
+    if (list.length > 0) {
+      const rows = list.map((e) => ({
         company_id: prof.company_id,
         cycle_id: cycle.id,
         user_id: e.id,
@@ -51,6 +63,7 @@ Deno.serve(async (req) => {
       const { error: psErr } = await admin.from("payslips").insert(rows);
       if (psErr) console.error("payslips insert", psErr);
     }
+    const employeesCount = list.length;
 
     await admin.from("audit_logs").insert({
       company_id: prof.company_id, actor_id: u.user.id,
@@ -58,7 +71,7 @@ Deno.serve(async (req) => {
       metadata: { start_date: parsed.data.start_date, end_date: parsed.data.end_date },
     });
 
-    return json({ ok: true, cycle_id: cycle.id, employees: employees?.length ?? 0 });
+    return json({ ok: true, cycle_id: cycle.id, employees: employeesCount });
   } catch (e) {
     console.error(e);
     return json({ error: "internal", message: String(e) }, 500);
