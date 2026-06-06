@@ -130,8 +130,17 @@ export default function BaterPonto() {
     try {
       toast.loading("Obtendo localização...", { id: "geo" });
       const coords = await getPosition();
-      const address = await reverseGeocode(coords.lat, coords.lng);
+      const dist = distanceMeters(coords.lat, coords.lng, OFFICE.lat, OFFICE.lng);
       toast.dismiss("geo");
+      if (dist > OFFICE.radiusMeters) {
+        toast.error(
+          `Você está a ${Math.round(dist)}m da empresa. Aproxime-se de ${OFFICE.address} (raio ${OFFICE.radiusMeters}m) para bater o ponto.`,
+          { duration: 6000 },
+        );
+        console.log("[HammerPonto] punch.out_of_range", { dist, coords });
+        return;
+      }
+      const address = await reverseGeocode(coords.lat, coords.lng);
       setPending({ type, coords, address });
     } catch (e: any) {
       toast.dismiss("geo");
