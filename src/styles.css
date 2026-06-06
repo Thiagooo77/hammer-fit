@@ -68,3 +68,48 @@
 #lovable-badge {
   display: none !important;
 }
+
+/* ============ Login premium loop animations ============ */
+@keyframes login-gradient-shift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(2%, -1%, 0) scale(1.05); }
+}
+@keyframes login-shine {
+  0% { transform: translateX(-120%) skewX(-12deg); opacity: 0; }
+  20% { opacity: 0.5; }
+  60% { opacity: 0.5; }
+  100% { transform: translateX(220%) skewX(-12deg); opacity: 0; }
+}
+@keyframes login-dash {
+  to { stroke-dashoffset: -40; }
+}
+@keyframes login-node-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+@keyframes login-toast {
+  0% { opacity: 0; transform: translateY(8px) scale(0.96); }
+  12%, 75% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-8px) scale(0.98); }
+}
+@keyframes login-clock-hand {
+  to { transform: rotate(360deg); }
+}
+.login-gradient-blob { animation: login-gradient-shift 18s ease-in-out infinite; will-change: transform; }
+.login-line { stroke-dasharray: 4 6; animation: login-dash 6s linear infinite; }
+.login-node { animation: login-node-pulse 3.5s ease-in-out infinite; transform-origin: center; }
+.login-shine {
+  position: absolute; inset: 0; overflow: hidden; border-radius: inherit; pointer-events: none;
+}
+.login-shine::before {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 40%;
+  background: linear-gradient(90deg, transparent, oklch(1 0 0 / 0.08), transparent);
+  animation: login-shine 7s ease-in-out infinite;
+}
+.login-toast { animation: login-toast 6s ease-in-out infinite; }
+.login-clock-hand { transform-origin: 50% 100%; animation: login-clock-hand linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .login-gradient-blob, .login-line, .login-node, .login-shine::before, .login-toast, .login-clock-hand { animation: none !important; }
+}
+
