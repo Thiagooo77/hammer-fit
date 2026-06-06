@@ -23,6 +23,25 @@ const TYPE_LABELS: Record<PunchType, string> = {
 
 const ORDER: PunchType[] = ["entrada", "almoco_saida", "almoco_retorno", "saida"];
 
+// Cerca virtual (geofence) — endereço autorizado da empresa
+const OFFICE = {
+  address: "R. José Barros Magaldi, 539 - Jardim São João, São Paulo - SP, 05815-010",
+  lat: -23.6680859,
+  lng: -46.7378753,
+  radiusMeters: 200,
+};
+
+function distanceMeters(lat1: number, lng1: number, lat2: number, lng2: number) {
+  const R = 6371000;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
 interface Coords { lat: number; lng: number; accuracy: number }
 
 async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
@@ -111,8 +130,17 @@ export default function BaterPonto() {
     try {
       toast.loading("Obtendo localização...", { id: "geo" });
       const coords = await getPosition();
-      const address = await reverseGeocode(coords.lat, coords.lng);
+      const dist = distanceMeters(coords.lat, coords.lng, OFFICE.lat, OFFICE.lng);
       toast.dismiss("geo");
+      if (dist > OFFICE.radiusMeters) {
+        toast.error(
+          `Você está a ${Math.round(dist)}m da empresa. Aproxime-se de ${OFFICE.address} (raio ${OFFICE.radiusMeters}m) para bater o ponto.`,
+          { duration: 6000 },
+        );
+        console.log("[HammerPonto] punch.out_of_range", { dist, coords });
+        return;
+      }
+      const address = await reverseGeocode(coords.lat, coords.lng);
       setPending({ type, coords, address });
     } catch (e: any) {
       toast.dismiss("geo");
@@ -173,8 +201,15 @@ export default function BaterPonto() {
       <header className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight">Bater Ponto</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          O registro exige autorização de localização. Confirme os dados antes de salvar.
+          O registro exige autorização de localização e que você esteja na empresa.
         </p>
+        <div className="mt-3 rounded-md border border-border bg-card px-4 py-3 text-xs text-muted-foreground flex items-start gap-2">
+          <MapPin className="w-4 h-4 mt-0.5 text-primary shrink-0" />
+          <span>
+            <span className="font-medium text-foreground">Endereço autorizado:</span> {OFFICE.address}
+            <span className="block mt-0.5">Raio permitido: {OFFICE.radiusMeters}m.</span>
+          </span>
+        </div>
       </header>
 
       <section className="grid sm:grid-cols-3 gap-4 mb-8">
