@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import gymVideo from "@/assets/gym-login.mp4.asset.json";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -34,10 +35,21 @@ export default function Login() {
 
   return (
     <div className="min-h-dvh flex bg-background">
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-primary to-primary/70 p-12 items-end">
-        <div className="text-primary-foreground max-w-md">
+      <div className="hidden lg:flex flex-1 relative overflow-hidden bg-primary p-12 items-end">
+        <video
+          src={gymVideo.url}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-tr from-primary/80 via-primary/40 to-transparent" />
+        <div className="relative text-primary-foreground max-w-md">
           <h1 className="text-4xl font-bold tracking-tight mb-3">HammerPonto</h1>
-          <p className="text-primary-foreground/80">
+          <p className="text-primary-foreground/90">
             Controle de ponto online com geolocalização, gestão de colaboradores e folha de pagamento.
           </p>
         </div>
