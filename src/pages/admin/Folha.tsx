@@ -147,15 +147,25 @@ export default function Folha() {
           <ul className="space-y-2">
             {cycles.map((c) => (
               <li key={c.id}>
-                <button
-                  onClick={() => setSelected(c)}
-                  className={`w-full text-left rounded-md border px-3 py-2 text-sm transition ${
+                <div
+                  className={`group flex items-stretch rounded-md border transition ${
                     selected?.id === c.id ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-secondary"
                   }`}
                 >
-                  <p className="font-medium">{new Date(c.start_date).toLocaleDateString("pt-BR")} → {new Date(c.end_date).toLocaleDateString("pt-BR")}</p>
-                  <p className="text-xs text-muted-foreground capitalize">{c.status}</p>
-                </button>
+                  <button onClick={() => setSelected(c)} className="flex-1 text-left px-3 py-2 text-sm">
+                    <p className="font-medium">{new Date(c.start_date).toLocaleDateString("pt-BR")} → {new Date(c.end_date).toLocaleDateString("pt-BR")}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{c.status}</p>
+                  </button>
+                  <button
+                    onClick={() => deleteCycle(c)}
+                    disabled={busy}
+                    aria-label="Excluir período"
+                    title="Excluir período e holerites"
+                    className="px-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-r-md transition disabled:opacity-40"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
