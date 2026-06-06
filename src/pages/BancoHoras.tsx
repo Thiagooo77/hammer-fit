@@ -137,10 +137,18 @@ export default function BancoHoras() {
                 <tr key={e.id} className="border-t border-border">
                   <td className="px-4 py-3 tabular-nums">{new Date(e.reference_date).toLocaleDateString("pt-BR")}</td>
                   {isAdmin && <td className="px-4 py-3">{e.profiles?.nome_completo ?? e.profiles?.email}</td>}
-                  <td className="px-4 py-3 capitalize">{e.kind}</td>
-                  <td className={`px-4 py-3 text-right tabular-nums font-semibold ${e.kind === "devedora" ? "text-destructive" : ""}`}>
-                    {e.kind === "devedora" ? "-" : "+"}{Number(e.hours).toFixed(2)}
+                  <td className="px-4 py-3 capitalize">
+                    {e.kind === "ajuste" ? "Compensação" : e.kind}
                   </td>
+                  {(() => {
+                    const signed = e.kind === "devedora" ? -Number(e.hours) : Number(e.hours);
+                    const negative = signed < 0;
+                    return (
+                      <td className={`px-4 py-3 text-right tabular-nums font-semibold ${negative ? "text-destructive" : "text-primary"}`}>
+                        {signed >= 0 ? "+" : ""}{signed.toFixed(2)}
+                      </td>
+                    );
+                  })()}
                   <td className="px-4 py-3 text-muted-foreground">{e.notes ?? "—"}</td>
                   <td className="px-4 py-3 text-right">
                     {e.approved ? (
