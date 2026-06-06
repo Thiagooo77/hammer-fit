@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Users, UserCheck, UserX, Clock as ClockIcon, TrendingUp } from "lucide-react";
+import { Users, UserCheck, Clock as ClockIcon, TrendingUp } from "lucide-react";
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
 } from "recharts";
