@@ -6,10 +6,19 @@ import AppShell from "@/components/layout/AppShell";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import AdminPanel from "@/pages/AdminPanel";
-import Placeholder from "@/pages/Placeholder";
 import NotFound from "@/pages/NotFound";
 import Colaboradores from "@/pages/admin/Colaboradores";
 import BaterPonto from "@/pages/BaterPonto";
+import Folha from "@/pages/admin/Folha";
+import Logs from "@/pages/admin/Logs";
+import MapaCorporativo from "@/pages/admin/MapaCorporativo";
+import BancoHoras from "@/pages/BancoHoras";
+import Holerites from "@/pages/Holerites";
+import Perfil from "@/pages/Perfil";
+
+const Admin = ({ children }: { children: React.ReactNode }) => (
+  <ProtectedRoute requireRole="admin">{children}</ProtectedRoute>
+);
 
 export default function App() {
   return (
@@ -18,60 +27,20 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
 
-        <Route
-          element={
-            <ProtectedRoute>
-              <AppShell />
-            </ProtectedRoute>
-          }
-        >
-          {/* Rotas de colaborador */}
+        <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
+          {/* Colaborador */}
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/ponto" element={<BaterPonto />} />
-          <Route path="/holerites" element={<Placeholder title="Meus Holerites" description="Holerites liberados pelo administrador (Fase 10)." />} />
-          <Route path="/perfil" element={<Placeholder title="Meu Perfil" description="Dados pessoais e troca de senha." />} />
+          <Route path="/holerites" element={<Holerites />} />
+          <Route path="/banco-horas" element={<BancoHoras />} />
+          <Route path="/perfil" element={<Perfil />} />
 
-          {/* Rotas de admin */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute requireRole="admin">
-                <AdminPanel />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/colaboradores"
-            element={
-              <ProtectedRoute requireRole="admin">
-                <Colaboradores />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/folha"
-            element={
-              <ProtectedRoute requireRole="admin">
-                <Placeholder title="Folha de Pagamento" description="Fechamento de período e holerites (Fases 8-10)." />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/relatorios"
-            element={
-              <ProtectedRoute requireRole="admin">
-                <Placeholder title="Relatórios" description="Exportação em PDF e Excel (Fase 7)." />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/logs"
-            element={
-              <ProtectedRoute requireRole="admin">
-                <Placeholder title="Logs e Auditoria" description="Histórico completo de ações (Fase 12)." />
-              </ProtectedRoute>
-            }
-          />
+          {/* Admin */}
+          <Route path="/admin" element={<Admin><AdminPanel /></Admin>} />
+          <Route path="/admin/colaboradores" element={<Admin><Colaboradores /></Admin>} />
+          <Route path="/admin/folha" element={<Admin><Folha /></Admin>} />
+          <Route path="/admin/mapa" element={<Admin><MapaCorporativo /></Admin>} />
+          <Route path="/admin/logs" element={<Admin><Logs /></Admin>} />
         </Route>
 
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
