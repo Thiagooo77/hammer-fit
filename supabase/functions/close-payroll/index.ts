@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
       metadata: { start_date: parsed.data.start_date, end_date: parsed.data.end_date },
     });
 
-    return json({ ok: true, cycle_id: cycle.id, employees: employees?.length ?? 0 });
+    return json({ ok: true, cycle_id: cycle.id, employees: employeesCount });
   } catch (e) {
     console.error(e);
     return json({ error: "internal", message: String(e) }, 500);
