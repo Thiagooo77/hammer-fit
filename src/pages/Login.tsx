@@ -81,12 +81,12 @@ export default function Login() {
         {/* Gradiente base corporativo */}
         <div className="absolute inset-0 bg-gradient-to-br from-[oklch(0.14_0.02_260)] via-[oklch(0.12_0.015_255)] to-[oklch(0.10_0.02_240)]" />
 
-        {/* Glows azuis em múltiplas camadas */}
-        <div className="absolute -top-32 -left-32 h-[560px] w-[560px] rounded-full bg-primary/25 blur-[120px] animate-pulse [animation-duration:7s]" />
-        <div className="absolute top-1/2 -right-40 h-[600px] w-[600px] rounded-full bg-[oklch(0.5_0.18_240)]/30 blur-[140px] animate-pulse [animation-duration:9s]" />
-        <div className="absolute -bottom-40 left-1/3 h-[520px] w-[520px] rounded-full bg-[oklch(0.45_0.15_270)]/20 blur-[130px] animate-pulse [animation-duration:11s]" />
+        {/* Gradientes em movimento contínuo */}
+        <div className="login-gradient-blob absolute -top-32 -left-32 h-[560px] w-[560px] rounded-full bg-primary/25 blur-[120px]" style={{ animationDelay: "0s" }} />
+        <div className="login-gradient-blob absolute top-1/3 -right-40 h-[600px] w-[600px] rounded-full bg-[oklch(0.5_0.18_240)]/30 blur-[140px]" style={{ animationDelay: "-6s" }} />
+        <div className="login-gradient-blob absolute -bottom-40 left-1/3 h-[520px] w-[520px] rounded-full bg-[oklch(0.45_0.15_270)]/20 blur-[130px]" style={{ animationDelay: "-12s" }} />
 
-        {/* Grid tecnológico extremamente sutil */}
+        {/* Grid tecnológico */}
         <div
           className="absolute inset-0 opacity-[0.05]"
           style={{
@@ -97,53 +97,91 @@ export default function Login() {
           }}
         />
 
-        {/* Mapa com pontos de localização + conexões */}
+        {/* Mapa SVG — nodes, conexões e relógio em loop */}
         <svg
-          className="absolute inset-0 h-full w-full opacity-[0.18]"
+          className="absolute inset-0 h-full w-full opacity-[0.22] hidden sm:block"
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
         >
           <defs>
             <linearGradient id="line" x1="0" x2="1" y1="0" y2="0">
               <stop offset="0%" stopColor="oklch(0.7 0.18 260)" stopOpacity="0" />
-              <stop offset="50%" stopColor="oklch(0.7 0.18 260)" stopOpacity="0.8" />
+              <stop offset="50%" stopColor="oklch(0.7 0.18 260)" stopOpacity="0.9" />
               <stop offset="100%" stopColor="oklch(0.7 0.18 260)" stopOpacity="0" />
             </linearGradient>
+            <radialGradient id="node-glow">
+              <stop offset="0%" stopColor="oklch(0.78 0.18 260)" stopOpacity="1" />
+              <stop offset="100%" stopColor="oklch(0.78 0.18 260)" stopOpacity="0" />
+            </radialGradient>
           </defs>
-          {/* Linhas conectando localizações */}
           {pins.slice(0, -1).map((p, i) => {
             const n = pins[i + 1];
             return (
               <line
                 key={i}
-                x1={p.x}
-                y1={p.y}
-                x2={n.x}
-                y2={n.y}
+                className="login-line"
+                x1={p.x} y1={p.y} x2={n.x} y2={n.y}
                 stroke="url(#line)"
-                strokeWidth="0.15"
-                strokeDasharray="0.8 0.6"
+                strokeWidth="0.18"
+                style={{ animationDelay: `${i * -0.8}s` }}
               />
             );
           })}
+          {pins.map((p, i) => (
+            <g key={`g${i}`} className="login-node" style={{ animationDelay: p.delay, transformOrigin: `${p.x}px ${p.y}px` }}>
+              <circle cx={p.x} cy={p.y} r="1.6" fill="url(#node-glow)" />
+              <circle cx={p.x} cy={p.y} r="0.45" fill="oklch(0.85 0.15 260)" />
+            </g>
+          ))}
         </svg>
 
-        {/* Pins animados (batidas em tempo real) */}
-        {pins.map((p, i) => (
-          <div
-            key={i}
-            className="absolute"
-            style={{ left: `${p.x}%`, top: `${p.y}%`, transform: "translate(-50%, -50%)" }}
-          >
-            <span
-              className="absolute inset-0 -m-3 rounded-full bg-primary/40 blur-md animate-ping"
-              style={{ animationDelay: p.delay, animationDuration: "3.2s" }}
-            />
-            <span className="relative block size-1.5 rounded-full bg-primary shadow-[0_0_12px_oklch(0.7_0.18_260)]" />
-          </div>
-        ))}
+        {/* Relógio corporativo discreto */}
+        <svg
+          aria-hidden
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(70vw,520px)] h-[min(70vw,520px)] opacity-[0.06] hidden md:block"
+          viewBox="0 0 200 200"
+        >
+          <circle cx="100" cy="100" r="92" fill="none" stroke="oklch(0.85 0.05 260)" strokeWidth="0.6" />
+          <circle cx="100" cy="100" r="70" fill="none" stroke="oklch(0.85 0.05 260)" strokeWidth="0.4" strokeDasharray="2 4" />
+          {Array.from({ length: 12 }).map((_, i) => {
+            const a = (i * 30 * Math.PI) / 180;
+            const x1 = 100 + Math.sin(a) * 86;
+            const y1 = 100 - Math.cos(a) * 86;
+            const x2 = 100 + Math.sin(a) * 92;
+            const y2 = 100 - Math.cos(a) * 92;
+            return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="oklch(0.85 0.05 260)" strokeWidth="0.8" />;
+          })}
+          {/* Ponteiro horas (lento) */}
+          <line className="login-clock-hand" style={{ animationDuration: "120s" }} x1="100" y1="100" x2="100" y2="55" stroke="oklch(0.85 0.1 260)" strokeWidth="1.2" strokeLinecap="round" />
+          {/* Ponteiro minutos */}
+          <line className="login-clock-hand" style={{ animationDuration: "30s" }} x1="100" y1="100" x2="100" y2="35" stroke="oklch(0.85 0.1 260)" strokeWidth="0.8" strokeLinecap="round" />
+          {/* Ponteiro segundos */}
+          <line className="login-clock-hand" style={{ animationDuration: "8s" }} x1="100" y1="100" x2="100" y2="22" stroke="oklch(0.7 0.18 260)" strokeWidth="0.5" strokeLinecap="round" />
+          <circle cx="100" cy="100" r="1.6" fill="oklch(0.7 0.18 260)" />
+        </svg>
 
-        {/* Vinheta nas extremidades */}
+        {/* Toasts em loop simulando batidas */}
+        <div className="absolute inset-0 hidden md:block">
+          {[
+            { msg: "Entrada registrada", top: "18%", left: "8%", delay: "0s" },
+            { msg: "Localização validada", top: "70%", left: "12%", delay: "-2s" },
+            { msg: "Jornada concluída", top: "28%", right: "10%", delay: "-4s" },
+            { msg: "Saída registrada", bottom: "18%", right: "14%", delay: "-1s" },
+          ].map((t, i) => (
+            <div
+              key={i}
+              className="login-toast absolute inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur px-3 py-1.5 text-[11px] text-muted-foreground shadow-lg"
+              style={{ top: t.top, left: t.left, right: t.right, bottom: t.bottom, animationDelay: t.delay, animationDuration: "9s" } as React.CSSProperties}
+            >
+              <span className="inline-flex size-4 items-center justify-center rounded-full bg-primary/20 text-primary">
+                <svg viewBox="0 0 24 24" fill="none" className="w-2.5 h-2.5"><path d="M5 12l4 4L19 6" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              </span>
+              {t.msg}
+            </div>
+          ))}
+        </div>
+
+        {/* Vinheta */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_55%,oklch(0.08_0.01_260)_100%)]" />
       </div>
 
