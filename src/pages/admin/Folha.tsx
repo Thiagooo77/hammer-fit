@@ -34,6 +34,8 @@ function defaultCycle() {
   return { start_date: start.toISOString().slice(0,10), end_date: end.toISOString().slice(0,10) };
 }
 
+interface EmployeeOpt { id: string; nome_completo: string | null; email: string; cargo: string | null; }
+
 export default function Folha() {
   const [cycles, setCycles] = useState<Cycle[]>([]);
   const [selected, setSelected] = useState<Cycle | null>(null);
@@ -41,6 +43,10 @@ export default function Folha() {
   const [editing, setEditing] = useState<Payslip | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [closeOpen, setCloseOpen] = useState(false);
+  const [employees, setEmployees] = useState<EmployeeOpt[]>([]);
+  const [pickedIds, setPickedIds] = useState<string[]>([]);
+  const [mode, setMode] = useState<"all" | "some">("all");
 
   const loadCycles = async () => {
     const { data } = await supabase.from("payroll_cycles").select("*").order("start_date", { ascending: false });
@@ -62,16 +68,31 @@ export default function Folha() {
   useEffect(() => { loadCycles(); }, []);
   useEffect(() => { if (selected) loadPayslips(selected.id); }, [selected]);
 
-  const closePeriod = async () => {
+  const openCloseDialog = async () => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("id,nome_completo,email,cargo")
+      .eq("ativo", true)
+      .order("nome_completo", { ascending: true });
+    setEmployees((data as EmployeeOpt[]) ?? []);
+    setPickedIds([]);
+    setMode("all");
+    setCloseOpen(true);
+  };
+
+  const confirmClose = async () => {
     const d = defaultCycle();
-    if (!confirm(`Fechar período de ${d.start_date} a ${d.end_date}?`)) return;
+    if (mode === "some" && pickedIds.length === 0) return toast.error("Selecione ao menos um funcionário");
     setBusy(true);
-    const { data, error } = await supabase.functions.invoke("close-payroll", { body: d });
+    const body: any = { ...d };
+    if (mode === "some") body.user_ids = pickedIds;
+    const { data, error } = await supabase.functions.invoke("close-payroll", { body });
     setBusy(false);
     if (error || (data as any)?.error) {
       toast.error((data as any)?.message ?? error?.message ?? "Falha");
       return;
     }
+    setCloseOpen(false);
     toast.success(`Período fechado. ${(data as any)?.employees ?? 0} holerites gerados.`);
     loadCycles();
   };
