@@ -64,7 +64,7 @@ export default function Folha() {
 
   const closePeriod = async () => {
     const d = defaultCycle();
-    if (!confirm(`Fechar período de ${d.start} a ${d.end}?`)) return;
+    if (!confirm(`Fechar período de ${d.start_date} a ${d.end_date}?`)) return;
     setBusy(true);
     const { data, error } = await supabase.functions.invoke("close-payroll", { body: d });
     setBusy(false);
