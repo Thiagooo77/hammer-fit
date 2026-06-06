@@ -5,6 +5,7 @@ import { z } from "npm:zod@3";
 const Body = z.object({
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  user_ids: z.array(z.string().uuid()).optional(),
 });
 
 Deno.serve(async (req) => {
@@ -35,8 +36,9 @@ Deno.serve(async (req) => {
       .select().single();
     if (cycleErr) return json({ error: "cycle_failed", message: cycleErr.message }, 400);
 
-    const { data: employees } = await admin
-      .from("profiles").select("id,salario").eq("company_id", prof.company_id).eq("ativo", true);
+    let q = admin.from("profiles").select("id,salario").eq("company_id", prof.company_id).eq("ativo", true);
+    if (parsed.data.user_ids && parsed.data.user_ids.length > 0) q = q.in("id", parsed.data.user_ids);
+    const { data: employees } = await q;
 
     if (employees && employees.length > 0) {
       const rows = employees.map((e: any) => ({
