@@ -8,6 +8,7 @@ import Dashboard from "@/pages/Dashboard";
 import AdminPanel from "@/pages/AdminPanel";
 import Placeholder from "@/pages/Placeholder";
 import NotFound from "@/pages/NotFound";
+import Colaboradores from "@/pages/admin/Colaboradores";
 
 export default function App() {
   return (
@@ -42,7 +43,7 @@ export default function App() {
             path="/admin/colaboradores"
             element={
               <ProtectedRoute requireRole="admin">
-                <Placeholder title="Colaboradores" description="Cadastro e gestão de colaboradores (Fase 4)." />
+                <Colaboradores />
               </ProtectedRoute>
             }
           />
