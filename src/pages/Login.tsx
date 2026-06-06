@@ -35,9 +35,9 @@ export default function Login() {
 
   return (
     <div className="min-h-dvh flex bg-background">
-      <div className="hidden lg:flex flex-1 relative overflow-hidden bg-primary p-12 items-end">
+      <div className="hidden lg:flex flex-1 relative overflow-hidden bg-black p-12 items-end">
         <video
-          src={gymVideo.url}
+          key={gymVideo.url}
           autoPlay
           muted
           loop
@@ -45,11 +45,15 @@ export default function Login() {
           preload="auto"
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-tr from-primary/80 via-primary/40 to-transparent" />
-        <div className="relative text-primary-foreground max-w-md">
-          <h1 className="text-4xl font-bold tracking-tight mb-3">Gestão de Ponto</h1>
-          <p className="text-primary-foreground/90">
+          onError={(e) => console.log("[Login] video.error", e)}
+          onLoadedData={() => console.log("[Login] video.loaded")}
+        >
+          <source src={gymVideo.url} type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-tr from-black/85 via-black/40 to-transparent" />
+        <div className="relative text-white max-w-md">
+          <h1 className="text-5xl font-bold tracking-tight mb-3 drop-shadow-lg">Gestão de Ponto</h1>
+          <p className="text-white/90 text-lg drop-shadow">
             Controle de ponto online com geolocalização, gestão de colaboradores e folha de pagamento.
           </p>
         </div>
