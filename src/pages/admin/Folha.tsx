@@ -76,6 +76,24 @@ export default function Folha() {
     loadCycles();
   };
 
+  const deleteCycle = async (c: Cycle) => {
+    if (!confirm(`Excluir o período de ${new Date(c.start_date).toLocaleDateString("pt-BR")} a ${new Date(c.end_date).toLocaleDateString("pt-BR")}?\n\nTodos os holerites e PDFs deste período serão removidos. Esta ação não pode ser desfeita.`)) return;
+    setBusy(true);
+    // Remove PDFs do storage
+    const { data: ps } = await supabase.from("payslips").select("pdf_url").eq("cycle_id", c.id);
+    const paths = (ps ?? []).map((p: any) => p.pdf_url).filter(Boolean);
+    if (paths.length) await supabase.storage.from("payslips").remove(paths);
+    // Remove holerites e ciclo
+    const { error: e1 } = await supabase.from("payslips").delete().eq("cycle_id", c.id);
+    if (e1) { setBusy(false); return toast.error(e1.message); }
+    const { error: e2 } = await supabase.from("payroll_cycles").delete().eq("id", c.id);
+    setBusy(false);
+    if (e2) return toast.error(e2.message);
+    toast.success("Período excluído");
+    if (selected?.id === c.id) { setSelected(null); setPayslips([]); }
+    loadCycles();
+  };
+
   const saveEdit = async () => {
     if (!editing) return;
     const final = Number(editing.base_salary) + Number(editing.extra_hours_value) + Number(editing.bonuses) - Number(editing.discounts);
