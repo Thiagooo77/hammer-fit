@@ -132,14 +132,21 @@ export default function AdminPanel() {
 
   return (
     <div className="p-6 md:p-8 max-w-7xl">
-      <header className="flex items-center justify-between gap-4 mb-6">
+      <header className="flex items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Painel Master</h1>
-          <p className="text-muted-foreground text-sm mt-1">Visão geral em tempo real (Supabase Realtime).</p>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-card/60 backdrop-blur text-xs text-muted-foreground mb-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            Tempo real · Supabase
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+            Painel Master
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1">Visão geral da operação ao vivo.</p>
         </div>
         <button
           onClick={exportCsv}
-          className="rounded-md border border-border bg-card px-4 py-2 text-sm hover:bg-secondary transition min-h-11"
+          className="rounded-md px-4 py-2 text-sm font-medium min-h-11 text-primary-foreground transition hover:opacity-90"
+          style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-elegant)" }}
         >
           Exportar CSV
         </button>
@@ -147,26 +154,41 @@ export default function AdminPanel() {
 
       {loading && !stats && <p className="text-sm text-muted-foreground">Carregando...</p>}
 
-      <section className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {cards.map(({ label, value, icon: Icon }) => (
-          <div key={label} className="rounded-lg border border-border bg-card p-5">
-            <Icon className="w-5 h-5 text-primary mb-3" />
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
-            <p className="text-2xl font-bold tabular-nums mt-1">{value}</p>
+          <div
+            key={label}
+            className="group relative rounded-xl border border-border p-5 overflow-hidden transition hover:border-primary/40"
+            style={{ background: "var(--gradient-surface)", boxShadow: "var(--shadow-card)" }}
+          >
+            <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-primary/10 blur-2xl opacity-0 group-hover:opacity-100 transition" />
+            <div className="relative">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3 border border-border bg-background/40">
+                <Icon className="w-5 h-5 text-primary" />
+              </div>
+              <p className="text-[11px] uppercase tracking-widest text-muted-foreground">{label}</p>
+              <p className="text-3xl font-bold tabular-nums mt-1">{value}</p>
+            </div>
           </div>
         ))}
       </section>
 
-      <section className="rounded-lg border border-border bg-card p-5 mb-8">
-        <h2 className="font-semibold mb-4">Pontos registrados — últimos 14 dias</h2>
+      <section
+        className="rounded-xl border border-border p-6 mb-8"
+        style={{ background: "var(--gradient-surface)", boxShadow: "var(--shadow-card)" }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold">Pontos registrados</h2>
+          <span className="text-xs text-muted-foreground">Últimos 14 dias</span>
+        </div>
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chart} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.4} />
               <XAxis dataKey="dia" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
               <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
-              <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", fontSize: 12 }} />
-              <Bar dataKey="pontos" fill="hsl(var(--primary))" radius={[4,4,0,0]} />
+              <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+              <Bar dataKey="pontos" fill="hsl(var(--primary))" radius={[6,6,0,0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
