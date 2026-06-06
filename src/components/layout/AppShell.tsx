@@ -83,7 +83,7 @@ export default function AppShell() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 h-dvh overflow-y-auto">
         <Outlet />
       </main>
     </div>
