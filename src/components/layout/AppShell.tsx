@@ -30,8 +30,8 @@ export default function AppShell() {
   };
 
   return (
-    <div className="min-h-dvh flex bg-background text-foreground">
-      <aside className="w-64 border-r border-border bg-card flex flex-col shrink-0">
+    <div className="h-dvh flex bg-background text-foreground overflow-hidden">
+      <aside className="w-64 h-dvh sticky top-0 border-r border-border bg-card flex flex-col shrink-0">
         <div className="px-6 py-5 border-b border-border">
           <h1 className="font-bold text-lg tracking-tight">
             Gestão<span className="text-primary"> de Ponto</span>
@@ -83,7 +83,7 @@ export default function AppShell() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 h-dvh overflow-y-auto">
         <Outlet />
       </main>
     </div>
