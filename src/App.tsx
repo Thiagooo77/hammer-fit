@@ -9,6 +9,7 @@ import AdminPanel from "@/pages/AdminPanel";
 import Placeholder from "@/pages/Placeholder";
 import NotFound from "@/pages/NotFound";
 import Colaboradores from "@/pages/admin/Colaboradores";
+import BaterPonto from "@/pages/BaterPonto";
 
 export default function App() {
   return (
@@ -26,7 +27,7 @@ export default function App() {
         >
           {/* Rotas de colaborador */}
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/ponto" element={<Placeholder title="Bater Ponto" description="Registro de ponto com geolocalização (Fase 5)." />} />
+          <Route path="/ponto" element={<BaterPonto />} />
           <Route path="/holerites" element={<Placeholder title="Meus Holerites" description="Holerites liberados pelo administrador (Fase 10)." />} />
           <Route path="/perfil" element={<Placeholder title="Meu Perfil" description="Dados pessoais e troca de senha." />} />
 
