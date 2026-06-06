@@ -31,7 +31,7 @@ function defaultCycle() {
   const today = new Date();
   const end = new Date(today.getFullYear(), today.getMonth(), 25);
   const start = new Date(today.getFullYear(), today.getMonth() - 1, 26);
-  return { start: start.toISOString().slice(0,10), end: end.toISOString().slice(0,10) };
+  return { start_date: start.toISOString().slice(0,10), end_date: end.toISOString().slice(0,10) };
 }
 
 export default function Folha() {
