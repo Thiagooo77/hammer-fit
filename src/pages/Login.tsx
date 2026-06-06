@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import gymVideo from "@/assets/gym-login.mp4.asset.json";
 
 export default function Login() {
   const [email, setEmail] = useState("");
