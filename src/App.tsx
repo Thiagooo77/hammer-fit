@@ -16,9 +16,16 @@ import BancoHoras from "@/pages/BancoHoras";
 import Holerites from "@/pages/Holerites";
 import Perfil from "@/pages/Perfil";
 
+import { useAuth } from "@/context/AuthContext";
+
 const Admin = ({ children }: { children: React.ReactNode }) => (
   <ProtectedRoute requireRole="admin">{children}</ProtectedRoute>
 );
+
+function RootRedirect() {
+  const { isAdmin } = useAuth();
+  return <Navigate to={isAdmin ? "/admin" : "/dashboard"} replace />;
+}
 
 export default function App() {
   return (
@@ -43,7 +50,7 @@ export default function App() {
           <Route path="/admin/logs" element={<Admin><Logs /></Admin>} />
         </Route>
 
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<ProtectedRoute><RootRedirect /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AuthProvider>
