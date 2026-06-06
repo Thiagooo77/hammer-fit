@@ -227,12 +227,22 @@ export default function Folha() {
                           </td>
                           <td className="px-4 py-3 text-right">
                             <div className="inline-flex gap-1">
-                              <button onClick={() => setEditing(p)} aria-label="Editar" className="rounded border border-border p-1.5 hover:bg-secondary">
+                              <button
+                                onClick={() => downloadPdf(p)}
+                                disabled={!p.pdf_url}
+                                aria-label="Visualizar holerite"
+                                title={p.pdf_url ? "Visualizar PDF" : "Gere o PDF primeiro"}
+                                className="rounded border border-border p-1.5 hover:bg-secondary disabled:opacity-40"
+                              >
                                 <Eye className="w-3.5 h-3.5" />
                               </button>
-                              <button onClick={() => generatePdf(p)} disabled={busy} aria-label="Gerar PDF" className="rounded border border-border p-1.5 hover:bg-secondary disabled:opacity-50">
+                              <button onClick={() => setEditing(p)} aria-label="Editar" title="Editar" className="rounded border border-border p-1.5 hover:bg-secondary">
+                                <Pencil className="w-3.5 h-3.5" />
+                              </button>
+                              <button onClick={() => generatePdf(p)} disabled={busy} aria-label="Gerar PDF" title="Gerar/atualizar PDF" className="rounded border border-border p-1.5 hover:bg-secondary disabled:opacity-50">
                                 <FileDown className="w-3.5 h-3.5" />
                               </button>
+
                               {p.pdf_url && (
                                 <button onClick={() => downloadPdf(p)} className="rounded border border-border px-2 text-xs hover:bg-secondary">
                                   Baixar
