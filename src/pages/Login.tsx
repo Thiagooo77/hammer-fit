@@ -5,10 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Login() {
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [nome, setNome] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -21,30 +19,19 @@ export default function Login() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
-            data: { nome_completo: nome },
-          },
-        });
-        if (error) throw error;
-        toast.success("Conta criada! Verifique seu e-mail se necessário.");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      console.log("[HammerPonto] login.success", { email });
     } catch (err: any) {
-      toast.error(err.message ?? "Erro ao autenticar");
+      console.log("[HammerPonto] login.error", err?.message);
+      toast.error(err.message ?? "Falha ao entrar");
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-dvh flex bg-background">
       <div className="hidden lg:flex flex-1 bg-gradient-to-br from-primary to-primary/70 p-12 items-end">
         <div className="text-primary-foreground max-w-md">
           <h1 className="text-4xl font-bold tracking-tight mb-3">HammerPonto</h1>
@@ -57,52 +44,42 @@ export default function Login() {
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold tracking-tight">
-              {mode === "signin" ? "Entrar" : "Criar conta"}
-            </h2>
+            <h2 className="text-2xl font-bold tracking-tight">Entrar</h2>
             <p className="text-sm text-muted-foreground mt-1">
               Acesse o painel HammerPonto
             </p>
           </div>
 
-          <form onSubmit={submit} className="space-y-4">
-            {mode === "signup" && (
-              <div>
-                <label className="text-sm font-medium">Nome completo</label>
-                <input
-                  required value={nome} onChange={(e) => setNome(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                />
-              </div>
-            )}
+          <form onSubmit={submit} className="space-y-4" aria-label="Formulário de login">
             <div>
-              <label className="text-sm font-medium">E-mail</label>
+              <label htmlFor="email" className="text-sm font-medium">E-mail</label>
               <input
-                type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                id="email" type="email" required value={email}
+                autoComplete="email"
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Senha</label>
+              <label htmlFor="password" className="text-sm font-medium">Senha</label>
               <input
-                type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                id="password" type="password" required minLength={6} value={password}
+                autoComplete="current-password"
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </div>
             <button
               type="submit" disabled={submitting}
-              className="w-full rounded-md bg-primary text-primary-foreground py-2.5 text-sm font-semibold hover:opacity-90 transition disabled:opacity-60"
+              className="w-full rounded-md bg-primary text-primary-foreground py-2.5 text-sm font-semibold hover:opacity-90 transition disabled:opacity-60 min-h-11"
             >
-              {submitting ? "Aguarde..." : mode === "signin" ? "Entrar" : "Cadastrar"}
+              {submitting ? "Aguarde..." : "Entrar"}
             </button>
           </form>
 
-          <button
-            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-            className="mt-4 w-full text-sm text-muted-foreground hover:text-foreground"
-          >
-            {mode === "signin" ? "Não tem conta? Cadastre-se" : "Já tem conta? Entrar"}
-          </button>
+          <p className="mt-6 text-xs text-muted-foreground text-center">
+            Não possui conta? Solicite acesso ao administrador da sua empresa.
+          </p>
         </div>
       </div>
     </div>
