@@ -171,7 +171,7 @@ export default function Folha() {
           </p>
         </div>
         <button
-          onClick={closePeriod}
+          onClick={openCloseDialog}
           disabled={busy}
           className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:opacity-90 transition disabled:opacity-60 min-h-11"
         >
