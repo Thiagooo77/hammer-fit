@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Pencil, Plus, RefreshCw, UserCheck, UserX } from "lucide-react";
+import { Pencil, Plus, RefreshCw, Trash2, UserCheck, UserX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Employee {
@@ -65,6 +65,22 @@ export default function Colaboradores() {
       .eq("id", e.id);
     if (err) return toast.error(err.message);
     toast.success(e.ativo ? "Colaborador inativado" : "Colaborador ativado");
+    load();
+  };
+
+  const removeEmployee = async (e: Employee) => {
+    const confirmed = window.confirm(
+      `Excluir definitivamente ${e.nome_completo ?? e.email}?\n\nEssa ação remove o usuário, pontos, banco de horas e holerites. Não pode ser desfeita.`,
+    );
+    if (!confirmed) return;
+    const { data, error: err } = await supabase.functions.invoke("delete-employee", {
+      body: { user_id: e.id },
+    });
+    if (err || (data as any)?.error) {
+      const msg = (data as any)?.message ?? (data as any)?.error ?? err?.message ?? "Erro ao excluir";
+      return toast.error(msg);
+    }
+    toast.success("Colaborador excluído");
     load();
   };
 
@@ -236,6 +252,13 @@ export default function Colaboradores() {
                       >
                         {e.ativo ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
                         {e.ativo ? "Inativar" : "Ativar"}
+                      </button>
+                      <button
+                        onClick={() => removeEmployee(e)}
+                        aria-label="Excluir colaborador"
+                        className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-3 py-1.5 text-xs hover:bg-destructive/10 transition"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> Excluir
                       </button>
                     </div>
                   </td>
