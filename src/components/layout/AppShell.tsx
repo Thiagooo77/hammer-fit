@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import {
-  Clock, LayoutDashboard, Users, FileText, LogOut, User, MapPin, ScrollText, History, SlidersHorizontal, Menu, X,
+  Clock, LayoutDashboard, Users, FileText, LogOut, User, MapPin, ScrollText, History, SlidersHorizontal, Menu, X, UserCheck,
 } from "lucide-react";
 
 const navColaborador = [
@@ -16,6 +16,7 @@ const navColaborador = [
 const navAdmin = [
   { to: "/admin", label: "Painel Master", icon: LayoutDashboard },
   { to: "/admin/colaboradores", label: "Colaboradores", icon: Users },
+  { to: "/admin/frequencia", label: "Frequência", icon: UserCheck },
   { to: "/admin/folha", label: "Folha", icon: FileText },
   { to: "/admin/mapa", label: "Mapa Corporativo", icon: MapPin },
   { to: "/admin/banco-horas/ajustes", label: "Ajustes de Banco de Horas", icon: SlidersHorizontal },

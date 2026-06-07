@@ -12,6 +12,7 @@ import BaterPonto from "@/pages/BaterPonto";
 import Folha from "@/pages/admin/Folha";
 import Logs from "@/pages/admin/Logs";
 import MapaCorporativo from "@/pages/admin/MapaCorporativo";
+import Frequencia from "@/pages/admin/Frequencia";
 import BancoHoras from "@/pages/BancoHoras";
 import AjustesBancoHoras from "@/pages/admin/AjustesBancoHoras";
 import Holerites from "@/pages/Holerites";
@@ -52,6 +53,7 @@ export default function App() {
           {/* Admin */}
           <Route path="/admin" element={<Admin><AdminPanel /></Admin>} />
           <Route path="/admin/colaboradores" element={<Admin><Colaboradores /></Admin>} />
+          <Route path="/admin/frequencia" element={<Admin><Frequencia /></Admin>} />
           <Route path="/admin/folha" element={<Admin><Folha /></Admin>} />
           <Route path="/admin/mapa" element={<Admin><MapaCorporativo /></Admin>} />
           <Route path="/admin/logs" element={<Admin><Logs /></Admin>} />
