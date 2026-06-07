@@ -179,6 +179,11 @@ export default function BaterPonto() {
   const nextType = ORDER.find((t) => !doneTypes.has(t)) ?? null;
 
   const startPunch = async (type: PunchType) => {
+    const check = checkSchedule(type, new Date(), schedule.entrada, schedule.saida);
+    if (!check.ok) {
+      toast.error(check.message!, { duration: 5000 });
+      return;
+    }
     setBusy(true);
     try {
       toast.loading("Obtendo localização...", { id: "geo" });
