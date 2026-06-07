@@ -13,6 +13,7 @@ import Folha from "@/pages/admin/Folha";
 import Logs from "@/pages/admin/Logs";
 import MapaCorporativo from "@/pages/admin/MapaCorporativo";
 import BancoHoras from "@/pages/BancoHoras";
+import AjustesBancoHoras from "@/pages/admin/AjustesBancoHoras";
 import Holerites from "@/pages/Holerites";
 import Perfil from "@/pages/Perfil";
 
@@ -48,6 +49,7 @@ export default function App() {
           <Route path="/admin/folha" element={<Admin><Folha /></Admin>} />
           <Route path="/admin/mapa" element={<Admin><MapaCorporativo /></Admin>} />
           <Route path="/admin/logs" element={<Admin><Logs /></Admin>} />
+          <Route path="/admin/banco-horas/ajustes" element={<Admin><AjustesBancoHoras /></Admin>} />
         </Route>
 
         <Route path="/" element={<ProtectedRoute><RootRedirect /></ProtectedRoute>} />
