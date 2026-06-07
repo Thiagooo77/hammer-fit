@@ -387,46 +387,8 @@ export default function Login() {
                       <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-300 uppercase tracking-wide">
                         <PlayCircle className="w-3.5 h-3.5" /> Modo Apresentação
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => setShowDemoCfg((v) => !v)}
-                        className="inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground"
-                      >
-                        <Settings2 className="w-3 h-3" /> Configurar
-                      </button>
+                      <span className="text-[10px] text-muted-foreground">{demoMinutes} min</span>
                     </div>
-
-                    {showDemoCfg && (
-                      <div className="space-y-2 rounded-md bg-black/30 p-2.5 text-[11px]">
-                        <div className="flex items-center gap-2">
-                          <label className="w-24 text-muted-foreground">Duração (min)</label>
-                          <input
-                            type="number" min={1} max={120}
-                            value={demoMinutes}
-                            onChange={(e) => setDemoMinutes(Math.max(1, Number(e.target.value) || 1))}
-                            className="flex-1 rounded border border-white/10 bg-black/40 px-2 py-1 outline-none focus:border-primary/60"
-                          />
-                        </div>
-                        <p className="text-muted-foreground/80 pt-1">Conta Admin (existente)</p>
-                        <input
-                          type="email" placeholder="admin@empresa.com"
-                          value={demoCfg.adminEmail || ""}
-                          onChange={(e) => saveDemoCfg({ ...demoCfg, adminEmail: e.target.value })}
-                          className="w-full rounded border border-white/10 bg-black/40 px-2 py-1 outline-none focus:border-primary/60"
-                        />
-                        <input
-                          type="password" placeholder="senha admin"
-                          value={demoCfg.adminPass || ""}
-                          onChange={(e) => saveDemoCfg({ ...demoCfg, adminPass: e.target.value })}
-                          className="w-full rounded border border-white/10 bg-black/40 px-2 py-1 outline-none focus:border-primary/60"
-                        />
-
-
-                        <p className="text-[10px] text-muted-foreground/70 pt-1">
-                          Salvo apenas neste navegador (localStorage).
-                        </p>
-                      </div>
-                    )}
 
                     <button
                       type="button"
@@ -435,10 +397,10 @@ export default function Login() {
                       className="w-full inline-flex items-center justify-center gap-1.5 rounded-md bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-200 text-xs font-semibold py-2 transition disabled:opacity-50"
                     >
                       <UserCog className="w-3.5 h-3.5" />
-                      {demoLoading === "admin" ? "..." : `Entrar como Admin · ${demoMinutes}min`}
+                      {demoLoading === "admin" ? "Entrando..." : `Entrar como Admin · ${demoMinutes}min`}
                     </button>
-
                   </div>
+
 
                   <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
                     Não possui conta? Solicite acesso ao administrador da sua empresa.
