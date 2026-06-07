@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Pencil, Plus, RefreshCw, UserCheck, UserX } from "lucide-react";
+import { Pencil, Plus, RefreshCw, Trash2, UserCheck, UserX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Employee {
