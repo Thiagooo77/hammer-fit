@@ -94,8 +94,6 @@ export default function Folha() {
     const d = defaultCycle();
     if (mode === "some" && pickedIds.length === 0) return toast.error("Selecione ao menos um funcionário");
     setBusy(true);
-    const body: any = { ...d };
-    if (mode === "some") body.user_ids = pickedIds;
     const body: any = { ...d, discount_faltas: discountFaltas, days_in_month: daysInMonth };
     if (mode === "some") body.user_ids = pickedIds;
     const { data, error } = await supabase.functions.invoke("close-payroll", { body });
