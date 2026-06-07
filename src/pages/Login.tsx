@@ -95,10 +95,39 @@ export default function Login() {
         {/* Gradiente base corporativo */}
         <div className="absolute inset-0 bg-gradient-to-br from-[oklch(0.14_0.02_260)] via-[oklch(0.12_0.015_255)] to-[oklch(0.10_0.02_240)]" />
 
-        {/* Gradientes em movimento contínuo */}
-        <div className="login-gradient-blob absolute -top-32 -left-32 h-[560px] w-[560px] rounded-full bg-primary/25 blur-[120px]" style={{ animationDelay: "0s" }} />
-        <div className="login-gradient-blob absolute top-1/3 -right-40 h-[600px] w-[600px] rounded-full bg-[oklch(0.5_0.18_240)]/30 blur-[140px]" style={{ animationDelay: "-6s" }} />
-        <div className="login-gradient-blob absolute -bottom-40 left-1/3 h-[520px] w-[520px] rounded-full bg-[oklch(0.45_0.15_270)]/20 blur-[130px]" style={{ animationDelay: "-12s" }} />
+        {/* Aurora boreal */}
+        <div className="login-aurora login-parallax" style={{ transform: `translate3d(${parallax.x * -14}px, ${parallax.y * -10}px, 0)` }} />
+
+        {/* Gradientes em movimento contínuo (com parallax) */}
+        <div className="login-gradient-blob login-parallax absolute -top-32 -left-32 h-[560px] w-[560px] rounded-full bg-primary/25 blur-[120px]" style={{ animationDelay: "0s", transform: `translate3d(${parallax.x * 18}px, ${parallax.y * 14}px, 0)` }} />
+        <div className="login-gradient-blob login-parallax absolute top-1/3 -right-40 h-[600px] w-[600px] rounded-full bg-[oklch(0.5_0.18_240)]/30 blur-[140px]" style={{ animationDelay: "-6s", transform: `translate3d(${parallax.x * -22}px, ${parallax.y * -12}px, 0)` }} />
+        <div className="login-gradient-blob login-parallax absolute -bottom-40 left-1/3 h-[520px] w-[520px] rounded-full bg-[oklch(0.45_0.15_270)]/20 blur-[130px]" style={{ animationDelay: "-12s", transform: `translate3d(${parallax.x * 12}px, ${parallax.y * -18}px, 0)` }} />
+
+        {/* Partículas premium */}
+        <div className="absolute inset-0 overflow-hidden hidden sm:block">
+          {Array.from({ length: 18 }).map((_, i) => {
+            const left = (i * 53) % 100;
+            const duration = 18 + ((i * 7) % 22);
+            const delay = -((i * 3) % 20);
+            const tx = ((i % 5) - 2) * 24;
+            const size = 2 + (i % 3);
+            return (
+              <span
+                key={`p${i}`}
+                className="login-particle"
+                style={{
+                  left: `${left}%`,
+                  animationDuration: `${duration}s`,
+                  animationDelay: `${delay}s`,
+                  width: `${size}px`,
+                  height: `${size}px`,
+                  ["--tx" as any]: `${tx}px`,
+                }}
+              />
+            );
+          })}
+        </div>
+
 
         {/* Grid tecnológico */}
         <div
