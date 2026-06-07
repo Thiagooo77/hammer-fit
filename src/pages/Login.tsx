@@ -13,7 +13,21 @@ export default function Login() {
   const navigate = useNavigate();
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [parallax, setParallax] = useState({ x: 0, y: 0 });
   const isDesktop = typeof window !== "undefined" && window.matchMedia?.("(min-width: 1024px)").matches;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia?.("(max-width: 767px)").matches) return;
+    const onMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      setParallax({ x, y });
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => window.removeEventListener("mousemove", onMove);
+  }, []);
 
   useEffect(() => {
     const handler = (e: Event) => {
