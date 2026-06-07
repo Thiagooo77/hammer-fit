@@ -68,6 +68,22 @@ export default function Colaboradores() {
     load();
   };
 
+  const removeEmployee = async (e: Employee) => {
+    const confirmed = window.confirm(
+      `Excluir definitivamente ${e.nome_completo ?? e.email}?\n\nEssa ação remove o usuário, pontos, banco de horas e holerites. Não pode ser desfeita.`,
+    );
+    if (!confirmed) return;
+    const { data, error: err } = await supabase.functions.invoke("delete-employee", {
+      body: { user_id: e.id },
+    });
+    if (err || (data as any)?.error) {
+      const msg = (data as any)?.message ?? (data as any)?.error ?? err?.message ?? "Erro ao excluir";
+      return toast.error(msg);
+    }
+    toast.success("Colaborador excluído");
+    load();
+  };
+
   const openCreate = () => {
     setEditingId(null);
     setForm(emptyForm);
