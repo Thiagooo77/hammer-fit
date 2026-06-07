@@ -266,6 +266,9 @@ export default function BaterPonto() {
           <span>
             <span className="font-medium text-foreground">Endereço autorizado:</span> {OFFICE.address}
             <span className="block mt-0.5">Raio permitido: {OFFICE.radiusMeters}m.</span>
+            {schedule.entrada && schedule.saida && (
+              <span className="block mt-0.5">Horário permitido: {schedule.entrada.slice(0,5)} às {schedule.saida.slice(0,5)}.</span>
+            )}
           </span>
         </div>
       </header>
