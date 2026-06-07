@@ -428,26 +428,16 @@ export default function Login() {
                       </div>
                     )}
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        disabled={demoLoading !== null}
-                        onClick={() => enterDemo("admin")}
-                        className="inline-flex items-center justify-center gap-1.5 rounded-md bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-200 text-xs font-semibold py-2 transition disabled:opacity-50"
-                      >
-                        <UserCog className="w-3.5 h-3.5" />
-                        {demoLoading === "admin" ? "..." : `Admin · ${demoMinutes}min`}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={demoLoading !== null}
-                        onClick={() => enterDemo("colab")}
-                        className="inline-flex items-center justify-center gap-1.5 rounded-md bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-200 text-xs font-semibold py-2 transition disabled:opacity-50"
-                      >
-                        <UserIcon className="w-3.5 h-3.5" />
-                        {demoLoading === "colab" ? "..." : `Colab · ${demoMinutes}min`}
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      disabled={demoLoading !== null}
+                      onClick={() => enterDemo("admin")}
+                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-md bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-200 text-xs font-semibold py-2 transition disabled:opacity-50"
+                    >
+                      <UserCog className="w-3.5 h-3.5" />
+                      {demoLoading === "admin" ? "..." : `Entrar como Admin · ${demoMinutes}min`}
+                    </button>
+
                   </div>
 
                   <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
