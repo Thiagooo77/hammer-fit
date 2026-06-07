@@ -17,6 +17,40 @@ export default function Login() {
   const [isInstalled, setIsInstalled] = useState(false);
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
   const isDesktop = typeof window !== "undefined" && window.matchMedia?.("(min-width: 1024px)").matches;
+  const [demoMinutes, setDemoMinutes] = useState<number>(() => Number(localStorage.getItem("demoMinutes") || 10));
+  const [demoCfg, setDemoCfg] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("demoCreds") || "{}"); } catch { return {}; }
+  });
+  const [showDemoCfg, setShowDemoCfg] = useState(false);
+  const [demoLoading, setDemoLoading] = useState<"admin" | "colab" | null>(null);
+
+  const saveDemoCfg = (next: any) => {
+    setDemoCfg(next);
+    localStorage.setItem("demoCreds", JSON.stringify(next));
+  };
+
+  const enterDemo = async (kind: "admin" | "colab") => {
+    const email = kind === "admin" ? demoCfg.adminEmail : demoCfg.colabEmail;
+    const pass = kind === "admin" ? demoCfg.adminPass : demoCfg.colabPass;
+    if (!email || !pass) {
+      setShowDemoCfg(true);
+      toast.error("Configure as credenciais demo antes de iniciar.");
+      return;
+    }
+    setDemoLoading(kind);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+      if (error) throw error;
+      startDemo(demoMinutes);
+      localStorage.setItem("demoMinutes", String(demoMinutes));
+      toast.success(`Modo apresentação iniciado (${demoMinutes} min).`);
+    } catch (err: any) {
+      toast.error(err.message ?? "Falha ao iniciar demo");
+    } finally {
+      setDemoLoading(null);
+    }
+  };
+
 
   useEffect(() => {
     if (typeof window === "undefined") return;
