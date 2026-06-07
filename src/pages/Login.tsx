@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Clock, MapPin, ShieldCheck, Lock, Smartphone, MoreVertical, Share, Plus, Monitor, Download } from "lucide-react";
+import { Clock, MapPin, ShieldCheck, Lock, Smartphone, MoreVertical, Share, Plus, Monitor, Download, PlayCircle, Settings2, UserCog, User as UserIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { startDemo } from "@/components/DemoBanner";
+
 
 export default function Login() {
   const [email, setEmail] = useState("");
