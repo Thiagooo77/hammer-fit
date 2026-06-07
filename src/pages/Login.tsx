@@ -420,19 +420,8 @@ export default function Login() {
                           onChange={(e) => saveDemoCfg({ ...demoCfg, adminPass: e.target.value })}
                           className="w-full rounded border border-white/10 bg-black/40 px-2 py-1 outline-none focus:border-primary/60"
                         />
-                        <p className="text-muted-foreground/80 pt-1">Conta Colaborador (existente)</p>
-                        <input
-                          type="email" placeholder="colab@empresa.com"
-                          value={demoCfg.colabEmail || ""}
-                          onChange={(e) => saveDemoCfg({ ...demoCfg, colabEmail: e.target.value })}
-                          className="w-full rounded border border-white/10 bg-black/40 px-2 py-1 outline-none focus:border-primary/60"
-                        />
-                        <input
-                          type="password" placeholder="senha colaborador"
-                          value={demoCfg.colabPass || ""}
-                          onChange={(e) => saveDemoCfg({ ...demoCfg, colabPass: e.target.value })}
-                          className="w-full rounded border border-white/10 bg-black/40 px-2 py-1 outline-none focus:border-primary/60"
-                        />
+
+
                         <p className="text-[10px] text-muted-foreground/70 pt-1">
                           Salvo apenas neste navegador (localStorage).
                         </p>
