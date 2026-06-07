@@ -423,7 +423,7 @@ function LogoMark({ size = "md" }: { size?: "md" | "lg" }) {
   const s = size === "lg" ? "size-10" : "size-8";
   return (
     <div
-      className={`${s} relative inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[oklch(0.55_0.2_280)] shadow-[0_8px_24px_-8px_oklch(0.7_0.18_260/0.6)]`}
+      className={`${s} login-logo-glow relative inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[oklch(0.55_0.2_280)]`}
       aria-hidden
     >
       <Clock className="absolute w-4 h-4 text-white/90" strokeWidth={2.5} />
