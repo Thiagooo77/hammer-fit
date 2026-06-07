@@ -29,17 +29,16 @@ export default function Login() {
     localStorage.setItem("demoCreds", JSON.stringify(next));
   };
 
-  const enterDemo = async (kind: "admin" | "colab") => {
-    const email = kind === "admin" ? demoCfg.adminEmail : demoCfg.colabEmail;
-    const pass = kind === "admin" ? demoCfg.adminPass : demoCfg.colabPass;
-    if (!email || !pass) {
-      setShowDemoCfg(true);
-      toast.error("Configure as credenciais demo antes de iniciar.");
-      return;
-    }
-    setDemoLoading(kind);
+  const DEMO_ADMIN_EMAIL = "admhammer@gmail.com";
+  const DEMO_ADMIN_PASS = "hammer10";
+
+  const enterDemo = async (_kind: "admin" | "colab") => {
+    setDemoLoading("admin");
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+      const { error } = await supabase.auth.signInWithPassword({
+        email: DEMO_ADMIN_EMAIL,
+        password: DEMO_ADMIN_PASS,
+      });
       if (error) throw error;
       startDemo(demoMinutes);
       localStorage.setItem("demoMinutes", String(demoMinutes));
@@ -48,6 +47,7 @@ export default function Login() {
       toast.error(err.message ?? "Falha ao iniciar demo");
     } finally {
       setDemoLoading(null);
+
     }
   };
 
