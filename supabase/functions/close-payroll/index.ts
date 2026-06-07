@@ -6,6 +6,8 @@ const Body = z.object({
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   user_ids: z.array(z.string().uuid()).optional(),
+  discount_faltas: z.boolean().optional().default(false),
+  days_in_month: z.number().int().min(20).max(31).optional().default(30),
 });
 
 Deno.serve(async (req) => {
@@ -36,7 +38,6 @@ Deno.serve(async (req) => {
       .select().single();
     if (cycleErr) return json({ error: "cycle_failed", message: cycleErr.message }, 400);
 
-    // Sempre inclui o admin que está fechando a folha
     const targetIds = parsed.data.user_ids && parsed.data.user_ids.length > 0
       ? Array.from(new Set([...parsed.data.user_ids, u.user.id]))
       : null;
@@ -45,33 +46,57 @@ Deno.serve(async (req) => {
     if (targetIds) q = q.in("id", targetIds);
     const { data: employees } = await q;
 
-    // Garante a linha do admin mesmo se filtrado por algum motivo
     const list: Array<{ id: string; salario: number | null }> = (employees as any) ?? [];
     if (!list.find((e) => e.id === u.user.id)) {
       const { data: me } = await admin.from("profiles").select("id,salario").eq("id", u.user.id).maybeSingle();
       if (me) list.push(me as any);
     }
 
+    const faltasReport: Array<{ user_id: string; faltas: number; discount: number }> = [];
     if (list.length > 0) {
-      const rows = list.map((e) => ({
-        company_id: prof.company_id,
-        cycle_id: cycle.id,
-        user_id: e.id,
-        base_salary: Number(e.salario ?? 0),
-        final_salary: Number(e.salario ?? 0),
-      }));
+      const userIds = list.map((e) => e.id);
+      const { data: decs } = await admin
+        .from("attendance_decisions")
+        .select("user_id,decision,reference_date")
+        .in("user_id", userIds)
+        .gte("reference_date", parsed.data.start_date)
+        .lte("reference_date", parsed.data.end_date)
+        .eq("decision", "falta");
+
+      const faltasMap: Record<string, number> = {};
+      for (const d of (decs ?? []) as any[]) {
+        faltasMap[d.user_id] = (faltasMap[d.user_id] ?? 0) + 1;
+      }
+
+      const rows = list.map((e) => {
+        const base = Number(e.salario ?? 0);
+        const faltas = faltasMap[e.id] ?? 0;
+        const dailyValue = base / parsed.data.days_in_month;
+        const discount = parsed.data.discount_faltas ? +(dailyValue * faltas).toFixed(2) : 0;
+        faltasReport.push({ user_id: e.id, faltas, discount });
+        return {
+          company_id: prof.company_id,
+          cycle_id: cycle.id,
+          user_id: e.id,
+          base_salary: base,
+          discounts: discount,
+          final_salary: +(base - discount).toFixed(2),
+          notes: faltas > 0
+            ? `${faltas} falta(s) no período${parsed.data.discount_faltas ? ` — desconto de R$ ${discount.toFixed(2)} (${parsed.data.days_in_month} dias)` : " — sem desconto aplicado"}`
+            : null,
+        };
+      });
       const { error: psErr } = await admin.from("payslips").insert(rows);
       if (psErr) console.error("payslips insert", psErr);
     }
-    const employeesCount = list.length;
 
     await admin.from("audit_logs").insert({
       company_id: prof.company_id, actor_id: u.user.id,
       action: "payroll.closed", entity: "payroll_cycles", entity_id: cycle.id,
-      metadata: { start_date: parsed.data.start_date, end_date: parsed.data.end_date },
+      metadata: { start_date: parsed.data.start_date, end_date: parsed.data.end_date, discount_faltas: parsed.data.discount_faltas },
     });
 
-    return json({ ok: true, cycle_id: cycle.id, employees: employeesCount });
+    return json({ ok: true, cycle_id: cycle.id, employees: list.length, faltas: faltasReport });
   } catch (e) {
     console.error(e);
     return json({ error: "internal", message: String(e) }, 500);

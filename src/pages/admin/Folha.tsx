@@ -47,6 +47,9 @@ export default function Folha() {
   const [employees, setEmployees] = useState<EmployeeOpt[]>([]);
   const [pickedIds, setPickedIds] = useState<string[]>([]);
   const [mode, setMode] = useState<"all" | "some">("all");
+  const [discountFaltas, setDiscountFaltas] = useState(false);
+  const [daysInMonth, setDaysInMonth] = useState(30);
+  const [faltasPreview, setFaltasPreview] = useState<Record<string, number>>({});
 
   const loadCycles = async () => {
     const { data } = await supabase.from("payroll_cycles").select("*").order("start_date", { ascending: false });
@@ -69,14 +72,21 @@ export default function Folha() {
   useEffect(() => { if (selected) loadPayslips(selected.id); }, [selected]);
 
   const openCloseDialog = async () => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("id,nome_completo,email,cargo")
-      .eq("ativo", true)
-      .order("nome_completo", { ascending: true });
-    setEmployees((data as EmployeeOpt[]) ?? []);
+    const d = defaultCycle();
+    const [{ data: emps }, { data: decs }] = await Promise.all([
+      supabase.from("profiles").select("id,nome_completo,email,cargo").eq("ativo", true).order("nome_completo", { ascending: true }),
+      supabase.from("attendance_decisions").select("user_id")
+        .eq("decision", "falta")
+        .gte("reference_date", d.start_date).lte("reference_date", d.end_date),
+    ]);
+    setEmployees((emps as EmployeeOpt[]) ?? []);
+    const map: Record<string, number> = {};
+    for (const r of (decs ?? []) as any[]) map[r.user_id] = (map[r.user_id] ?? 0) + 1;
+    setFaltasPreview(map);
     setPickedIds([]);
     setMode("all");
+    setDiscountFaltas(false);
+    setDaysInMonth(30);
     setCloseOpen(true);
   };
 
@@ -84,7 +94,7 @@ export default function Folha() {
     const d = defaultCycle();
     if (mode === "some" && pickedIds.length === 0) return toast.error("Selecione ao menos um funcionário");
     setBusy(true);
-    const body: any = { ...d };
+    const body: any = { ...d, discount_faltas: discountFaltas, days_in_month: daysInMonth };
     if (mode === "some") body.user_ids = pickedIds;
     const { data, error } = await supabase.functions.invoke("close-payroll", { body });
     setBusy(false);
@@ -377,6 +387,44 @@ export default function Folha() {
                   })}
                 </div>
               )}
+
+              {/* Faltas / desconto */}
+              <div className="rounded-md border border-border p-3 space-y-3 bg-secondary/30">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium">Descontar faltas do período?</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {Object.keys(faltasPreview).length === 0
+                        ? "Nenhuma falta marcada na aba Frequência."
+                        : `${Object.values(faltasPreview).reduce((a,b)=>a+b,0)} falta(s) marcada(s) em ${Object.keys(faltasPreview).length} colaborador(es).`}
+                    </p>
+                  </div>
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" checked={discountFaltas} onChange={(e) => setDiscountFaltas(e.target.checked)} className="h-4 w-4" />
+                  </label>
+                </div>
+
+                {discountFaltas && (
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="dim" className="text-xs text-muted-foreground">Dias base do mês:</label>
+                    <input id="dim" type="number" min={20} max={31} value={daysInMonth}
+                      onChange={(e) => setDaysInMonth(Math.max(20, Math.min(31, Number(e.target.value) || 30)))}
+                      className="w-20 rounded-md border border-input bg-background px-2 py-1 text-sm" />
+                    <span className="text-xs text-muted-foreground">→ valor/dia = salário ÷ dias</span>
+                  </div>
+                )}
+
+                {discountFaltas && Object.keys(faltasPreview).length > 0 && (
+                  <div className="rounded border border-border max-h-40 overflow-y-auto divide-y divide-border">
+                    {employees.filter(e => faltasPreview[e.id]).map(e => (
+                      <div key={e.id} className="flex justify-between px-2 py-1.5 text-xs">
+                        <span className="truncate">{e.nome_completo ?? e.email}</span>
+                        <span className="tabular-nums text-destructive font-medium">−{faltasPreview[e.id]} dia(s)</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="p-6 pt-0 flex justify-end gap-2">
               <button onClick={() => setCloseOpen(false)} className="rounded-md border border-border px-4 py-2 text-sm hover:bg-secondary">Cancelar</button>

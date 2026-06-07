@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      attendance_decisions: {
+        Row: {
+          company_id: string
+          created_at: string
+          decided_by: string | null
+          decision: Database["public"]["Enums"]["attendance_decision"]
+          id: string
+          notes: string | null
+          reference_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          decided_by?: string | null
+          decision: Database["public"]["Enums"]["attendance_decision"]
+          id?: string
+          notes?: string | null
+          reference_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          decided_by?: string | null
+          decision?: Database["public"]["Enums"]["attendance_decision"]
+          id?: string
+          notes?: string | null
+          reference_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -469,6 +505,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "colaborador"
+      attendance_decision: "falta" | "abonado"
       payroll_status: "aberto" | "fechado" | "pago"
       punch_type: "entrada" | "almoco_saida" | "almoco_retorno" | "saida"
       time_bank_kind: "extra" | "devedora" | "ajuste"
@@ -600,6 +637,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "colaborador"],
+      attendance_decision: ["falta", "abonado"],
       payroll_status: ["aberto", "fechado", "pago"],
       punch_type: ["entrada", "almoco_saida", "almoco_retorno", "saida"],
       time_bank_kind: ["extra", "devedora", "ajuste"],
