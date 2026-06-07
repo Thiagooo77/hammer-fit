@@ -17,17 +17,9 @@ export default function Login() {
   const [isInstalled, setIsInstalled] = useState(false);
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
   const isDesktop = typeof window !== "undefined" && window.matchMedia?.("(min-width: 1024px)").matches;
-  const [demoMinutes, setDemoMinutes] = useState<number>(() => Number(localStorage.getItem("demoMinutes") || 10));
-  const [demoCfg, setDemoCfg] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("demoCreds") || "{}"); } catch { return {}; }
-  });
-  const [showDemoCfg, setShowDemoCfg] = useState(false);
+  const demoMinutes = Number(localStorage.getItem("demoMinutes") || 10);
   const [demoLoading, setDemoLoading] = useState<"admin" | "colab" | null>(null);
 
-  const saveDemoCfg = (next: any) => {
-    setDemoCfg(next);
-    localStorage.setItem("demoCreds", JSON.stringify(next));
-  };
 
   const DEMO_ADMIN_EMAIL = "admhammer@gmail.com";
   const DEMO_ADMIN_PASS = "hammer10";
