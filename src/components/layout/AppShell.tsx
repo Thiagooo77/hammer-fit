@@ -1,9 +1,11 @@
 import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import DemoBanner from "@/components/DemoBanner";
 import {
   Clock, LayoutDashboard, Users, FileText, LogOut, User, MapPin, ScrollText, History, SlidersHorizontal, Menu, X, UserCheck,
 } from "lucide-react";
+
 
 const navColaborador = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -118,8 +120,10 @@ export default function AppShell() {
       </aside>
 
       <main className="flex-1 min-w-0 md:h-dvh md:overflow-y-auto">
+        <DemoBanner />
         <Outlet />
       </main>
+
     </div>
   );
 }

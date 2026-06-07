@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Clock, MapPin, ShieldCheck, Lock, Smartphone, MoreVertical, Share, Plus, Monitor, Download } from "lucide-react";
+import { Clock, MapPin, ShieldCheck, Lock, Smartphone, MoreVertical, Share, Plus, Monitor, Download, PlayCircle, Settings2, UserCog, User as UserIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { startDemo } from "@/components/DemoBanner";
+
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -15,6 +17,40 @@ export default function Login() {
   const [isInstalled, setIsInstalled] = useState(false);
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
   const isDesktop = typeof window !== "undefined" && window.matchMedia?.("(min-width: 1024px)").matches;
+  const [demoMinutes, setDemoMinutes] = useState<number>(() => Number(localStorage.getItem("demoMinutes") || 10));
+  const [demoCfg, setDemoCfg] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("demoCreds") || "{}"); } catch { return {}; }
+  });
+  const [showDemoCfg, setShowDemoCfg] = useState(false);
+  const [demoLoading, setDemoLoading] = useState<"admin" | "colab" | null>(null);
+
+  const saveDemoCfg = (next: any) => {
+    setDemoCfg(next);
+    localStorage.setItem("demoCreds", JSON.stringify(next));
+  };
+
+  const enterDemo = async (kind: "admin" | "colab") => {
+    const email = kind === "admin" ? demoCfg.adminEmail : demoCfg.colabEmail;
+    const pass = kind === "admin" ? demoCfg.adminPass : demoCfg.colabPass;
+    if (!email || !pass) {
+      setShowDemoCfg(true);
+      toast.error("Configure as credenciais demo antes de iniciar.");
+      return;
+    }
+    setDemoLoading(kind);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+      if (error) throw error;
+      startDemo(demoMinutes);
+      localStorage.setItem("demoMinutes", String(demoMinutes));
+      toast.success(`Modo apresentação iniciado (${demoMinutes} min).`);
+    } catch (err: any) {
+      toast.error(err.message ?? "Falha ao iniciar demo");
+    } finally {
+      setDemoLoading(null);
+    }
+  };
+
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -345,9 +381,90 @@ export default function Login() {
                 </form>
 
                 <div className="mt-6 pt-5 border-t border-white/10 space-y-4">
+                  {/* ============ MODO APRESENTAÇÃO ============ */}
+                  <div className="rounded-lg border border-amber-400/30 bg-amber-400/[0.06] p-3 space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-300 uppercase tracking-wide">
+                        <PlayCircle className="w-3.5 h-3.5" /> Modo Apresentação
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowDemoCfg((v) => !v)}
+                        className="inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground"
+                      >
+                        <Settings2 className="w-3 h-3" /> Configurar
+                      </button>
+                    </div>
+
+                    {showDemoCfg && (
+                      <div className="space-y-2 rounded-md bg-black/30 p-2.5 text-[11px]">
+                        <div className="flex items-center gap-2">
+                          <label className="w-24 text-muted-foreground">Duração (min)</label>
+                          <input
+                            type="number" min={1} max={120}
+                            value={demoMinutes}
+                            onChange={(e) => setDemoMinutes(Math.max(1, Number(e.target.value) || 1))}
+                            className="flex-1 rounded border border-white/10 bg-black/40 px-2 py-1 outline-none focus:border-primary/60"
+                          />
+                        </div>
+                        <p className="text-muted-foreground/80 pt-1">Conta Admin (existente)</p>
+                        <input
+                          type="email" placeholder="admin@empresa.com"
+                          value={demoCfg.adminEmail || ""}
+                          onChange={(e) => saveDemoCfg({ ...demoCfg, adminEmail: e.target.value })}
+                          className="w-full rounded border border-white/10 bg-black/40 px-2 py-1 outline-none focus:border-primary/60"
+                        />
+                        <input
+                          type="password" placeholder="senha admin"
+                          value={demoCfg.adminPass || ""}
+                          onChange={(e) => saveDemoCfg({ ...demoCfg, adminPass: e.target.value })}
+                          className="w-full rounded border border-white/10 bg-black/40 px-2 py-1 outline-none focus:border-primary/60"
+                        />
+                        <p className="text-muted-foreground/80 pt-1">Conta Colaborador (existente)</p>
+                        <input
+                          type="email" placeholder="colab@empresa.com"
+                          value={demoCfg.colabEmail || ""}
+                          onChange={(e) => saveDemoCfg({ ...demoCfg, colabEmail: e.target.value })}
+                          className="w-full rounded border border-white/10 bg-black/40 px-2 py-1 outline-none focus:border-primary/60"
+                        />
+                        <input
+                          type="password" placeholder="senha colaborador"
+                          value={demoCfg.colabPass || ""}
+                          onChange={(e) => saveDemoCfg({ ...demoCfg, colabPass: e.target.value })}
+                          className="w-full rounded border border-white/10 bg-black/40 px-2 py-1 outline-none focus:border-primary/60"
+                        />
+                        <p className="text-[10px] text-muted-foreground/70 pt-1">
+                          Salvo apenas neste navegador (localStorage).
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        disabled={demoLoading !== null}
+                        onClick={() => enterDemo("admin")}
+                        className="inline-flex items-center justify-center gap-1.5 rounded-md bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-200 text-xs font-semibold py-2 transition disabled:opacity-50"
+                      >
+                        <UserCog className="w-3.5 h-3.5" />
+                        {demoLoading === "admin" ? "..." : `Admin · ${demoMinutes}min`}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={demoLoading !== null}
+                        onClick={() => enterDemo("colab")}
+                        className="inline-flex items-center justify-center gap-1.5 rounded-md bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-200 text-xs font-semibold py-2 transition disabled:opacity-50"
+                      >
+                        <UserIcon className="w-3.5 h-3.5" />
+                        {demoLoading === "colab" ? "..." : `Colab · ${demoMinutes}min`}
+                      </button>
+                    </div>
+                  </div>
+
                   <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
                     Não possui conta? Solicite acesso ao administrador da sua empresa.
                   </p>
+
 
                   {!isInstalled && (
                     <button
