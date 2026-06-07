@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import {
-  Clock, LayoutDashboard, Users, FileText, LogOut, User, MapPin, ScrollText, History,
+  Clock, LayoutDashboard, Users, FileText, LogOut, User, MapPin, ScrollText, History, SlidersHorizontal,
 } from "lucide-react";
 
 const navColaborador = [
@@ -17,6 +17,7 @@ const navAdmin = [
   { to: "/admin/colaboradores", label: "Colaboradores", icon: Users },
   { to: "/admin/folha", label: "Folha", icon: FileText },
   { to: "/admin/mapa", label: "Mapa Corporativo", icon: MapPin },
+  { to: "/admin/banco-horas/ajustes", label: "Ajustes de Banco de Horas", icon: SlidersHorizontal },
   { to: "/admin/logs", label: "Logs & Auditoria", icon: ScrollText },
 ];
 
