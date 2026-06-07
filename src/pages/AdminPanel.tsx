@@ -53,16 +53,18 @@ export default function AdminPanel() {
       const start = startOfDay(new Date()).toISOString();
       const last14 = new Date(); last14.setDate(last14.getDate() - 13); last14.setHours(0,0,0,0);
 
-      const [{ data: emps }, { data: todayPunches }, { data: monthPunches }, { data: recent }] = await Promise.all([
+      const [{ data: emps }, { data: todayPunches }, { data: monthPunches }, { data: recent }, { data: adminRoles }] = await Promise.all([
         supabase.from("profiles").select("id,nome_completo,horario_entrada,ativo"),
         supabase.from("punches").select("user_id,punch_type,punched_at").gte("punched_at", start),
         supabase.from("punches").select("punched_at").gte("punched_at", last14.toISOString()),
         supabase.from("punches")
           .select("id,user_id,punch_type,punched_at")
           .order("punched_at", { ascending: false }).limit(8),
+        supabase.from("user_roles").select("user_id").eq("role", "admin"),
       ]);
 
-      const ativos = (emps ?? []).filter((e: any) => e.ativo);
+      const adminIds = new Set((adminRoles ?? []).map((r: any) => r.user_id));
+      const ativos = (emps ?? []).filter((e: any) => e.ativo && !adminIds.has(e.id));
       const nameMap: Record<string, string> = Object.fromEntries(
         (emps ?? []).map((e: any) => [e.id, e.nome_completo ?? "Colaborador"]),
       );
