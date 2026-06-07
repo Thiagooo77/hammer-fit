@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Clock, MapPin, ShieldCheck, Lock, Smartphone, MoreVertical, Share, Plus, Monitor, Download, PlayCircle, Settings2, UserCog, User as UserIcon } from "lucide-react";
+import { Clock, MapPin, ShieldCheck, Lock, Smartphone, MoreVertical, Share, Plus, Monitor, Download, PlayCircle, Settings2, UserCog } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { startDemo } from "@/components/DemoBanner";
@@ -420,45 +420,24 @@ export default function Login() {
                           onChange={(e) => saveDemoCfg({ ...demoCfg, adminPass: e.target.value })}
                           className="w-full rounded border border-white/10 bg-black/40 px-2 py-1 outline-none focus:border-primary/60"
                         />
-                        <p className="text-muted-foreground/80 pt-1">Conta Colaborador (existente)</p>
-                        <input
-                          type="email" placeholder="colab@empresa.com"
-                          value={demoCfg.colabEmail || ""}
-                          onChange={(e) => saveDemoCfg({ ...demoCfg, colabEmail: e.target.value })}
-                          className="w-full rounded border border-white/10 bg-black/40 px-2 py-1 outline-none focus:border-primary/60"
-                        />
-                        <input
-                          type="password" placeholder="senha colaborador"
-                          value={demoCfg.colabPass || ""}
-                          onChange={(e) => saveDemoCfg({ ...demoCfg, colabPass: e.target.value })}
-                          className="w-full rounded border border-white/10 bg-black/40 px-2 py-1 outline-none focus:border-primary/60"
-                        />
+
+
                         <p className="text-[10px] text-muted-foreground/70 pt-1">
                           Salvo apenas neste navegador (localStorage).
                         </p>
                       </div>
                     )}
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        disabled={demoLoading !== null}
-                        onClick={() => enterDemo("admin")}
-                        className="inline-flex items-center justify-center gap-1.5 rounded-md bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-200 text-xs font-semibold py-2 transition disabled:opacity-50"
-                      >
-                        <UserCog className="w-3.5 h-3.5" />
-                        {demoLoading === "admin" ? "..." : `Admin · ${demoMinutes}min`}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={demoLoading !== null}
-                        onClick={() => enterDemo("colab")}
-                        className="inline-flex items-center justify-center gap-1.5 rounded-md bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-200 text-xs font-semibold py-2 transition disabled:opacity-50"
-                      >
-                        <UserIcon className="w-3.5 h-3.5" />
-                        {demoLoading === "colab" ? "..." : `Colab · ${demoMinutes}min`}
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      disabled={demoLoading !== null}
+                      onClick={() => enterDemo("admin")}
+                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-md bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-200 text-xs font-semibold py-2 transition disabled:opacity-50"
+                    >
+                      <UserCog className="w-3.5 h-3.5" />
+                      {demoLoading === "admin" ? "..." : `Entrar como Admin · ${demoMinutes}min`}
+                    </button>
+
                   </div>
 
                   <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
