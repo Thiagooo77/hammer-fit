@@ -253,6 +253,13 @@ export default function Colaboradores() {
                         {e.ativo ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
                         {e.ativo ? "Inativar" : "Ativar"}
                       </button>
+                      <button
+                        onClick={() => removeEmployee(e)}
+                        aria-label="Excluir colaborador"
+                        className="inline-flex items-center gap-1 rounded-md border border-destructive/40 text-destructive px-3 py-1.5 text-xs hover:bg-destructive/10 transition"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> Excluir
+                      </button>
                     </div>
                   </td>
                 </tr>
