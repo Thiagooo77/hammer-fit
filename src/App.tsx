@@ -23,6 +23,12 @@ const Admin = ({ children }: { children: React.ReactNode }) => (
   <ProtectedRoute requireRole="admin">{children}</ProtectedRoute>
 );
 
+const Colab = ({ children }: { children: React.ReactNode }) => {
+  const { isAdmin } = useAuth();
+  if (isAdmin) return <Navigate to="/admin" replace />;
+  return <>{children}</>;
+};
+
 function RootRedirect() {
   const { isAdmin } = useAuth();
   return <Navigate to={isAdmin ? "/admin" : "/dashboard"} replace />;
@@ -37,11 +43,11 @@ export default function App() {
 
         <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
           {/* Colaborador */}
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/ponto" element={<BaterPonto />} />
-          <Route path="/holerites" element={<Holerites />} />
-          <Route path="/banco-horas" element={<BancoHoras />} />
-          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/dashboard" element={<Colab><Dashboard /></Colab>} />
+          <Route path="/ponto" element={<Colab><BaterPonto /></Colab>} />
+          <Route path="/holerites" element={<Colab><Holerites /></Colab>} />
+          <Route path="/banco-horas" element={<Colab><BancoHoras /></Colab>} />
+          <Route path="/perfil" element={<Colab><Perfil /></Colab>} />
 
           {/* Admin */}
           <Route path="/admin" element={<Admin><AdminPanel /></Admin>} />
