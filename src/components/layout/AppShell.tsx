@@ -42,36 +42,17 @@ export default function AppShell() {
           </p>
         </div>
 
-        <nav className="flex-1 px-3 py-4 space-y-4 overflow-y-auto">
-          {isAdmin && (
-            <div>
-              <p className="px-3 mb-1 text-[10px] uppercase tracking-widest text-muted-foreground">Administração</p>
-              <div className="space-y-1">
-                {navAdmin.map(({ to, label, icon: Icon }) => (
-                  <NavLink key={to} to={to} end
-                    className={({ isActive }) =>
-                      `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition ${
-                        isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                      }`}>
-                    <Icon className="w-4 h-4" />{label}
-                  </NavLink>
-                ))}
-              </div>
-            </div>
-          )}
-          <div>
-            <p className="px-3 mb-1 text-[10px] uppercase tracking-widest text-muted-foreground">Colaborador</p>
-            <div className="space-y-1">
-              {navColaborador.map(({ to, label, icon: Icon }) => (
-                <NavLink key={to} to={to} end
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition ${
-                      isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    }`}>
-                  <Icon className="w-4 h-4" />{label}
-                </NavLink>
-              ))}
-            </div>
+        <nav className="flex-1 px-3 py-4 overflow-y-auto">
+          <div className="space-y-1">
+            {(isAdmin ? navAdmin : navColaborador).map(({ to, label, icon: Icon }) => (
+              <NavLink key={to} to={to} end
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition ${
+                    isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  }`}>
+                <Icon className="w-4 h-4" />{label}
+              </NavLink>
+            ))}
           </div>
         </nav>
 
