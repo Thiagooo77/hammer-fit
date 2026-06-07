@@ -109,7 +109,49 @@
 .login-toast { animation: login-toast 6s ease-in-out infinite; }
 .login-clock-hand { transform-origin: 50% 100%; animation: login-clock-hand linear infinite; }
 
+/* Aurora */
+@keyframes login-aurora {
+  0%, 100% { transform: translate3d(-10%, -5%, 0) rotate(0deg); opacity: 0.55; }
+  50% { transform: translate3d(8%, 6%, 0) rotate(8deg); opacity: 0.85; }
+}
+.login-aurora {
+  position: absolute; inset: -20%;
+  background:
+    radial-gradient(40% 30% at 30% 30%, oklch(0.68 0.18 260 / 0.35), transparent 70%),
+    radial-gradient(35% 25% at 70% 40%, oklch(0.62 0.2 290 / 0.32), transparent 70%),
+    radial-gradient(30% 25% at 50% 70%, oklch(0.7 0.16 220 / 0.28), transparent 70%);
+  filter: blur(60px);
+  animation: login-aurora 24s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Partículas premium */
+@keyframes login-particle {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 0.9; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-110vh) translateX(var(--tx, 0px)); opacity: 0; }
+}
+.login-particle {
+  position: absolute; bottom: -10px; width: 3px; height: 3px; border-radius: 9999px;
+  background: oklch(0.85 0.12 260 / 0.9);
+  box-shadow: 0 0 8px oklch(0.78 0.18 260 / 0.8);
+  animation: login-particle linear infinite;
+  will-change: transform, opacity;
+}
+
+/* Logo glow */
+@keyframes login-logo-glow {
+  0%, 100% { box-shadow: 0 8px 24px -8px oklch(0.7 0.18 260 / 0.6), 0 0 0 0 oklch(0.7 0.18 260 / 0.35); }
+  50% { box-shadow: 0 12px 32px -8px oklch(0.7 0.18 260 / 0.9), 0 0 0 10px oklch(0.7 0.18 260 / 0); }
+}
+.login-logo-glow { animation: login-logo-glow 3.5s ease-in-out infinite; }
+
+/* Parallax layer */
+.login-parallax { transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1); will-change: transform; }
+
 @media (prefers-reduced-motion: reduce) {
-  .login-gradient-blob, .login-line, .login-node, .login-shine::before, .login-toast, .login-clock-hand { animation: none !important; }
+  .login-gradient-blob, .login-line, .login-node, .login-shine::before, .login-toast, .login-clock-hand,
+  .login-aurora, .login-particle, .login-logo-glow, .login-parallax { animation: none !important; transition: none !important; }
 }
 

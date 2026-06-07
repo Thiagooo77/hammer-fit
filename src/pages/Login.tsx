@@ -13,7 +13,21 @@ export default function Login() {
   const navigate = useNavigate();
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [parallax, setParallax] = useState({ x: 0, y: 0 });
   const isDesktop = typeof window !== "undefined" && window.matchMedia?.("(min-width: 1024px)").matches;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia?.("(max-width: 767px)").matches) return;
+    const onMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      setParallax({ x, y });
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => window.removeEventListener("mousemove", onMove);
+  }, []);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -81,10 +95,39 @@ export default function Login() {
         {/* Gradiente base corporativo */}
         <div className="absolute inset-0 bg-gradient-to-br from-[oklch(0.14_0.02_260)] via-[oklch(0.12_0.015_255)] to-[oklch(0.10_0.02_240)]" />
 
-        {/* Gradientes em movimento contínuo */}
-        <div className="login-gradient-blob absolute -top-32 -left-32 h-[560px] w-[560px] rounded-full bg-primary/25 blur-[120px]" style={{ animationDelay: "0s" }} />
-        <div className="login-gradient-blob absolute top-1/3 -right-40 h-[600px] w-[600px] rounded-full bg-[oklch(0.5_0.18_240)]/30 blur-[140px]" style={{ animationDelay: "-6s" }} />
-        <div className="login-gradient-blob absolute -bottom-40 left-1/3 h-[520px] w-[520px] rounded-full bg-[oklch(0.45_0.15_270)]/20 blur-[130px]" style={{ animationDelay: "-12s" }} />
+        {/* Aurora boreal */}
+        <div className="login-aurora login-parallax" style={{ transform: `translate3d(${parallax.x * -14}px, ${parallax.y * -10}px, 0)` }} />
+
+        {/* Gradientes em movimento contínuo (com parallax) */}
+        <div className="login-gradient-blob login-parallax absolute -top-32 -left-32 h-[560px] w-[560px] rounded-full bg-primary/25 blur-[120px]" style={{ animationDelay: "0s", transform: `translate3d(${parallax.x * 18}px, ${parallax.y * 14}px, 0)` }} />
+        <div className="login-gradient-blob login-parallax absolute top-1/3 -right-40 h-[600px] w-[600px] rounded-full bg-[oklch(0.5_0.18_240)]/30 blur-[140px]" style={{ animationDelay: "-6s", transform: `translate3d(${parallax.x * -22}px, ${parallax.y * -12}px, 0)` }} />
+        <div className="login-gradient-blob login-parallax absolute -bottom-40 left-1/3 h-[520px] w-[520px] rounded-full bg-[oklch(0.45_0.15_270)]/20 blur-[130px]" style={{ animationDelay: "-12s", transform: `translate3d(${parallax.x * 12}px, ${parallax.y * -18}px, 0)` }} />
+
+        {/* Partículas premium */}
+        <div className="absolute inset-0 overflow-hidden hidden sm:block">
+          {Array.from({ length: 18 }).map((_, i) => {
+            const left = (i * 53) % 100;
+            const duration = 18 + ((i * 7) % 22);
+            const delay = -((i * 3) % 20);
+            const tx = ((i % 5) - 2) * 24;
+            const size = 2 + (i % 3);
+            return (
+              <span
+                key={`p${i}`}
+                className="login-particle"
+                style={{
+                  left: `${left}%`,
+                  animationDuration: `${duration}s`,
+                  animationDelay: `${delay}s`,
+                  width: `${size}px`,
+                  height: `${size}px`,
+                  ["--tx" as any]: `${tx}px`,
+                }}
+              />
+            );
+          })}
+        </div>
+
 
         {/* Grid tecnológico */}
         <div
@@ -380,7 +423,7 @@ function LogoMark({ size = "md" }: { size?: "md" | "lg" }) {
   const s = size === "lg" ? "size-10" : "size-8";
   return (
     <div
-      className={`${s} relative inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[oklch(0.55_0.2_280)] shadow-[0_8px_24px_-8px_oklch(0.7_0.18_260/0.6)]`}
+      className={`${s} login-logo-glow relative inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[oklch(0.55_0.2_280)]`}
       aria-hidden
     >
       <Clock className="absolute w-4 h-4 text-white/90" strokeWidth={2.5} />
