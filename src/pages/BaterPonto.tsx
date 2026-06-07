@@ -89,10 +89,52 @@ function todayRange() {
   return { start: start.toISOString(), end: end.toISOString() };
 }
 
+// Tolerância (em minutos) para cada batida em relação ao horário do colaborador
+const TOLERANCE_MIN: Record<PunchType, { before: number; after: number }> = {
+  entrada:        { before: 15, after: 480 }, // até 15 min antes; durante a jornada inteira
+  almoco_saida:   { before: 60, after: 480 }, // qualquer momento durante a jornada
+  almoco_retorno: { before: 60, after: 480 },
+  saida:          { before: 60, after: 60 },  // até 1h depois do fim do expediente
+};
+
+function parseHM(s: string): { h: number; m: number } {
+  const [h, m] = s.split(":").map(Number);
+  return { h: h || 0, m: m || 0 };
+}
+
+function minutesOfDay(d: Date) { return d.getHours() * 60 + d.getMinutes(); }
+
+function checkSchedule(
+  type: PunchType,
+  now: Date,
+  entrada: string | null,
+  saida: string | null,
+): { ok: boolean; message?: string } {
+  if (!entrada || !saida) return { ok: true }; // sem horário cadastrado: não bloqueia
+  const e = parseHM(entrada); const s = parseHM(saida);
+  const startMin = e.h * 60 + e.m;
+  const endMin = s.h * 60 + s.m;
+  const nowMin = minutesOfDay(now);
+  const tol = TOLERANCE_MIN[type];
+
+  const windowStart = type === "saida" ? endMin - tol.before : startMin - tol.before;
+  const windowEnd   = type === "saida" ? endMin + tol.after  : endMin + (type === "entrada" ? 0 : tol.after);
+
+  if (nowMin < windowStart || nowMin > windowEnd) {
+    const fmt = (m: number) => `${String(Math.floor(((m % 1440) + 1440) % 1440 / 60)).padStart(2, "0")}:${String(((m % 60) + 60) % 60).padStart(2, "0")}`;
+    return {
+      ok: false,
+      message: `Fora do horário permitido para ${TYPE_LABELS[type]}. Janela: ${fmt(windowStart)}–${fmt(windowEnd)}.`,
+    };
+  }
+  return { ok: true };
+}
+
 export default function BaterPonto() {
   const [today, setToday] = useState<Punch[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(new Date());
+  const [schedule, setSchedule] = useState<{ entrada: string | null; saida: string | null }>({ entrada: null, saida: null });
 
   // confirmation flow
   const [pending, setPending] = useState<{ type: PunchType; coords: Coords; address: string | null } | null>(null);
@@ -108,15 +150,26 @@ export default function BaterPonto() {
     const { start, end } = todayRange();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setLoading(false); return; }
-    const { data, error } = await supabase
-      .from("punches")
-      .select("id,punch_type,punched_at,address,latitude,longitude")
-      .eq("user_id", user.id)
-      .gte("punched_at", start)
-      .lte("punched_at", end)
-      .order("punched_at", { ascending: true });
+    const [{ data, error }, { data: prof }] = await Promise.all([
+      supabase
+        .from("punches")
+        .select("id,punch_type,punched_at,address,latitude,longitude")
+        .eq("user_id", user.id)
+        .gte("punched_at", start)
+        .lte("punched_at", end)
+        .order("punched_at", { ascending: true }),
+      supabase
+        .from("profiles")
+        .select("horario_entrada,horario_saida")
+        .eq("id", user.id)
+        .single(),
+    ]);
     if (error) toast.error(error.message);
     setToday((data as Punch[]) ?? []);
+    setSchedule({
+      entrada: (prof?.horario_entrada as string | null) ?? null,
+      saida: (prof?.horario_saida as string | null) ?? null,
+    });
     setLoading(false);
   };
 
@@ -126,6 +179,11 @@ export default function BaterPonto() {
   const nextType = ORDER.find((t) => !doneTypes.has(t)) ?? null;
 
   const startPunch = async (type: PunchType) => {
+    const check = checkSchedule(type, new Date(), schedule.entrada, schedule.saida);
+    if (!check.ok) {
+      toast.error(check.message!, { duration: 5000 });
+      return;
+    }
     setBusy(true);
     try {
       toast.loading("Obtendo localização...", { id: "geo" });
@@ -208,6 +266,9 @@ export default function BaterPonto() {
           <span>
             <span className="font-medium text-foreground">Endereço autorizado:</span> {OFFICE.address}
             <span className="block mt-0.5">Raio permitido: {OFFICE.radiusMeters}m.</span>
+            {schedule.entrada && schedule.saida && (
+              <span className="block mt-0.5">Horário permitido: {schedule.entrada.slice(0,5)} às {schedule.saida.slice(0,5)}.</span>
+            )}
           </span>
         </div>
       </header>
