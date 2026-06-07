@@ -47,6 +47,9 @@ export default function Folha() {
   const [employees, setEmployees] = useState<EmployeeOpt[]>([]);
   const [pickedIds, setPickedIds] = useState<string[]>([]);
   const [mode, setMode] = useState<"all" | "some">("all");
+  const [discountFaltas, setDiscountFaltas] = useState(false);
+  const [daysInMonth, setDaysInMonth] = useState(30);
+  const [faltasPreview, setFaltasPreview] = useState<Record<string, number>>({});
 
   const loadCycles = async () => {
     const { data } = await supabase.from("payroll_cycles").select("*").order("start_date", { ascending: false });
@@ -69,14 +72,21 @@ export default function Folha() {
   useEffect(() => { if (selected) loadPayslips(selected.id); }, [selected]);
 
   const openCloseDialog = async () => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("id,nome_completo,email,cargo")
-      .eq("ativo", true)
-      .order("nome_completo", { ascending: true });
-    setEmployees((data as EmployeeOpt[]) ?? []);
+    const d = defaultCycle();
+    const [{ data: emps }, { data: decs }] = await Promise.all([
+      supabase.from("profiles").select("id,nome_completo,email,cargo").eq("ativo", true).order("nome_completo", { ascending: true }),
+      supabase.from("attendance_decisions").select("user_id")
+        .eq("decision", "falta")
+        .gte("reference_date", d.start_date).lte("reference_date", d.end_date),
+    ]);
+    setEmployees((emps as EmployeeOpt[]) ?? []);
+    const map: Record<string, number> = {};
+    for (const r of (decs ?? []) as any[]) map[r.user_id] = (map[r.user_id] ?? 0) + 1;
+    setFaltasPreview(map);
     setPickedIds([]);
     setMode("all");
+    setDiscountFaltas(false);
+    setDaysInMonth(30);
     setCloseOpen(true);
   };
 
@@ -85,6 +95,8 @@ export default function Folha() {
     if (mode === "some" && pickedIds.length === 0) return toast.error("Selecione ao menos um funcionário");
     setBusy(true);
     const body: any = { ...d };
+    if (mode === "some") body.user_ids = pickedIds;
+    const body: any = { ...d, discount_faltas: discountFaltas, days_in_month: daysInMonth };
     if (mode === "some") body.user_ids = pickedIds;
     const { data, error } = await supabase.functions.invoke("close-payroll", { body });
     setBusy(false);
